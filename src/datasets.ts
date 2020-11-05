@@ -3,9 +3,9 @@
 import * as d3 from "d3";
 
 export type Dataset2D = {
-    x: number,
-    y: number,
-    label: number
+    x1: number,
+    x2: number,
+    y: number
 };
 
 export class Datasets {
@@ -26,13 +26,12 @@ export function generateTwoGaussianData(numSamples: number, noise: number): Data
      * @param cy Mean of distribution along y
      * @param variance Variance of distribution
      */
-    function generateGaussianData(cx: number, cy: number, label: number) {
+    function generateGaussianData(cx1: number, cx2: number, y: number) {
         // Workiung with an -8, 8 grid non-variable for the forseeable future
         for(let i = 0; i < numSamples/2; i++) {
-            let x = normalDistribution(cx, variance);
-            let y = normalDistribution(cy, variance);
-            console.log(x)
-            samples.push({x: x, y: y, label: label})
+            let x1 = normalDistribution(cx1, variance);
+            let x2 = normalDistribution(cx2, variance);
+            samples.push({x1: x1, x2: x2, y: y})
         }
     }
 

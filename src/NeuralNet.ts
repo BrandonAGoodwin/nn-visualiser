@@ -12,6 +12,8 @@ export class Node {
     bias: number = 0;
     output: number = 0;
 
+    outputDerivative: number = 0;
+
     constructor(id: string, activationFunction: ActivationFunction){
         this.id = id;
         this.activationFunction = activationFunction;
@@ -122,6 +124,41 @@ export function generateNetwork(
         }
     }
 
-
     return network;
+}
+
+export function forwardPropagate(network: Node[][], inputs: number[]) : number {
+    let numLayers = network.length;
+    let inputLayer = network[0];
+    let outputlayer = network[numLayers - 1];
+
+    for(let i = 0; i < inputLayer.length; i++) {
+        if(inputLayer.length != inputs.length) {
+             // Check the number of inputs is equal to the number of nodes in the first layer
+            throw new Error("Then number of inputs should equal the number of input neurons");
+        }
+        let node = inputLayer[i];
+        node.output = inputs[i];
+    }
+
+    for(let layerNum = 1; layerNum < numLayers; layerNum++) {
+        let currentLayer = network[layerNum];
+        for(let i = 0; i < currentLayer.length; i++) {
+            let node = currentLayer[i];
+            node.updateOutput();
+        }
+    }
+
+    return outputlayer[0].output;
+}
+
+/**
+ * Back propagation algorithm.
+ * @param network The neural network to run backprogation on.
+ * @param costFunction The cost function used to determing how well the neural network performs.
+ * @param y The expected out put of the neural network.
+ */
+export function backPropagate(network: Node[][], costFunction: CostFunction, y: number): void {
+    let outputNode = network[network.length][0];
+    outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
 }
