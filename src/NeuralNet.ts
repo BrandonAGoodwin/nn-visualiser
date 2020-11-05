@@ -7,10 +7,10 @@ export class Node {
     linksIn: Link[] = [];
     linksOut: Link[] = [];
 
-    totalInput: number;
+    totalInput: number = 0;
 
-    bias: number;
-    output: number;
+    bias: number = 0;
+    output: number = 0;
 
     constructor(id: string, activationFunction: ActivationFunction){
         this.id = id;
@@ -95,7 +95,7 @@ export function generateNetwork(
     let id = 1;
 
     for(let layerNum = 0; layerNum < numlayers; layerNum++) {
-        let currentLayer: Node[];
+        let currentLayer: Node[] = [];
 
         network.push(currentLayer);
 
