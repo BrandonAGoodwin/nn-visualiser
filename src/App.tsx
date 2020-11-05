@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import BarChart from './BarChart'
 
@@ -22,7 +21,7 @@ function App() {
         </a>
         
       </header> */}
-      <div id="scatterplot"></div>
+      {/* <div id="scatterplot"></div> */}
       <BarChart/>
     </div>
   );
