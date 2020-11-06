@@ -1,7 +1,6 @@
 
 /** Represents a node in the neural network. */
 export class Node {
-    
     id: string;
     activationFunction: ActivationFunction;
 
@@ -12,18 +11,15 @@ export class Node {
 
     bias: number = 0;
     output: number = 0;
-    
-    /** AKA dc/da */
+
     outputDerivative: number = 0;
-    /** AKA delta */
-    inputDerivative: number = 0;
 
     constructor(id: string, activationFunction: ActivationFunction){
         this.id = id;
         this.activationFunction = activationFunction;
     }
 
-    // Figure out what happens for input layer (maybe make sure this doesn't get called)
+    // Figure out what happens for input layer (maybe make suyre this doesn't get called)
     updateOutput(): number {
         this.totalInput = this.bias;
         for(let i = 0; i < this.linksIn.length; i++) {
@@ -164,22 +160,5 @@ export function forwardPropagate(network: Node[][], inputs: number[]) : number {
  */
 export function backPropagate(network: Node[][], costFunction: CostFunction, y: number): void {
     let outputNode = network[network.length][0];
-    //outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
-    // outputDerivative = dc/dz = dc/dz . phi_d(z)
-    outputNode.outputDerivative = costFunction.derivative(outputNode.output, y) * outputNode.activationFunction.derivative(outputNode.totalInput)
-
-    for(let layerNum = network.length - 2; layerNum > 0; layerNum--) {
-        let currentLayer = network[layerNum];
-        for(let i = 0; i < network[layerNum].length; i++) {
-            let node = currentLayer[i];
-
-            let acc = 0.0;
-            let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.outputDerivative;
-            
-            node.linksOut.forEach(f)
-
-            outputNode.inputDerivative = node.outputDerivative * node.activationFunction.derivative(node.totalInput) * acc;
-            
-        }
-    }
+    outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
 }
