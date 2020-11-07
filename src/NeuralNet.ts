@@ -3,20 +3,29 @@
 export class Node {
     
     id: string;
+    /** AKA phi(x) */
     activationFunction: ActivationFunction;
 
     linksIn: Link[] = [];
     linksOut: Link[] = [];
 
+    /** AKA z = phi(a) */
     totalInput: number = 0;
 
+    /** AKA b */
     bias: number = 0;
+    /** AKA a */
     output: number = 0;
     
     /** AKA dc/da */
     outputDerivative: number = 0;
     /** AKA delta */
     inputDerivative: number = 0;
+
+    /** AKA dc/dw = delta^l . a^l-1 */
+    dw: number = 0;
+    /** AKA dc/db =  delta^l */
+    db: number = 0;
 
     constructor(id: string, activationFunction: ActivationFunction){
         this.id = id;
@@ -71,14 +80,26 @@ export class Costs {
  * (for now weights are initialised to 0)
  */
 export class Link {
+    /** Linked node in the previous layer. */
     source: Node;
+    /** Linked node in the next layer. */
     dest: Node;
+
+    /** Weight associated to this link.
+     *  AKA w
+     */
     weight: number;
+    /** Accumulated derivatives */
+    derAcc: number;
+    /** Number of accumulated derivatives */
+    noAccDer: number;
 
     constructor(source: Node, dest: Node) {
         this.source = source;
         this.dest = dest;
         this.weight = 0.0;
+        this.derAcc = 0.0;
+        this.noAccDer = 0;
     }
 }
 
@@ -137,7 +158,7 @@ export function forwardPropagate(network: Node[][], inputs: number[]) : number {
     let outputlayer = network[numLayers - 1];
 
     for(let i = 0; i < inputLayer.length; i++) {
-        if(inputLayer.length != inputs.length) {
+        if(inputLayer.length !== inputs.length) {
              // Check the number of inputs is equal to the number of nodes in the first layer
             throw new Error("Then number of inputs should equal the number of input neurons");
         }
@@ -166,20 +187,27 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
     let outputNode = network[network.length][0];
     //outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
     // outputDerivative = dc/dz = dc/dz . phi_d(z)
-    outputNode.outputDerivative = costFunction.derivative(outputNode.output, y) * outputNode.activationFunction.derivative(outputNode.totalInput)
+    outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
+    outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput)
 
     for(let layerNum = network.length - 2; layerNum > 0; layerNum--) {
         let currentLayer = network[layerNum];
         for(let i = 0; i < network[layerNum].length; i++) {
             let node = currentLayer[i];
 
-            let acc = 0.0;
-            let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.outputDerivative;
+            // let acc = 0.0;
+            // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
             
-            node.linksOut.forEach(f)
+            // node.linksOutput.forEach(f)
 
-            outputNode.inputDerivative = node.outputDerivative * node.activationFunction.derivative(node.totalInput) * acc;
-            
+            // outputNode.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
+            let acc = 0.0;
+            for(let j = 0; j < node.linksIn.length; j++) {
+                let link = node.linksIn[j];
+                
+            }
+
+            //outputNode.dw = outputNode.inputDerivative * outputNode.
         }
     }
 }
