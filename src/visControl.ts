@@ -33,8 +33,8 @@ export function start(networkShape: number[], inputIds: string[]): nn.Node[][] {
     // GenerateInputId's might beable to come back in here
 
     let network = nn.generateNetwork(networkShape, nn.Activations.SIGMOID, inputIds);
-
-    console.log(network);
+    let network2 = nn.generateNetwork(networkShape, nn.Activations.SIGMOID, inputIds);
+    console.log(network2);
 
     return network;
 }
@@ -42,7 +42,7 @@ export function start(networkShape: number[], inputIds: string[]): nn.Node[][] {
 //export function step()
 
 export function get2GaussDist(): Dataset2D[] {
-    let dataset = generateTwoGaussianData(200, 0);
+    let dataset = generateTwoGaussianData(20, 0);
     console.log(dataset);
     //trainingData = dataset;
     return dataset;
@@ -67,8 +67,20 @@ export function step(network: nn.Node[][], trainingData: Dataset2D[]): void {
     for(let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
         nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2));
-        nn.backPropagate(network, nn.Costs.SQUARE, sample.y)
+        nn.backPropagate(network, nn.Costs.SQUARE, sample.y);
     }
+    nn.train(network, 0.03);
+
+}
+
+export function getCost(network: nn.Node[][], data: Dataset2D[]/* , costFunction: nn.CostFunction */): number {
+    let totalCost = 0;
+    for(let i = 0; i < data.length; i++) {
+        let dataPoint = data[i];
+        totalCost += nn.Costs.SQUARE.cost(nn.forwardPropagate(network, constructInputs(dataPoint.x1, dataPoint.x2)), dataPoint.y);
+    }
+    
+    return totalCost;
 }
 
 export function reset(): void { 

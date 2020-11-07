@@ -63,7 +63,13 @@ class BarChart extends Component {
         }
     
     test() {
-        vis.step(this.network, this.gausData);
+        console.log(vis.getCost(this.network, this.gausData))
+        for(let i = 0; i < 1000; i++) {
+            console.log("Stttep")
+            vis.step(this.network, this.gausData);
+        }
+        console.log(this.network)
+        console.log(vis.getCost(this.network, this.gausData))
     }
 
     render() { return <div ref={this.canvas}></div> }
