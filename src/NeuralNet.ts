@@ -20,7 +20,7 @@ export class Node {
     totalInput: number = 0.0;
 
     /** AKA b */
-    bias: number = 0.5;
+    bias: number = 0.0;
     /** AKA a */
     output: number = 0.0;
     
@@ -112,7 +112,7 @@ export class Link {
     constructor(source: Node, dest: Node) {
         this.source = source;
         this.dest = dest;
-        this.weight = 0.5;
+        this.weight = 0.0;
         this.derAcc = 0.0;
         this.noAccDer = 0.0;
     }
@@ -290,4 +290,15 @@ export function train(network: Node[][], learningRate: number) {
     }
 }
 
-// export function forEachNode() <T> {}
+export function forEachNode(network: Node[][], f: (node: Node) => void, ignoreInputs?: boolean): void {
+    for(let layerNum = ignoreInputs ? 1 : 0; layerNum < network.length; layerNum++) {
+        let currentLayer = network[layerNum];
+        for(let i = 0; i < currentLayer.length; i++) {
+            f(currentLayer[i]);
+        }
+    }
+}
+
+export function getOutputNode(network: Node[][]): Node {
+    return network[network.length - 1][0];
+}
