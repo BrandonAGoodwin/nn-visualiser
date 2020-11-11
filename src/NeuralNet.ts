@@ -3,7 +3,7 @@ import { Dataset2D } from "./datasets";
 
 /** Represents a node in the neural network. */
 export class Node {
-    
+
     // Standardise no and num usage
 
 
@@ -23,7 +23,7 @@ export class Node {
     bias: number = 0.0;
     /** AKA a */
     output: number = 0.0;
-    
+
     /** AKA dc/da */
     outputDerivative: number = 0.0;
     /** AKA delta */
@@ -41,7 +41,7 @@ export class Node {
     /** AKA dc/db =  delta^l */
     db: number = 0;
 
-    constructor(id: string, activationFunction: ActivationFunction){
+    constructor(id: string, activationFunction: ActivationFunction) {
         this.id = id;
         this.activationFunction = activationFunction;
     }
@@ -50,8 +50,8 @@ export class Node {
     updateOutput(): number {
         let prevOutput = this.output;
         this.totalInput = this.bias;
-        for(let i = 0; i < this.linksIn.length; i++) {
-            this.totalInput += this.linksIn[i].weight * this.linksIn[i].source.output; 
+        for (let i = 0; i < this.linksIn.length; i++) {
+            this.totalInput += this.linksIn[i].weight * this.linksIn[i].source.output;
         }
 
         this.output = this.activationFunction.output(this.totalInput);
@@ -87,7 +87,7 @@ export class Activations {
 }
 
 /** Built in cost functions (Only using SQUARE for now) */
-export class Costs { 
+export class Costs {
     public static SQUARE: CostFunction = {
         cost: (output: number, y: number) => 0.5 * Math.pow(output - y, 2),
         derivative: (output: number, y: number) => output - y
@@ -140,7 +140,7 @@ export function generateNetwork(
 
     let id = 1;
 
-    for(let layerNum = 0; layerNum < numlayers; layerNum++) {
+    for (let layerNum = 0; layerNum < numlayers; layerNum++) {
         let currentLayer: Node[] = [];
 
         network.push(currentLayer);
@@ -148,16 +148,16 @@ export function generateNetwork(
         let numNodes = networkShape[layerNum];
         let isInputLayer = layerNum === 0;
 
-        for(let i = 0; i < numNodes; i++) {
+        for (let i = 0; i < numNodes; i++) {
             let nodeId = isInputLayer ? inputIds[i] : (id++).toString();
 
             let node = new Node(nodeId, activationFunction);
             currentLayer.push(node);
 
-            if(!isInputLayer) {
+            if (!isInputLayer) {
                 // Link nodes from previous layer
                 let prevLayer = network[layerNum - 1]
-                for(let j = 0; j < prevLayer.length; j++) {
+                for (let j = 0; j < prevLayer.length; j++) {
                     let prevNode = prevLayer[j];
                     let link = new Link(prevNode, node);
                     prevNode.linksOut.push(link);
@@ -170,23 +170,23 @@ export function generateNetwork(
     return network;
 }
 
-export function forwardPropagate(network: Node[][], inputs: number[]) : number {
+export function forwardPropagate(network: Node[][], inputs: number[]): number {
     let numLayers = network.length;
     let inputLayer = network[0];
     let outputlayer = network[numLayers - 1];
 
-    for(let i = 0; i < inputLayer.length; i++) {
-        if(inputLayer.length !== inputs.length) {
-             // Check the number of inputs is equal to the number of nodes in the first layer
+    for (let i = 0; i < inputLayer.length; i++) {
+        if (inputLayer.length !== inputs.length) {
+            // Check the number of inputs is equal to the number of nodes in the first layer
             throw new Error("Then number of inputs should equal the number of input neurons");
         }
         let node = inputLayer[i];
         node.output = inputs[i];
     }
 
-    for(let layerNum = 1; layerNum < numLayers; layerNum++) {
+    for (let layerNum = 1; layerNum < numLayers; layerNum++) {
         let currentLayer = network[layerNum];
-        for(let i = 0; i < currentLayer.length; i++) {
+        for (let i = 0; i < currentLayer.length; i++) {
             let node = currentLayer[i];
             node.updateOutput();
         }
@@ -205,7 +205,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
 
     // Special Case: Last Layer (Single output node) /////////////////////////////////////////
 
-    let outputNode = network[network.length-1][0];
+    let outputNode = network[network.length - 1][0];
     // outputDerivative = dc/da
     outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
     // inputDerivative = dc/dz = dc/da . phi_d(z)
@@ -214,26 +214,26 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
     outputNode.accInputDererivatives += outputNode.inputDerivative;
     outputNode.numInputDerivatives++;
 
-    for(let i = 0; i < outputNode.linksIn.length; i++) {
+    for (let i = 0; i < outputNode.linksIn.length; i++) {
         let outputNodeLink = outputNode.linksIn[i];
         outputNodeLink.derAcc += outputNodeLink.source.output * outputNode.inputDerivative;
         outputNodeLink.noAccDer++;
     }
-    
+
     // General Case: Hidden Layers //////////////////////////////////////////////////////////
-    
+
     // Tinker with layerNum > 1
-    for(let layerNum = network.length - 1; layerNum > 0; layerNum--) {
+    for (let layerNum = network.length - 1; layerNum > 0; layerNum--) {
         let currentLayer = network[layerNum];
-        for(let i = 0; i < network[layerNum].length; i++) {
+        for (let i = 0; i < network[layerNum].length; i++) {
             let node = currentLayer[i];
 
             // let acc = 0.0;
             // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
-            
+
             // node.linksIn.forEach(f);
 
-            node.inputDerivative = node.outputDerivative *  node.activationFunction.derivative(outputNode.totalInput);
+            node.inputDerivative = node.outputDerivative * node.activationFunction.derivative(outputNode.totalInput);
             //node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
 
             // For average in gradient decent
@@ -241,7 +241,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
             node.numInputDerivatives++;
 
             // dc/dw for each weight comming in
-            for(let j = 0; j <  node.linksIn.length; j++) {
+            for (let j = 0; j < node.linksIn.length; j++) {
                 let link = node.linksIn[j];
                 link.derAcc += link.source.output * node.inputDerivative;
                 link.noAccDer++;
@@ -252,23 +252,23 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
             // let acc = 0.0;
             // for(let j = 0; j < node.linksIn.length; j++) {
             //     let link = node.linksIn[j];
-                
+
             // }
 
             //outputNode.dw = outputNode.inputDerivative * outputNode.
         }
         let previousLayer = network[layerNum - 1];
-        for(let i = 0; i < previousLayer.length; i++) {
+        for (let i = 0; i < previousLayer.length; i++) {
             let node = previousLayer[i];
             // Compute the error derivative with respect to each node's output.
             node.outputDerivative = 0;
-            for(let j = 0; j < node.linksOut.length; j++) {
+            for (let j = 0; j < node.linksOut.length; j++) {
                 let link = node.linksOut[j];
                 node.outputDerivative += link.dest.inputDerivative * link.weight;
             }
-        }   
+        }
     }
-    
+
 }
 
 /**
@@ -280,13 +280,13 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
  */
 export function train(network: Node[][], learningRate: number) {
 
-    for(let layerNum = 1; layerNum < network.length-1; layerNum++) {
-        
+    for (let layerNum = 1; layerNum < network.length - 1; layerNum++) {
+
         let currentLayer = network[layerNum];
-        for(let i = 0; i < currentLayer.length; i++) {
+        for (let i = 0; i < currentLayer.length; i++) {
             let node = currentLayer[i];
 
-            for(let j = 0; j < node.linksIn.length; j++) {
+            for (let j = 0; j < node.linksIn.length; j++) {
                 let link = node.linksIn[j];
 
                 let averageWeightGradient = link.derAcc / link.noAccDer;
@@ -296,10 +296,10 @@ export function train(network: Node[][], learningRate: number) {
                 link.derAcc = 0.0;
                 link.noAccDer = 0.0;
             }
-            
+
             let averageBiasGradient = node.accInputDererivatives / node.numInputDerivatives;
             //console.log(`AVARAGEIASGDEINT = ${averageBiasGradient}\nNUMBIASSES = ${node.numInputDerivatives}`)
-            
+
             node.bias = node.bias - (learningRate * averageBiasGradient);
 
             node.accInputDererivatives = 0.0;
@@ -310,9 +310,9 @@ export function train(network: Node[][], learningRate: number) {
 }
 
 export function forEachNode(network: Node[][], f: (node: Node) => void, ignoreInputs?: boolean): void {
-    for(let layerNum = ignoreInputs ? 1 : 0; layerNum < network.length; layerNum++) {
+    for (let layerNum = ignoreInputs ? 1 : 0; layerNum < network.length; layerNum++) {
         let currentLayer = network[layerNum];
-        for(let i = 0; i < currentLayer.length; i++) {
+        for (let i = 0; i < currentLayer.length; i++) {
             f(currentLayer[i]);
         }
     }
@@ -346,9 +346,9 @@ export function getOutputNode(network: Node[][]): Node {
 //         outputNodeLink.derAcc += outputNodeLink.source.output * outputNode.inputDerivative;
 //         outputNodeLink.noAccDer++;
 //     }
-    
+
 //     // General Case: Hidden Layers //////////////////////////////////////////////////////////
-    
+
 //     // Tinker with layerNum > 1
 //     for(let layerNum = network.length - 1; layerNum > 0; layerNum--) {
 //         let currentLayer = network[layerNum];
@@ -358,7 +358,7 @@ export function getOutputNode(network: Node[][]): Node {
 
 //             // let acc = 0.0;
 //             // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
-            
+
 //             // node.linksOut.forEach(f);
 
 //             node.inputDerivative = node.outputDerivative *  node.activationFunction.derivative(outputNode.totalInput);
@@ -381,7 +381,7 @@ export function getOutputNode(network: Node[][]): Node {
 //             // let acc = 0.0;
 //             // for(let j = 0; j < node.linksIn.length; j++) {
 //             //     let link = node.linksIn[j];
-                
+
 //             // }
 
 //             //outputNode.dw = outputNode.inputDerivative * outputNode.
@@ -397,7 +397,7 @@ export function getOutputNode(network: Node[][]): Node {
 //         }
 //         for(let i = 0; i < currentLayer.length; i++) {
 //             node = currentLayer[i];
-            
+
 //         }
 //     }
 

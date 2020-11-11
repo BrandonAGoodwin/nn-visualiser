@@ -22,7 +22,7 @@ function App() {
         
       </header> */}
       {/* <div id="scatterplot"></div> */}
-      <BarChart/>
+      <BarChart />
     </div>
   );
 }

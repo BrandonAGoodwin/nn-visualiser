@@ -28,15 +28,15 @@ export function generateTwoGaussianData(numSamples: number, noise: number): Data
      */
     function generateGaussianData(cx1: number, cx2: number, y: number) {
         // Workiung with an -8, 8 grid non-variable for the forseeable future
-        for(let i = 0; i < numSamples/2; i++) {
+        for (let i = 0; i < numSamples / 2; i++) {
             let x1 = normalDistribution(cx1, variance);
             let x2 = normalDistribution(cx2, variance);
-            samples.push({x1: x1, x2: x2, y: y})
+            samples.push({ x1: x1, x2: x2, y: y })
         }
     }
 
     // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
-    generateGaussianData(-3,-3, 0); // Classifications 0 or 1 changed from -1 to 1 because of sigmoid neural net output
+    generateGaussianData(-3, -3, 0); // Classifications 0 or 1 changed from -1 to 1 because of sigmoid neural net output
     generateGaussianData(3, 3, 1)
 
     return samples;
@@ -48,7 +48,7 @@ export function generateTwoGaussianData(numSamples: number, noise: number): Data
  * @param mean the mean or mu to describe the normal(/gaussian) distribution
  * @param variance The variance or sigma squared to describe the normal(/gaussian) distribution
  */
-function normalDistribution(mean: number, variance:number): number {
+function normalDistribution(mean: number, variance: number): number {
     let x1, x2, y, w: number;
 
     // check that the mean and variance have values
@@ -63,7 +63,7 @@ function normalDistribution(mean: number, variance:number): number {
     } while (w > 1);
 
     y = Math.sqrt(-2 * Math.log(w) / w) * x1;
-    
+
     // while(mean === 0) mean = Math.random();
     // while(variance === 0) variance = Math.random();
     //console.log(mean)
