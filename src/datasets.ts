@@ -1,5 +1,3 @@
-//var d3 = require("d3"); // might require browserify/watchify
-//var p5 = require("p5")
 import * as d3 from "d3";
 
 export type Dataset2D = {
@@ -64,8 +62,5 @@ function normalDistribution(mean: number, variance: number): number {
 
     y = Math.sqrt(-2 * Math.log(w) / w) * x1;
 
-    // while(mean === 0) mean = Math.random();
-    // while(variance === 0) variance = Math.random();
-    //console.log(mean)
     return mean + Math.sqrt(variance) * y;
 }
