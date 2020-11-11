@@ -36,7 +36,7 @@ export function generateTwoGaussianData(numSamples: number, noise: number): Data
     }
 
     // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
-    generateGaussianData(-3,-3, -1);
+    generateGaussianData(-3,-3, 0); // Classifications 0 or 1 changed from -1 to 1 because of sigmoid neural net output
     generateGaussianData(3, 3, 1)
 
     return samples;

@@ -80,6 +80,10 @@ export class Activations {
             return output * (1.0 - output)
         }
     };
+    public static RELU: ActivationFunction = {
+        output: (x: number) => x > 0 ? x : 0,
+        derivative: (x: number) => x > 0 ? 1 : 0
+    };
 }
 
 /** Built in cost functions (Only using SQUARE for now) */
@@ -112,7 +116,7 @@ export class Link {
     constructor(source: Node, dest: Node) {
         this.source = source;
         this.dest = dest;
-        this.weight = 0.0;
+        this.weight = Math.random() - 0.5;
         this.derAcc = 0.0;
         this.noAccDer = 0.0;
     }
@@ -205,7 +209,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
     // outputDerivative = dc/da
     outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
     // inputDerivative = dc/dz = dc/da . phi_d(z)
-    outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput);
+    //outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput);
 
     outputNode.accInputDererivatives += outputNode.inputDerivative;
     outputNode.numInputDerivatives++;
@@ -219,17 +223,18 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
     // General Case: Hidden Layers //////////////////////////////////////////////////////////
     
     // Tinker with layerNum > 1
-    for(let layerNum = network.length - 2; layerNum > 0; layerNum--) {
+    for(let layerNum = network.length - 1; layerNum > 0; layerNum--) {
         let currentLayer = network[layerNum];
         for(let i = 0; i < network[layerNum].length; i++) {
             let node = currentLayer[i];
 
-            let acc = 0.0;
-            let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
+            // let acc = 0.0;
+            // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
             
-            node.linksOut.forEach(f);
+            // node.linksIn.forEach(f);
 
-            node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
+            node.inputDerivative = node.outputDerivative *  node.activationFunction.derivative(outputNode.totalInput);
+            //node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
 
             // For average in gradient decent
             node.accInputDererivatives += node.inputDerivative;
@@ -243,7 +248,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
             }
 
             // dc/dc for the bias on the current node
-            node.db = node.inputDerivative;
+            //node.db = node.inputDerivative;
             // let acc = 0.0;
             // for(let j = 0; j < node.linksIn.length; j++) {
             //     let link = node.linksIn[j];
@@ -252,7 +257,18 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
 
             //outputNode.dw = outputNode.inputDerivative * outputNode.
         }
+        let previousLayer = network[layerNum - 1];
+        for(let i = 0; i < previousLayer.length; i++) {
+            let node = previousLayer[i];
+            // Compute the error derivative with respect to each node's output.
+            node.outputDerivative = 0;
+            for(let j = 0; j < node.linksOut.length; j++) {
+                let link = node.linksOut[j];
+                node.outputDerivative += link.dest.inputDerivative * link.weight;
+            }
+        }   
     }
+    
 }
 
 /**
@@ -274,14 +290,17 @@ export function train(network: Node[][], learningRate: number) {
                 let link = node.linksIn[j];
 
                 let averageWeightGradient = link.derAcc / link.noAccDer;
+                //console.log(averageWeightGradient)
                 link.weight = link.weight - (learningRate * averageWeightGradient);
 
                 link.derAcc = 0.0;
                 link.noAccDer = 0.0;
             }
             
-            let averageBiasGradeint = node.accInputDererivatives / node.numInputDerivatives;
-            node.bias = node.bias - (learningRate * averageBiasGradeint);
+            let averageBiasGradient = node.accInputDererivatives / node.numInputDerivatives;
+            //console.log(`AVARAGEIASGDEINT = ${averageBiasGradient}\nNUMBIASSES = ${node.numInputDerivatives}`)
+            
+            node.bias = node.bias - (learningRate * averageBiasGradient);
 
             node.accInputDererivatives = 0.0;
             node.numInputDerivatives = 0.0;
@@ -302,3 +321,84 @@ export function forEachNode(network: Node[][], f: (node: Node) => void, ignoreIn
 export function getOutputNode(network: Node[][]): Node {
     return network[network.length - 1][0];
 }
+
+// /**
+//  * Back propagation algorithm.
+//  * @param network The neural network to run backprogation on.
+//  * @param costFunction The cost function used to determing how well the neural network performs.
+//  * @param y The expected out put of the neural network.
+//  */
+// export function backPropagate(network: Node[][], costFunction: CostFunction, y: number): void {
+
+//     // Special Case: Last Layer (Single output node) /////////////////////////////////////////
+
+//     let outputNode = network[network.length-1][0];
+//     // outputDerivative = dc/da
+//     outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
+//     // inputDerivative = dc/dz = dc/da . phi_d(z)
+//     //outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput);
+
+//     outputNode.accInputDererivatives += outputNode.inputDerivative;
+//     outputNode.numInputDerivatives++;
+
+//     for(let i = 0; i < outputNode.linksIn.length; i++) {
+//         let outputNodeLink = outputNode.linksIn[i];
+//         outputNodeLink.derAcc += outputNodeLink.source.output * outputNode.inputDerivative;
+//         outputNodeLink.noAccDer++;
+//     }
+    
+//     // General Case: Hidden Layers //////////////////////////////////////////////////////////
+    
+//     // Tinker with layerNum > 1
+//     for(let layerNum = network.length - 1; layerNum > 0; layerNum--) {
+//         let currentLayer = network[layerNum];
+//         let node: Node;
+//         for(let i = 0; i < currentLayer.length; i++) {
+//             node = currentLayer[i];
+
+//             // let acc = 0.0;
+//             // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
+            
+//             // node.linksOut.forEach(f);
+
+//             node.inputDerivative = node.outputDerivative *  node.activationFunction.derivative(outputNode.totalInput);
+//             //node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
+
+//             // dc/dw for each weight comming in
+//             for(let j = 0; j <  node.linksIn.length; j++) {
+//                 let link = node.linksIn[j];
+//                 link.derAcc += link.source.output * node.inputDerivative;
+//                 link.noAccDer++;
+//             }
+
+//             // For average in gradient decent
+//             node.accInputDererivatives += node.inputDerivative;
+//             node.numInputDerivatives++;
+
+
+//             // dc/dc for the bias on the current node
+//             node.db = node.inputDerivative;
+//             // let acc = 0.0;
+//             // for(let j = 0; j < node.linksIn.length; j++) {
+//             //     let link = node.linksIn[j];
+                
+//             // }
+
+//             //outputNode.dw = outputNode.inputDerivative * outputNode.
+//         }
+
+//         for(let i = 0; i < currentLayer.length; i++) {
+//             node = currentLayer[i];
+//             for(let j = 0; j < node.linksIn.length; j++) {
+//                 let link = node.linksIn[j];
+
+//                 link.source.outputDerivative = 
+//             }
+//         }
+//         for(let i = 0; i < currentLayer.length; i++) {
+//             node = currentLayer[i];
+            
+//         }
+//     }
+
+// }
