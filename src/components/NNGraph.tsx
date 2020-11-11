@@ -1,9 +1,9 @@
 import React, { Component, createRef } from 'react'
 import * as d3 from 'd3'
-import * as vis from './visControl'
-import { Dataset2D } from './datasets';
+import * as vis from '../visControl'
+import { Dataset2D } from '../datasets';
 
-class BarChart extends Component {
+class NNGraph extends Component {
 
     private noSamples = 200
     private gausData = vis.get2GaussDist(this.noSamples)
@@ -169,4 +169,4 @@ class BarChart extends Component {
         );
     }
 }
-export default BarChart
+export default NNGraph

@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
-import BarChart from './BarChart'
+import NNGraph from './components/NNGraph';
+import BarChart from './components/NNGraph'
 
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
         
       </header> */}
       {/* <div id="scatterplot"></div> */}
-      <BarChart />
+      <NNGraph />
     </div>
   );
 }
