@@ -4,48 +4,37 @@ import * as vis from '../visControl'
 import { Dataset2D } from '../datasets';
 
 type GraphProps = {
-    dataset: Dataset2D[],
-    density: number,
-    canvasWidth: number;
-    margin: number,
-    numCells: number;
-    xDomain: number[];
-    yDomain: number[];
-    decisionBoundary: Dataset2D[];
+    networkShape: number[];
 }
 
 type GraphState = {
-    decisionBoundary: Dataset2D[]
     svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>
 }
 
 
 class NNGraph extends Component<GraphProps, GraphState> {
 
-    private noSamples = 30;
+    private noSamples = 20;
     private gausData = vis.get2GaussDist(this.noSamples)
-    //private network = vis.start([2, 2, 1], vis.generateInputIds())
+    private network = vis.start([2, 2, 1], vis.generateInputIds())
 
     private DENSITY = 100
     private margin = 20
-    private canvasWidth = 640
-    private canvasHeight = this.canvasWidth
+    private canvasHeight = 640
+    private canvasWidth = this.canvasHeight
     private scale = this.canvasHeight / 16
     private xCentre = this.canvasWidth / 2 + this.margin
     private yCentre = this.canvasHeight / 2 + this.margin
+    private numCells = 100
     private container = createRef<HTMLDivElement>()
 
     componentDidMount() {
-        this.drawChart()
-    }
-    
-    // Use effect watches for change in the decision boundary then calls updatebackground
-    //  Delete all d3 objects that are updated, can be done by using the classing
-    componentDidUpdate() {
+        this.test()
+        this.drawChart(this.gausData)
 
     }
 
-    drawChart() {
+    drawChart(data: Dataset2D[]) {
         // const DENSITY = 100;
         // const margin = 20;
         // const canvasHeight = 640;
@@ -75,10 +64,45 @@ class NNGraph extends Component<GraphProps, GraphState> {
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())))
 
 
-        this.updateBackground(svgCanvas, this.props.decisionBoundary, false)
+        // const f:(x: number) => number = (x: number) => {
+        //     let y: number;
+
+        //     y = x;
+
+        //     return y;
+        // }
+
+        // const mine: [number, number][] = d3.range(-10, 10)
+        //     .map(function(x) {
+        //         return [x, f(x)];
+        // }); 
+
+        // console.log(mine);
+
+        // // Make " and ' usage consistent   
+
+        // //Could cause issues
+        // const line = d3.line()
+        //     .x(function(d) {
+        //         return x(d[0]) || 0;
+        //     })
+        //     .y(function(d: number[]) {
+        //         return y(d[1]) || 0;
+        //     })
+        //     .curve(d3.curveBasis);
+
+
+        this.updateBackground(svgCanvas, vis.getOutputDecisionBoundary(this.network, this.numCells, x.domain(), y.domain()), false)
+
+        // svgCanvas.append('path')
+        // .datum(mine)
+        // .attr('d', line)
+        // .attr('stroke', 'black')
+        // .attr('stroke-width', '1')
+        // .attr('fill', 'none');
 
         svgCanvas.selectAll(".circle")
-            .data(this.props.dataset)
+            .data(data)
             .enter().append('circle')
             .attr('class', 'circle')
             .attr("r", 5)
@@ -97,12 +121,11 @@ class NNGraph extends Component<GraphProps, GraphState> {
 
     }
 
-
-
     updateBackground(svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>, data: Dataset2D[], discretize: boolean): void {
-
-        let cellWidth = (this.canvasWidth / (this.props.numCells)) // this.scale
+        //let test = d3.this.container.current
+        let cellWidth = (this.canvasWidth / (this.numCells)) // this.scale
         let cellHeight = cellWidth
+        let diff = ((this.canvasWidth / (this.numCells)) - (this.canvasWidth / (this.numCells + 1)))
 
         console.log(data)
 
@@ -121,6 +144,7 @@ class NNGraph extends Component<GraphProps, GraphState> {
             .domain([0, 1])
             .range(colors);
 
+        let scale = d3.scaleLinear().domain([-8, 8]).range([0, this.DENSITY - 1])
 
         svgCanvas.selectAll("rect")
             .data(data)
@@ -137,15 +161,15 @@ class NNGraph extends Component<GraphProps, GraphState> {
     }
 
 
-    // test() {
-    //     console.log(vis.getCost(this.network, this.gausData))
-    //     for (let i = 0; i < 1000; i++) {
-    //         //console.log("Step")
-    //         vis.step(this.network, this.gausData);
-    //     }
-    //     console.log(this.network)
-    //     console.log(vis.getCost(this.network, this.gausData))
-    // }
+    test() {
+        console.log(vis.getCost(this.network, this.gausData))
+        for (let i = 0; i < 1000; i++) {
+            //console.log("Step")
+            vis.step(this.network, this.gausData);
+        }
+        console.log(this.network)
+        console.log(vis.getCost(this.network, this.gausData))
+    }
 
     render() {
         return (
