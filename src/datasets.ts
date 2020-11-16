@@ -1,4 +1,3 @@
-import * as d3 from "d3";
 
 export type Dataset2D = {
     x1: number,
@@ -14,7 +13,7 @@ export class Datasets {
 export function generateTwoGaussianData(numSamples: number, noise: number): Dataset2D[] {
     // Implementing without noise first
     noise = 0;
-    let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
+    //let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
     let variance = 0.5;
     let samples: Dataset2D[] = [];
 
@@ -34,7 +33,7 @@ export function generateTwoGaussianData(numSamples: number, noise: number): Data
     }
 
     // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
-    generateGaussianData(-3, -3, 0); // Classifications 0 or 1 changed from -1 to 1 because of sigmoid neural net output
+    generateGaussianData(-3, -3, -1); // Classifications 0 or 1 changed from -1 to 1 because of sigmoid neural net output
     generateGaussianData(3, 3, 1)
 
     return samples;

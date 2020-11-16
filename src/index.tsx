@@ -1,12 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import MainPage from './components/MainPage';
 //import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <MainPage
+      xDomain={[-8, 8]}
+      yDomain={[-8, 8]}
+      noSamples={20}
+      numCells={100}
+    />
   </React.StrictMode>,
   document.getElementById('root')
 );
