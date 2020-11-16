@@ -1,51 +1,109 @@
-import React, { Component, createRef } from 'react'
+import React, { createRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
-import * as vis from '../visControl'
 import { Dataset2D } from '../datasets';
 
 type GraphProps = {
+    id: string;
     dataset: Dataset2D[],
     density: number,
     canvasWidth: number;
+    canvasHeight: number;
     margin: number,
     numCells: number;
     xDomain: number[];
     yDomain: number[];
-    decisionBoundary: Dataset2D[];
+    decisionBoundary?: Dataset2D[];
 }
 
-type GraphState = {
-    decisionBoundary: Dataset2D[]
-    svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>
-}
+// type GraphState = {
+//     decisionBoundary: Dataset2D[]
+//     graph: d3.Selection<SVGGElement, unknown, null, undefined>
+// }
+
+//let graph: any;
+let initialised = false;
+
+//
+//
+//
+//
+//
+//  Use containers to implent SVGs again
+//
+//
+//
+//
+//
 
 
-class NNGraph extends Component<GraphProps, GraphState> {
+function NNGraph (props: GraphProps): JSX.Element {
 
-    private noSamples = 30;
-    private gausData = vis.get2GaussDist(this.noSamples)
-    //private network = vis.start([2, 2, 1], vis.generateInputIds())
+    const [graph, setGraph] = useState<d3.Selection<SVGGElement, unknown, HTMLElement, any>>();
+    const [initialised, setInitialised] = useState<boolean>(false);
+    //let id = `graph-${props.id}`
+    //let noSamples = 30
+    //let gausData = vis.get2GaussDist(noSamples)
+    //let network = vis.start([2, 2, 1], vis.generateInputIds())
 
-    private DENSITY = 100
-    private margin = 20
-    private canvasWidth = 640
-    private canvasHeight = this.canvasWidth
-    private scale = this.canvasHeight / 16
-    private xCentre = this.canvasWidth / 2 + this.margin
-    private yCentre = this.canvasHeight / 2 + this.margin
-    private container = createRef<HTMLDivElement>()
+    //let initalised = false;
 
-    componentDidMount() {
-        this.drawChart()
-    }
+    // let DENSITY = 100
+    //let margin = props.margin
+    //let canvasWidth = 640
+    //let canvasHeight = props.canvasWidth
+    let scale = props.canvasHeight / 16
+    // let xCentre = canvasWidth / 2 + margin
+    // let yCentre = canvasHeight / 2 + margin
+    //let graph: any;
     
     // Use effect watches for change in the decision boundary then calls updatebackground
     //  Delete all d3 objects that are updated, can be done by using the classing
-    componentDidUpdate() {
 
+    const init = () => {
+        console.log("NNGraph init")
+        // graph = d3.select(container.current)
+        // .append("svg")
+        // .attr("width", canvasWidth + margin * 2)
+        // .attr("height", canvasHeight + margin * 2)
+        // //.style("border", "1px solid black")
+        // .append('g')
+        // .attr('transform', `translate(${margin}, ${margin})`)
+        //setDecisionBoundary(props.decisionBoundary || []);
+        createGraph();
+        setInitialised(true);
     }
 
-    drawChart() {
+    useEffect(() => {
+        console.log("NNGraph inital useEffect")
+        init()
+    }, [])
+
+    useEffect(() => {
+        console.log("props and props.decisionboundary NNGraph useEffect")
+        if(!initialised) {
+            init()
+        } else {
+            updateGraph()
+            //updateBackground(graph, props.decisionBoundary, false)
+        }
+    }, [props, props.decisionBoundary])
+
+    //const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([])
+
+    const createGraph = () => {
+        console.log("Creating graph")
+        setGraph(d3.select(`#${props.id}`))
+        //let graph = d3.select(`#${props.id}`)
+        if(!graph) return;
+        graph.attr('width', props.canvasWidth + props.margin * 2)
+        .attr('height', props.canvasWidth + props.margin * 2)
+        .append('g')
+        .attr('transform', `translate(${props.margin}, ${props.margin})`);
+    }
+
+    const updateGraph = () => {
+        console.log("Updating graph")
+        if(!graph) return;
         // const DENSITY = 100;
         // const margin = 20;
         // const canvasHeight = 640;
@@ -53,55 +111,65 @@ class NNGraph extends Component<GraphProps, GraphState> {
         // const scale = canvasHeight / 16;
         // const xCentre = canvasWidth / 2 + margin;
         // const yCentre = canvasHeight / 2 + margin
-        const svgCanvas = d3.select(this.container.current)
-            .append("svg")
-            .attr("width", this.canvasWidth + this.margin * 2)
-            .attr("height", this.canvasHeight + this.margin * 2)
-            //.style("border", "1px solid black")
-            .append('g')
-            .attr('transform', `translate(${this.margin}, ${this.margin})`)
+        // const graph = d3.select(container.current)
+        //     .append("svg")
+        //     .attr("width", canvasWidth + margin * 2)
+        //     .attr("height", canvasHeight + margin * 2)
+        //     //.style("border", "1px solid black")
+        //     .append('g')
+        //     .attr('transform', `translate(${margin}, ${margin})`)
 
-        const x = d3.scaleLinear().range([0, this.canvasWidth])
-        const y = d3.scaleLinear().range([this.canvasHeight, 0])
+        d3.selectAll(`.circle-${props.id}`).remove();
+        d3.selectAll(`.rect-${props.id}`).remove();
+        d3.selectAll(`.axis-${props.id}`).remove();
+        // d3.selectAll(".circle").remove();
+        // d3.selectAll(".circle").remove();
+
+
+        const x = d3.scaleLinear().range([0, props.canvasWidth])
+        const y = d3.scaleLinear().range([props.canvasHeight, 0])
 
         x.domain([-8, 8])
         y.domain([-8, 8])
 
-        svgCanvas.append('g')
-            .attr('transform', `translate(0,${this.canvasHeight})`)
+        graph.append('g')
+            .attr("class", `axis-${props.id}`)
+            .attr('transform', `translate(0,${props.canvasHeight})`)
             .call(d3.axisBottom(x).tickValues([0].concat(x.ticks())))
 
-        svgCanvas.append('g')
+        graph.append('g')
+            .attr("class", `axis-${props.id}`)
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())))
 
+        props.decisionBoundary && updateBackground(graph, props.decisionBoundary, false)
 
-        this.updateBackground(svgCanvas, this.props.decisionBoundary, false)
-
-        svgCanvas.selectAll(".circle")
-            .data(this.props.dataset)
+        graph.selectAll(`.circle-${props.id}`)
+            .data(props.dataset)
             .enter().append('circle')
-            .attr('class', 'circle')
+            .attr('class', `circle-${props.id}`)
             .attr("r", 5)
             .attr("fill", function (datapoint: Dataset2D): string {
                 let colour = "black";
                 if (datapoint.y === 1) colour = "#621fa2";
                 //if(datapoint.y === -1) color = "#F50000";//"#fbfb39";
-                if (datapoint.y === 0) colour = "#fbfb39";
+                if (datapoint.y === -1) colour = "#fbfb39";
 
                 return colour;
             })
             .style("stroke", "white")
-            .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2) + this.margin)
-            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2) + this.margin)
+            .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2) + props.margin)
+            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasHeight / 2) + props.margin)
 
 
     }
 
+    const updateBackground = (graph: d3.Selection<SVGGElement, unknown, HTMLElement, undefined>, data: Dataset2D[], discretize: boolean): void => {
+        console.log("Update background")
+        //graph.selectAll("rect").remove()
 
+        let start = Date.now();
 
-    updateBackground(svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>, data: Dataset2D[], discretize: boolean): void {
-
-        let cellWidth = (this.canvasWidth / (this.props.numCells)) // this.scale
+        let cellWidth = (props.canvasWidth / (props.numCells)) // this.scale
         let cellHeight = cellWidth
 
         console.log(data)
@@ -118,21 +186,26 @@ class NNGraph extends Component<GraphProps, GraphState> {
         });
 
         let color = d3.scaleQuantize()
-            .domain([0, 1])
+            .domain([-1, 1])
             .range(colors);
 
+        let halfCanvasWidth = props.canvasWidth / 2;
 
-        svgCanvas.selectAll("rect")
+        graph.selectAll(`.rect-${props.id}`)
             .data(data)
             .enter().append("rect")
-            .attr("x", (datapoint: Dataset2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2))
-            .attr("y", (datapoint: Dataset2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2)) // Note will probably need to be flipped
+            .attr("class", `rect-${props.id}`)
+            .attr("x", (datapoint: Dataset2D) => (datapoint.x1 * scale) + halfCanvasWidth)
+            .attr("y", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + halfCanvasWidth) // Note will probably need to be flipped
             .attr("width", cellWidth)
             .attr("height", cellHeight)
             .attr("fill", (datapoint: Dataset2D) => {
-                let value = datapoint.y < 0.5 ? 0 : 1
+                let value = datapoint.y < 0 ? -1 : 1
                 return color(value) || "#FF0000"
             })
+        
+        let delta = Date.now() - start;
+        console.log(`Finsihed updating background (Duration: ${delta}ms)`)
 
     }
 
@@ -147,10 +220,14 @@ class NNGraph extends Component<GraphProps, GraphState> {
     //     console.log(vis.getCost(this.network, this.gausData))
     // }
 
-    render() {
-        return (
-            <div ref={this.container} />
-        );
-    }
+    //drawChart();
+
+    return (
+        //<div ref={container} />
+        <>
+            <div><svg id={props.id}/></div>
+            <div><canvas className="canvas"/></div>
+        </>
+    );
 }
 export default NNGraph

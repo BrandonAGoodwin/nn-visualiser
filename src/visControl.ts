@@ -30,7 +30,7 @@ export function start(networkShape: number[], inputIds: string[]): nn.Node[][] {
 
     // GenerateInputId's might beable to come back in here
 
-    let network = nn.generateNetwork(networkShape, nn.Activations.SIGMOID, inputIds);
+    let network = nn.generateNetwork(networkShape, nn.Activations.SIGMOID, nn.Activations. TANH, inputIds);
     console.log(network);
 
     return network;

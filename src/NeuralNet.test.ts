@@ -1,6 +1,6 @@
 import * as nn from "./NeuralNet";
 
-describe("Forward Propagation: ", () => {
+describe("Forward Propagation", () => {
     let network: nn.Node[][];
 
     beforeEach(() => {
