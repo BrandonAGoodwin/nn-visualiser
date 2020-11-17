@@ -104,7 +104,8 @@ function MainPage(props: PageProps) {
         </div>
         <div>
             {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                id = {"graph-1"}
+                //id = {"graph-1"}
+                //container = {}
                 dataset = {dataset}
                 density = {100}
                 canvasWidth = {640}
@@ -115,7 +116,7 @@ function MainPage(props: PageProps) {
                 yDomain = {props.yDomain}
                 decisionBoundary = {decisionBoundary}
             />}
-            {dataset && <NNGraph // MAKE FUNCTIONAL COM
+            {/* {dataset && <NNGraph // MAKE FUNCTIONAL COM
                 id = {"graph-2"}
                 dataset = {dataset}
                 density = {100}
@@ -126,7 +127,7 @@ function MainPage(props: PageProps) {
                 xDomain = {props.xDomain}
                 yDomain = {props.yDomain}
                 decisionBoundary = {decisionBoundary}
-            />}
+            />} */}
         </div>
             <Button onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>
             <Button onClick={() => step(1)}> Step 1</Button>
