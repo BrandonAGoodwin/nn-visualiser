@@ -19,7 +19,7 @@ type PageProps = {
 function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [network, setNetwork] = useState<nn.Node[][]>([]);
-    const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([]);
+    const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
     // const xDomain = [-8, 8];
     // const yDomain = [-8, 8];
     // const noSamples = 30;
@@ -69,7 +69,7 @@ function MainPage(props: PageProps) {
     //     setState({
     //         decisionBoundary: vis.getOutputDecisionBoundary(network, numCells, xDomain, yDomain)
     //     });
-        network && setDecisionBoundary(vis.getOutputDecisionBoundary(network, props.numCells, props.xDomain, props.yDomain));
+        network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain));
     }
 
 

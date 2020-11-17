@@ -1,6 +1,7 @@
 import React, { createRef, useEffect, useState, useRef } from 'react'
 import * as d3 from 'd3'
 import { Dataset2D } from '../datasets';
+import BackgroundCanvas from './BackgroundCanvas';
 
 type GraphProps = {
     container?: any,
@@ -12,7 +13,7 @@ type GraphProps = {
     numCells: number;
     xDomain: number[];
     yDomain: number[];
-    decisionBoundary?: Dataset2D[];
+    decisionBoundary?: number[];
 }
 
 // type GraphState = {
@@ -151,7 +152,7 @@ function NNGraph (props: GraphProps): JSX.Element {
             //.attr('transform', `translate(0,0)`)
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())))
 
-        props.decisionBoundary && updateBackground(graph, props.decisionBoundary, false)
+        //props.decisionBoundary && updateBackground(graph, props.decisionBoundary, false)
 
         graph.selectAll(`.circle`)
             .data(props.dataset)
@@ -237,7 +238,14 @@ function NNGraph (props: GraphProps): JSX.Element {
         <>
             <div><svg className="graph" /* ref={() => (graphRef)} *//></div>
            {/*  <div ref={() => (graphRef)}/> */}
-            {/* <div><canvas className="canvas"/></div> */}
+            <div>
+                <BackgroundCanvas
+                    width = {props.canvasWidth}
+                    height = {props.canvasHeight}
+                    numCells = {props.numCells}
+                    decisionBoundary = {props.decisionBoundary}
+                />
+            </div>
         </>
     );
 }
