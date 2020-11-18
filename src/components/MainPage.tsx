@@ -6,7 +6,7 @@ import NNGraph from './NNGraph';
 import { Button } from '@material-ui/core';
 import * as nn from './../NeuralNet';
 import './../MainPage.css'
-
+import styled from '@emotion/styled';
 
 type PageProps = {
     xDomain: number[];
@@ -17,7 +17,13 @@ type PageProps = {
 
 // Implement grid area layout on CSS
 
+type SizedButtonProps = {
+    color: string;
+}
 
+const SizedButton = styled("button")`
+    color: ${(props: SizedButtonProps) => props.color};
+`
 
 function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
@@ -104,6 +110,7 @@ function MainPage(props: PageProps) {
     return (
         <div className="container">
             <div className="config-bar">
+                <SizedButton color="red"> Sized Button </SizedButton>
                 <Button variant={"contained"} color={"primary"} onClick={generateDataset}> Generate Dataset </Button>
                 <Button variant={"contained"} color={"secondary"} onClick={reset}> Reset </Button>
                 <Button variant={"contained"} onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>

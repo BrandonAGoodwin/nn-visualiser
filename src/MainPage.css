@@ -2,7 +2,7 @@
 .container {
     display: grid;
     width: 800px;
-    height: 800px;
+    height: 600px;
     grid-template-columns: 200px 1fr 1fr;
     grid-template-rows: 80px 1fr 1fr 100px;
     grid-gap: 1rem;
@@ -15,6 +15,8 @@
 .config-bar {
     grid-area: config-bar;
     align-content: center;
+    display: flex;
+    align-items: center;
 }
 
 .sidebar {
