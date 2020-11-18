@@ -5,6 +5,7 @@ import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
 import { Button } from '@material-ui/core';
 import * as nn from './../NeuralNet';
+import './../MainPage.css'
 
 
 type PageProps = {
@@ -16,10 +17,13 @@ type PageProps = {
 
 // Implement grid area layout on CSS
 
+
+
 function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [network, setNetwork] = useState<nn.Node[][]>([]);
     const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([]);
+    const [loss, setLoss] = useState<number>();
     // const xDomain = [-8, 8];
     // const yDomain = [-8, 8];
     // const noSamples = 30;
@@ -92,47 +96,53 @@ function MainPage(props: PageProps) {
 
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
-        console.log(vis.getCost(network, dataset))
+        setLoss(vis.getCost(network, dataset))
+        console.log(loss)
         updateDecisionBoundary();
     }
 
     return (
-        <>  
-        <div>
-            <Button onClick={generateDataset}> Generate Dataset </Button>
-            <Button onClick={reset}> Reset </Button>
+        <div className="container">
+            <div className="config-bar">
+                <Button variant={"contained"} color={"primary"} onClick={generateDataset}> Generate Dataset </Button>
+                <Button variant={"contained"} color={"secondary"} onClick={reset}> Reset </Button>
+                <Button variant={"contained"} onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>
+                <Button variant={"contained"} onClick={() => step(1)}> Step 1</Button>
+                <Button variant={"contained"} onClick={() => step(100)}> Step 100</Button>
+            </div>
+            <div className="network"></div>
+            <div className="nn-graph">
+                {dataset && <NNGraph // MAKE FUNCTIONAL COM
+                    //id = {"graph-1"}
+                    //container = {}
+                    dataset = {dataset}
+                    density = {100}
+                    canvasWidth = {640}
+                    canvasHeight = {640}
+                    margin = {20}
+                    numCells = {props.numCells}
+                    xDomain = {props.xDomain}
+                    yDomain = {props.yDomain}
+                    decisionBoundary = {decisionBoundary}
+                />}
+                {/* {dataset && <NNGraph // MAKE FUNCTIONAL COM
+                    id = {"graph-2"}
+                    dataset = {dataset}
+                    density = {100}
+                    canvasWidth = {320}
+                    canvasHeight = {320}
+                    margin = {20}
+                    numCells = {props.numCells}
+                    xDomain = {props.xDomain}
+                    yDomain = {props.yDomain}
+                    decisionBoundary = {decisionBoundary}
+                />} */}
+            </div>
+            <div className="stats">
+                <h2>Loss: {loss}</h2>
+            </div>
+            
         </div>
-        <div>
-            {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                //id = {"graph-1"}
-                //container = {}
-                dataset = {dataset}
-                density = {100}
-                canvasWidth = {640}
-                canvasHeight = {640}
-                margin = {20}
-                numCells = {props.numCells}
-                xDomain = {props.xDomain}
-                yDomain = {props.yDomain}
-                decisionBoundary = {decisionBoundary}
-            />}
-            {/* {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                id = {"graph-2"}
-                dataset = {dataset}
-                density = {100}
-                canvasWidth = {320}
-                canvasHeight = {320}
-                margin = {20}
-                numCells = {props.numCells}
-                xDomain = {props.xDomain}
-                yDomain = {props.yDomain}
-                decisionBoundary = {decisionBoundary}
-            />} */}
-        </div>
-            <Button onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>
-            <Button onClick={() => step(1)}> Step 1</Button>
-            <Button onClick={() => step(100)}> Step 100</Button>
-        </>
     );
 }
 // Minimum information to NNGraph to render the correct immage
