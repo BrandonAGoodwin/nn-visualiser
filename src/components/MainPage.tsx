@@ -124,8 +124,8 @@ function MainPage(props: PageProps) {
                     //container = {}
                     dataset = {dataset}
                     density = {100}
-                    canvasWidth = {640}
-                    canvasHeight = {640}
+                    canvasWidth = {160}
+                    //canvasHeight = {640}
                     margin = {20}
                     numCells = {props.numCells}
                     xDomain = {props.xDomain}

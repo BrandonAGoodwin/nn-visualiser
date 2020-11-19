@@ -7,7 +7,7 @@ type GraphProps = {
     dataset: Dataset2D[],
     density: number,
     canvasWidth: number;
-    canvasHeight: number;
+    //canvasHeight: number;
     margin: number,
     numCells: number;
     xDomain: number[];
@@ -53,7 +53,7 @@ function NNGraph (props: GraphProps): JSX.Element {
     //let margin = props.margin
     //let canvasWidth = 640
     //let canvasHeight = props.canvasWidth
-    let scale = props.canvasHeight / 16
+    let scale = props.canvasWidth / 16
     // let xCentre = canvasWidth / 2 + margin
     // let yCentre = canvasHeight / 2 + margin
     //let graph: any;
@@ -136,14 +136,14 @@ function NNGraph (props: GraphProps): JSX.Element {
 
 
         const x = d3.scaleLinear().range([0, props.canvasWidth])
-        const y = d3.scaleLinear().range([props.canvasHeight, 0])
+        const y = d3.scaleLinear().range([props.canvasWidth, 0])
 
         x.domain([-8, 8])
         y.domain([-8, 8])
 
         graph.append('g')
             .attr("class", `axis`)
-            .attr('transform', `translate(0,${props.canvasHeight})`)
+            .attr('transform', `translate(0,${props.canvasWidth})`)
             .call(d3.axisBottom(x).tickValues([0].concat(x.ticks())))
 
         graph.append('g')
@@ -168,7 +168,7 @@ function NNGraph (props: GraphProps): JSX.Element {
             })
             .style("stroke", "white")
             .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2) + props.margin)
-            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasHeight / 2) + props.margin)
+            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2) + props.margin)
 
 
     }
