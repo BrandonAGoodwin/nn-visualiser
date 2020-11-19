@@ -132,18 +132,16 @@ function MainPage(props: PageProps) {
                     yDomain = {props.yDomain}
                     decisionBoundary = {decisionBoundary}
                 />}
-                {/* {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                    id = {"graph-2"}
+                {dataset && <NNGraph // MAKE FUNCTIONAL COM
                     dataset = {dataset}
                     density = {100}
-                    canvasWidth = {320}
-                    canvasHeight = {320}
+                    canvasWidth = {80}
                     margin = {20}
                     numCells = {props.numCells}
                     xDomain = {props.xDomain}
                     yDomain = {props.yDomain}
                     decisionBoundary = {decisionBoundary}
-                />} */}
+                />}
             </div>
             <div className="stats">
                 <h2>Loss: {loss}</h2>
