@@ -3,16 +3,24 @@ import React, { useEffect, useState } from 'react';
 import * as vis from '../visControl'
 import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
-import { Button } from '@material-ui/core';
+import { Button, InputLabel, MenuItem, Select } from '@material-ui/core';
 import * as nn from './../NeuralNet';
 import './../MainPage.css'
 import styled from '@emotion/styled';
+
+interface NNConfig {
+    networkShape: number[];
+    activationFunction: string;
+    noise: number;
+
+}
 
 type PageProps = {
     xDomain: number[];
     yDomain: number[];
     noSamples: number;
     numCells: number;
+    
 }
 
 // Implement grid area layout on CSS
@@ -30,6 +38,15 @@ function MainPage(props: PageProps) {
     const [network, setNetwork] = useState<nn.Node[][]>([]);
     const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([]);
     const [loss, setLoss] = useState<number>();
+    const [config, setConfig] = useState<NNConfig>(
+        {
+            networkShape: [2, 4, 4, 1],
+            activationFunction: "ReLU",
+            noise: 0
+        }
+    )
+
+    const [activationFunction, setActivationFunction] = useState<string>("ReLU")
     // const xDomain = [-8, 8];
     // const yDomain = [-8, 8];
     // const noSamples = 30;
@@ -107,10 +124,19 @@ function MainPage(props: PageProps) {
         updateDecisionBoundary();
     }
 
+    const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+        //setActivationFunction(e.target.value as string)
+        setConfig({...config, activationFunction: e.target.value as string})
+    }
+
     return (
         <div className="container">
             <div className="config-bar">
-                <SizedButton color="red"> Sized Button </SizedButton>
+                <InputLabel id="label">Activation Function</InputLabel>
+                <Select id="select" value={config.activationFunction} onChange={handleActivationChange}>
+                    <MenuItem value="ReLU">ReLU</MenuItem>
+                    <MenuItem value="Sigmoid">Sigmoid</MenuItem>
+                </Select>
                 <Button variant={"contained"} color={"primary"} onClick={generateDataset}> Generate Dataset </Button>
                 <Button variant={"contained"} color={"secondary"} onClick={reset}> Reset </Button>
                 <Button variant={"contained"} onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>
