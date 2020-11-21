@@ -1,8 +1,8 @@
+import styled from "@emotion/styled";
 import * as d3 from "d3";
 import React, { useEffect, useRef } from "react";
-import { Dataset2D } from "../datasets";
 
-type CanvasProps = {
+interface CanvasProps {
     width: number;
     height: number;
     numCells: number;
@@ -10,39 +10,39 @@ type CanvasProps = {
     decisionBoundary?: number[];
 }
 
+
+const CustomCanvas = styled.canvas`
+    width: ${(props: CanvasProps) => props.numCells};
+    height: ${(props: CanvasProps) => props.numCells};
+`
+
 function BackgroundCanvas(props: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        console.log("canvas")
-        const context = canvas?.getContext("2d");
 
-        if(context) {
-            context.fillStyle = "#129c4c"
-            context.fillRect(0, 0, props.width, props.height)
-        }   
+        init()
+        
     }, []);
 
+    const init = () => {
+
+    }
+
     useEffect(() => {
+        console.log(`BackgroundCanvas decisionBoundary useEffect`);
         updateCanvas()
     }, [props.decisionBoundary])
     
     const updateCanvas = () => {
 
-        console.log("Update canvas")
-        //graph.selectAll("rect").remove()
+        console.log("Update canvas");
 
         let start = Date.now();
 
-        // let cellWidth = (props.canvasWidth / (props.numCells)) // this.scale
-        // let cellHeight = cellWidth
-
-        // console.log(data)
-
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
-            .range(["#fbfb397F", "#FFFFFF7F", "#621fa27F"])
+            .range(["#621fa27F", "#FFFFFF7F", "#fbfb397F"])
             .clamp(true);
 
         let numShades = 20;
@@ -51,49 +51,48 @@ function BackgroundCanvas(props: CanvasProps) {
             return tmpScale(a) || 0;
         });
 
-        let color = d3.scaleQuantize()
+        let color: any = d3.scaleQuantize()
             .domain([-1, 1])
             .range(colors);
 
-        //let halfCanvasWidth = props.canvasWidth / 2;
-
-        // graph.selectAll(`.rect`)
-        //     .data(data)
-        //     .enter().append("rect")
-        //     .attr("class", `rect`)
-        //     .attr("x", (datapoint: Dataset2D) => (datapoint.x1 * scale) + halfCanvasWidth)
-        //     .attr("y", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + halfCanvasWidth) // Note will probably need to be flipped
-        //     .attr("width", cellWidth)
-        //     .attr("height", cellHeight)
-        //     .attr("fill", (datapoint: Dataset2D) => {
-        //         let value = datapoint.y < 0 ? -1 : 1
-        //         return color(value) || "#FF0000"
-        //     })
-        
-        
-
-
         const canvas = canvasRef.current;
-        if(!props.decisionBoundary || !canvas) return
-        const context = canvas.getContext("2d")
-        let imageData = context?.createImageData(props.width, props.height)
+        const context = canvas?.getContext("2d");
+        if(!props.decisionBoundary || !context) return
+        let imageData = context.createImageData(props.numCells, props.numCells);
+
+        if(!imageData) return;
+
+        const data = imageData.data;
+        let iter = -1;
         for(let i = 0; i < props.decisionBoundary.length; i++) {
-            //let datapoint = props.decisionBoundary[i]
             let value: number = props.decisionBoundary[i];
-            console.log(color(value))
-            console.log(color(value)?.toLocaleString)
-            //let c = d3.rgb(color(value))
+            let c = d3.rgb(color(value))
+            data[++iter] = c.r;
+            data[++iter] = c.g;
+            data[++iter] = c.b;
+            data[++iter] = 160;
         }
+        context.putImageData(imageData, 0, 0);
+
         let delta = Date.now() - start;
-        console.log(`Finsihed updating canvas (Duration: ${delta}ms)`)
+        console.log(`Finsihed updating canvas (Duration: ${delta}ms)`);
     }
 
     return (
         <canvas
             ref={canvasRef}
-            width={props.width}
-            height={props.height}
+            id={`${props.width}`}
+            className="background"
+            width={props.numCells}
+            height={props.numCells}
+            style={{
+                width: `${props.width}px`,
+                height: `${props.height}px`,
+                position: "absolute",
+                padding: "20px"
+            }}
         />);
+        //<div ref={containerRef}/>
 }
 
 export default BackgroundCanvas;
