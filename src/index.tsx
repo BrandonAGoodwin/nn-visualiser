@@ -1,17 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import MainPage from './components/MainPage';
+import App from './App';
+import { StylesProvider } from '@material-ui/core';
 //import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <MainPage
-      xDomain={[-8, 8]}
-      yDomain={[-8, 8]}
-      noSamples={20}
-      numCells={100}
-    />
+    <StylesProvider injectFirst>
+      <App/>
+    </StylesProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

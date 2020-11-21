@@ -126,3 +126,27 @@ export function getOutputDecisionBoundary(network: nn.Node[][], density: number,
 
     return boundary;
 }
+
+export function getOutputDecisionBoundary1D(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[]): number[] {
+
+    let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
+    let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
+    let boundary: number[] = [];
+    let iter = 0;
+
+    for (let i = 0; i < density; i++) {
+        for (let j = 0; j < density; j++) {
+            let x = xScale(i);
+            let y = yScale(j);
+            
+            let input = constructInputs(x || 0, y || 0);
+            nn.forwardPropagate(network, input);
+
+            //let dataPoint: Dataset2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
+
+            boundary[iter++] = nn.getOutputNode(network).output;
+        }
+    }
+
+    return boundary;
+}
