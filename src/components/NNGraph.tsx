@@ -88,6 +88,15 @@ function NNGraph (props: GraphProps): JSX.Element {
             .attr("class", `axis`)
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())));
 
+        graph.append('g')
+        .attr("class", `axis`)
+        .attr('transform', `translate(${props.canvasWidth},0)`)
+        .call(d3.axisRight(y).tickValues([0].concat(y.ticks())));
+
+        graph.append('g')
+            .attr("class", `axis`)
+            .call(d3.axisTop(x).tickValues([0].concat(x.ticks())));
+
         graph.selectAll(`.circle`)
             .data(props.dataset)
             .enter().append('circle')

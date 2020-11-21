@@ -55,6 +55,7 @@ const ContainerSection = styled("div")`
     margin: auto auto;
     width: 100%;
     height: 100%;
+    padding: 10px;
     //padding: 30px; 
     border-radius: 30px;
     border: 2px solid #bdbdbd;
@@ -81,6 +82,14 @@ const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-
     padding-left: 10px;
     padding-right: 10px;
     justify-content: left;
+`
+
+const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    padding: 0px;
+    justify-content: centre;
 `
 
 function MainPage(props: PageProps) {
@@ -222,9 +231,9 @@ function MainPage(props: PageProps) {
                     decisionBoundary = {decisionBoundary}
                 />} */}
             </ContainerSection>
-            <ContainerSection gridArea="stats">
+            <StatsBar>
                 <h2> Loss: {loss} </h2>
-            </ContainerSection>
+            </StatsBar>
             
         </Container>
     );
