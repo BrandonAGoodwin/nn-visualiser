@@ -1,10 +1,16 @@
 import * as nn from "./NeuralNet";
 import { generateTwoGaussianData, Dataset2D } from "./datasets";
+import { NNConfig } from "./components/MainPage";
 import * as d3 from "d3";
 
 interface InputFunc {
     f: (x: number, y: number) => number;
     label: string;
+}
+
+let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
+    "ReLU" : nn.Activations.RELU,
+    "Sigmoid": nn.Activations.SIGMOID,
 }
 
 let INPUTS: { [name: string]: InputFunc } = {
@@ -26,11 +32,11 @@ export function generateInputIds(): string[] {
     return inputIds;
 }
 
-export function start(networkShape: number[], inputIds: string[]): nn.Node[][] {
+export function start(config: NNConfig): nn.Node[][] {
 
     // GenerateInputId's might beable to come back in here
 
-    let network = nn.generateNetwork(networkShape, nn.Activations.SIGMOID, nn.Activations. TANH, inputIds);
+    let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, generateInputIds());
     console.log(network);
 
     return network;

@@ -8,11 +8,10 @@ import * as nn from './../NeuralNet';
 import './../MainPage.css'
 import styled from '@emotion/styled';
 
-interface NNConfig {
+export interface NNConfig {
     networkShape: number[];
     activationFunction: string;
     noise: number;
-
 }
 
 type PageProps = {
@@ -35,80 +34,53 @@ const SizedButton = styled("button")`
 
 function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
-    const [network, setNetwork] = useState<nn.Node[][]>([]);
-    const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([]);
-    const [loss, setLoss] = useState<number>();
     const [config, setConfig] = useState<NNConfig>(
         {
             networkShape: [2, 4, 4, 1],
             activationFunction: "ReLU",
             noise: 0
         }
-    )
+    );
+    const [network, setNetwork] = useState<nn.Node[][]>(vis.start(config));
+    const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>(vis.getOutputDecisionBoundary(network, props.numCells, props.xDomain, props.yDomain));
+    const [loss, setLoss] = useState<number>(vis.getCost(network, dataset));
 
-    const [activationFunction, setActivationFunction] = useState<string>("ReLU")
-    // const xDomain = [-8, 8];
-    // const yDomain = [-8, 8];
-    // const noSamples = 30;
-    // const gausData = vis.get2GaussDist(noSamples);
-    // const network = vis.start([2, 2, 1], vis.generateInputIds());
-
-    //const numCells = 100;
-    //const container = createRef<HTMLDivElement>();
-
-    
-    // constructor(props : PageProps) {
-    //     super(props)
-    //     state = {
-    //         decisionBoundary: vis.getOutputDecisionBoundary(network, numCells, xDomain, yDomain)
-    //     };  
-    // }
+    // useEffect(() => {
+    //     console.log("useEffect init MainPage");
+    //     generateNetwork();
+    //     generateDataset();
+    // },[]);
 
     useEffect(() => {
-        console.log("useEffect init MainPage");
-        generateNetwork();
-        generateDataset();
-    },[]);
-
-    const reset = () => {
-        console.log("Reset");
+        console.log("Config change useEffect");
         generateNetwork();
         generateDataset();
         updateDecisionBoundary();
-    }
+    },[config]);
 
     const generateDataset = () => {
         console.log("Generating dataset");
         setDataset(vis.get2GaussDist(props.noSamples));
     }
-    // componentDidMount() { // HAppen after the components have rendered
-    //     test();
-    // }
 
     const generateNetwork = () => {
         console.log("Generating network");
-        setNetwork(vis.start([2, 4, 4, 1], vis.generateInputIds()));
+        setNetwork(vis.start(config));
     }
 
     const updateDecisionBoundary = () => {
         console.log("Updating decision boundary");
         // Don't like numcells having to be the same
-    //     setState({
-    //         decisionBoundary: vis.getOutputDecisionBoundary(network, numCells, xDomain, yDomain)
-    //     });
         network && setDecisionBoundary(vis.getOutputDecisionBoundary(network, props.numCells, props.xDomain, props.yDomain));
     }
 
+    const reset = () => {
+        console.log("Reset");
+        generateNetwork();
+        generateDataset();
+        //updateDecisionBoundary();
+    }
 
-    // test() {
-    //     console.log(vis.getCost(network, gausData))
-    //     for (let i = 0; i < 1000; i++) {
-    //         //console.log("Step")
-    //         vis.step(network, gausData);
-    //     }
-    //     console.log(network)
-    //     console.log(vis.getCost(network, gausData))
-    // }
 
     const step = (noSteps: number) => { // 1
         console.log(`MainPage step(${noSteps})`);
@@ -125,7 +97,6 @@ function MainPage(props: PageProps) {
     }
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        //setActivationFunction(e.target.value as string)
         setConfig({...config, activationFunction: e.target.value as string})
     }
 
@@ -139,27 +110,22 @@ function MainPage(props: PageProps) {
                 </Select>
                 <Button variant={"contained"} color={"primary"} onClick={generateDataset}> Generate Dataset </Button>
                 <Button variant={"contained"} color={"secondary"} onClick={reset}> Reset </Button>
-                <Button variant={"contained"} onClick={() => updateDecisionBoundary()}> Update Decision Boundary </Button>
                 <Button variant={"contained"} onClick={() => step(1)}> Step 1</Button>
                 <Button variant={"contained"} onClick={() => step(100)}> Step 100</Button>
             </div>
             <div className="network"></div>
             <div className="nn-graph">
-                {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                    //id = {"graph-1"}
-                    //container = {}
+                {dataset && <NNGraph 
                     dataset = {dataset}
                     density = {100}
                     canvasWidth = {160}
-                    //canvasHeight = {640}
                     margin = {20}
                     numCells = {props.numCells}
                     xDomain = {props.xDomain}
                     yDomain = {props.yDomain}
                     decisionBoundary = {decisionBoundary}
                 />}
-                {/* {dataset && <NNGraph // MAKE FUNCTIONAL COM
-                    id = {"graph-2"}
+                {/* {dataset && <NNGraph 
                     dataset = {dataset}
                     density = {100}
                     canvasWidth = {320}
