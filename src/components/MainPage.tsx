@@ -237,7 +237,7 @@ function MainPage(props: PageProps) {
             </ContainerSection>
             <StatsBar>
                 <h2> Epochs: {epochs} </h2>
-                <h2> Loss: {loss} </h2>
+                <h2> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
             </StatsBar>
             
         </Container>
