@@ -89,7 +89,7 @@ const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...p
     flex-direction: row;
     align-items: stretch;
     padding: 0px;
-    justify-content: centre;
+    justify-content: space-around;
 `
 
 function MainPage(props: PageProps) {
@@ -106,6 +106,7 @@ function MainPage(props: PageProps) {
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
     const [loss, setLoss] = useState<number>(0);
+    const [epochs, setEpochs] = useState<number>(0);
 
     // useEffect(() => {
     //     console.log("useEffect init MainPage");
@@ -132,6 +133,7 @@ function MainPage(props: PageProps) {
     const generateNetwork = () => {
         console.log("Generating network");
         setNetwork(vis.start(config));
+        setEpochs(0);
     }
 
     const updateDecisionBoundary = () => {
@@ -141,7 +143,6 @@ function MainPage(props: PageProps) {
             setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain));
             dataset && setLoss(vis.getCost(network, dataset))
         }
-
     }
 
     const reset = () => {
@@ -161,6 +162,8 @@ function MainPage(props: PageProps) {
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate);
         }
+
+        setEpochs(epochs + noSteps)
 
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
@@ -203,6 +206,7 @@ function MainPage(props: PageProps) {
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
+                <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
@@ -232,6 +236,7 @@ function MainPage(props: PageProps) {
                 />} */}
             </ContainerSection>
             <StatsBar>
+                <h2> Epochs: {epochs} </h2>
                 <h2> Loss: {loss} </h2>
             </StatsBar>
             
