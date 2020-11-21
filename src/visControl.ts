@@ -46,7 +46,6 @@ export function start(config: NNConfig): nn.Node[][] {
 export function get2GaussDist(noSamples: number): Dataset2D[] {
     let dataset = generateTwoGaussianData(noSamples, 0);
     console.log(dataset);
-    //trainingData = dataset;
     return dataset;
 }
 
@@ -59,13 +58,13 @@ export function constructInputs(x: number, y: number): number[] {
 
 }
 
-export function step(network: nn.Node[][], trainingData: Dataset2D[]): void {
+export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number): void {
     for (let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
         nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2));
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y);
     }
-    nn.train(network, 0.03);
+    nn.train(network, learningRate);
 }
 
 export function getCost(network: nn.Node[][], data: Dataset2D[]/* , costFunction: nn.CostFunction */): number {
@@ -77,32 +76,6 @@ export function getCost(network: nn.Node[][], data: Dataset2D[]/* , costFunction
 
     return totalCost / data.length;
 }
-
-// export function reset(): void {
-//     iter = 0;
-// }
-
-// export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[]): number[][] {
-
-//     let xScale = d3.scaleLinear().domain([0, density - 1]).range(xDomain);
-//     let yScale = d3.scaleLinear().domain([density - 1, 0]).range(yDomain);
-//     let boundary: number[][] = [];
-
-//     for(let i = 0; i < density; i++) {
-//         let temp: number[] = [];
-//         boundary.push(temp);
-//         for(let j = 0; j < density; j++) {
-//           let x = xScale(i);
-//           let y = yScale(j);
-//           let input = constructInputs(x || 0, y || 0);
-//           nn.forwardPropagate(network, input);
-
-//           temp.push(nn.getOutputNode(network).output);
-//         }
-//       }
-
-//     return boundary;
-// }
 
 export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[]): Dataset2D[] {
 
@@ -141,8 +114,6 @@ export function getOutputDecisionBoundary1D(network: nn.Node[][], density: numbe
             
             let input = constructInputs(x || 0, y || 0);
             nn.forwardPropagate(network, input);
-
-            //let dataPoint: Dataset2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
 
             boundary[iter++] = nn.getOutputNode(network).output;
         }

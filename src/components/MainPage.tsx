@@ -12,26 +12,23 @@ export interface NNConfig {
     networkShape: number[];
     activationFunction: string;
     noise: number;
+    learningRate: number;
 }
 
-type PageProps = {
+interface PageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
 }
 
-// Implement grid area layout on CSS
-
-type SizedButtonProps = {
-    color: string;
-}
-
-const SizedButton = styled("button")`
-    color: ${(props: SizedButtonProps) => props.color};
-`
 
 const StyledButton = styled(Button)`
-    margin: 10px;
+    margin: 5px;
+`
+
+const StyledFormControl = styled(FormControl)`
+    margin: 5px;
+    min-width: 130px;
 `
 
 const Container = styled("div")`
@@ -41,8 +38,8 @@ const Container = styled("div")`
     height: 600px;
     padding: 20px;
     grid-template-columns: 200px 1fr;
-    grid-template-rows: 60px 1fr 80px;
-    grid-gap: 35px;//3rem;
+    grid-template-rows: 90px 1fr 80px;
+    grid-gap: 15px;
     grid-template-areas: 
         "config-bar config-bar"
         "control-panel nn-graph"
@@ -50,14 +47,15 @@ const Container = styled("div")`
 `
 
 const ContainerSection = styled("div")`
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box; 
     grid-area: ${(props:{ gridArea: string }) => (props.gridArea)};
     background-color: white;
     margin: auto auto;
     width: 100%;
     height: 100%;
-    padding: 8px; 
-    /* padding-right: 15px; 
-    padding-top: 15px; */
+    //padding: 30px; 
     border-radius: 30px;
     border: 2px solid #bdbdbd;
     display: flex;
@@ -65,27 +63,35 @@ const ContainerSection = styled("div")`
     justify-content: center;
 `
 
+// Fix so that this doesn't use hard coded paddings
 const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar" {...props} />)`
     display: flex;
     flex-direction: row;
-    align-items: stretch;
-    align-items: center;
+    justify-content: left;
+    padding-left: 30px;
+    padding-top: 10px;
 `
 
 const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    justify-content: left;
 `
 
 function MainPage(props: PageProps) {
-    const [numSamples, setNumSamples] = useState<number>(20);
+    const [numSamples, setNumSamples] = useState<number>(200);
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
             networkShape: [2, 4, 4, 1],
             activationFunction: "ReLU",
-            noise: 0
+            noise: 0,
+            learningRate: 0.03,
         }
     );
     const [network, setNetwork] = useState<nn.Node[][]>();
@@ -144,7 +150,7 @@ function MainPage(props: PageProps) {
         let start = Date.now();
         
         for (let i = 0; i < noSteps; i++) {
-            vis.step(network, dataset);
+            vis.step(network, dataset, config.learningRate);
         }
 
         let delta = Date.now() - start;
@@ -158,11 +164,15 @@ function MainPage(props: PageProps) {
         setConfig({...config, activationFunction: e.target.value as string})
     }
 
+    const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+        setConfig({...config, learningRate: e.target.value as number})
+    }
+
     return (
         <Container>
             <ConfigBar>
-                <FormControl variant="filled">
-                    <InputLabel id="label">Activation</InputLabel>
+                <StyledFormControl variant="filled">
+                    <InputLabel>Activation</InputLabel>
                     <Select
                         value={config.activationFunction}
                         onChange={handleActivationChange}
@@ -170,7 +180,17 @@ function MainPage(props: PageProps) {
                         <MenuItem value="ReLU">ReLU</MenuItem>
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </Select>
-                </FormControl>
+                </StyledFormControl>
+                <StyledFormControl variant="filled">
+                    <InputLabel>Learning Rate</InputLabel>
+                    <Select
+                        value={config.learningRate}
+                        onChange={handleLearningRateChange}
+                    >
+                        <MenuItem value="0.03">0.03</MenuItem>
+                        <MenuItem value="0.005">0.005</MenuItem>
+                    </Select>
+                </StyledFormControl>
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>

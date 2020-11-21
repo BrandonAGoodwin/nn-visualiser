@@ -45,7 +45,7 @@ function BackgroundCanvas(props: CanvasProps) {
             .range(["#621fa2", "#FFFFFF", "#fbfb39"])
             .clamp(true);
 
-        let numShades = 20;
+        let numShades = props.numShades || 100;
 
         let colors = d3.range(0, 1 + 1E-9, 1 / numShades).map(a => {
             return tmpScale(a) || 0;
