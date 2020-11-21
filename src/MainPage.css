@@ -1,15 +1,15 @@
 
-.container {
+/* .container {
     margin: auto auto;
     display: grid;
     width: 800px;
     height: 600px;
-    grid-template-columns: 200px 1fr 1fr;
-    grid-template-rows: 80px 1fr 1fr 100px;
+    grid-template-columns:  1fr;
+    grid-template-rows: 100px 1fr 50px;
     grid-gap: 1rem;
     grid-template-areas: 
         "config-bar config-bar config-bar"
-        "sidebar network nn-graph"
+        "nn-graph nn-graph nn-graph"
         "stats stats stats";
 }
 
@@ -34,20 +34,11 @@
 
 .nn-graph {
     grid-area: nn-graph;
-}
-
-/* body {
-    background-color: #3b404e;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    margin: auto;
-    width: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: auto auto;
 } */
 
 .item {
-    background-color: #1EAAFC;
+    /* background-color: #1EAAFC;
     background-image: linear-gradient(130deg, #6C52D9 0%, #1EAAFC 85%, #3EDFD7 100%);
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
     color: #ffffff;
@@ -57,7 +48,10 @@
     justify-content: center;
     align-items: center;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: bold; */
+
+    border-radius: 4px;
+    border: 6px solid #171717;
 }
 
 /* .MainPage {
@@ -65,7 +59,7 @@
     flex-direction: column;
 } */
 
-.config-bar {
+/* .config-bar {
     background-color: #1EAAFC;
     background-image: linear-gradient(160deg, #6C52D9 0%, #9B8AE6 127%);
 }
@@ -89,8 +83,4 @@
 .nn-graph {
     background-color: #1EAAFC;
     background-image: linear-gradient(160deg, #6C52D9 0%, #9B8AE6 127%);
-}
-
-svg.graph {
-    width: 200px;
-}
+} */
