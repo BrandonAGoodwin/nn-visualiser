@@ -41,7 +41,7 @@ const Container = styled("div")`
     height: 600px;
     padding: 20px;
     grid-template-columns: 200px 1fr;
-    grid-template-rows: 100px 1fr 80px;
+    grid-template-rows: 60px 1fr 80px;
     grid-gap: 35px;//3rem;
     grid-template-areas: 
         "config-bar config-bar"
