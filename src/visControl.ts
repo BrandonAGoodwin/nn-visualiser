@@ -1,5 +1,5 @@
 import * as nn from "./NeuralNet";
-import { generateTwoGaussianData, Dataset2D } from "./datasets";
+import { Dataset2D, DatasetGenerator, Dataset } from "./datasets";
 import { NNConfig } from "./components/MainPage";
 import * as d3 from "d3";
 
@@ -12,6 +12,12 @@ let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
     "ReLU" : nn.Activations.RELU,
     "Sigmoid": nn.Activations.SIGMOID,
 }
+
+let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
+    "Gaussian" : Dataset.GAUSSIAN,
+    "XOR": Dataset.XOR,
+}
+
 
 let INPUTS: { [name: string]: InputFunc } = {
     "x": { f: (x, y) => x, label: "X_1" },
@@ -42,9 +48,9 @@ export function start(config: NNConfig): nn.Node[][] {
     return network;
 }
 
-
-export function get2GaussDist(noSamples: number): Dataset2D[] {
-    let dataset = generateTwoGaussianData(noSamples, 0);
+export function getDataset(datasetType: string, numSamples: number, noise: number) {
+    let datasetGenerator = GENERATORS[datasetType];
+    let dataset = datasetGenerator(numSamples, noise);
     console.log(dataset);
     return dataset;
 }

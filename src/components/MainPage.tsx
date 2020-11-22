@@ -21,7 +21,6 @@ interface PageProps {
     numCells: number;
 }
 
-
 const StyledButton = styled(Button)`
     margin: 5px;
 `
@@ -94,24 +93,22 @@ const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...p
 
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(200);
+    const [noise, setNoise] = useState<number>(0);
+    const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2, 4, 4, 1],
+            networkShape: [2, 8, 8, 8, 8, 1],
             activationFunction: "ReLU",
             noise: 0,
             learningRate: 0.03,
         }
     );
-    const [network, setNetwork] = useState<nn.Node[][]>();
-    const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
-    const [loss, setLoss] = useState<number>(0);
-    const [epochs, setEpochs] = useState<number>(0);
-
-    // useEffect(() => {
-    //     console.log("useEffect init MainPage");
-    //     reset();
-    // },[]);
+    const [network, setNetwork]                     = useState<nn.Node[][]>();
+    const [decisionBoundary, setDecisionBoundary]   = useState<number[]>([]);
+    const [loss, setLoss]                           = useState<number>(0);
+    const [epochs, setEpochs]                       = useState<number>(0);
+    const [discreetBoundary, setDiscreetBoundary]   = useState<boolean>(false);
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -127,7 +124,7 @@ function MainPage(props: PageProps) {
 
     const generateDataset = () => {
         console.log("Generating dataset");
-        setDataset(vis.get2GaussDist(numSamples));
+        setDataset(vis.getDataset(datasetType, numSamples, noise));
     }
 
     const generateNetwork = () => {
@@ -141,7 +138,7 @@ function MainPage(props: PageProps) {
         // Don't like numcells having to be the same
         if(network) {
             setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain));
-            dataset && setLoss(vis.getCost(network, dataset))
+            dataset && setLoss(vis.getCost(network, dataset));
         }
     }
 
@@ -163,7 +160,7 @@ function MainPage(props: PageProps) {
             vis.step(network, dataset, config.learningRate);
         }
 
-        setEpochs(epochs + noSteps)
+        setEpochs(epochs + noSteps);
 
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
@@ -172,12 +169,20 @@ function MainPage(props: PageProps) {
         updateDecisionBoundary();
     }
 
+    const toggleDiscreetOutput = () => {
+
+    }
+
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({...config, activationFunction: e.target.value as string})
+        setConfig({...config, activationFunction: e.target.value as string});
     }
 
     const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({...config, learningRate: e.target.value as number})
+        setConfig({...config, learningRate: e.target.value as number});
+    }
+
+    const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+        setDatasetType(e.target.value as string);
     }
 
     return (
@@ -203,11 +208,22 @@ function MainPage(props: PageProps) {
                         <MenuItem value="0.005">0.005</MenuItem>
                     </Select>
                 </StyledFormControl>
+                <StyledFormControl variant="filled">
+                    <InputLabel>Dataset</InputLabel>
+                    <Select
+                        value={datasetType}
+                        onChange={handleDatasetChange}
+                    >
+                        <MenuItem value="Gaussian">Gaussian</MenuItem>
+                        <MenuItem value="XOR">XOR</MenuItem>
+                    </Select>
+                </StyledFormControl>
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton>
+                <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
             </ControlPanel>
