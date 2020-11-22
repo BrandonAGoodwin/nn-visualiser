@@ -8,6 +8,7 @@ interface CanvasProps {
     numCells: number;
     numShades?: number;
     decisionBoundary?: number[];
+    discreetBoundary: boolean;
 }
 
 
@@ -66,6 +67,7 @@ function BackgroundCanvas(props: CanvasProps) {
         let iter = -1;
         for(let i = 0; i < props.decisionBoundary.length; i++) {
             let value: number = props.decisionBoundary[i];
+            if(props.discreetBoundary) value = value > 0 ? 1 : -1;
             let c = d3.rgb(color(value))
             data[++iter] = c.r;
             data[++iter] = c.g;

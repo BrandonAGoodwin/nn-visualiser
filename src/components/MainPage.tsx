@@ -108,7 +108,7 @@ function MainPage(props: PageProps) {
     const [decisionBoundary, setDecisionBoundary]   = useState<number[]>([]);
     const [loss, setLoss]                           = useState<number>(0);
     const [epochs, setEpochs]                       = useState<number>(0);
-    const [discreetBoundary, setDiscreetBoundary]   = useState<boolean>(false);
+    const [discreetBoundary, setDiscreetBoundary]   = useState<boolean>(true);
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -237,6 +237,7 @@ function MainPage(props: PageProps) {
                     xDomain = {props.xDomain}
                     yDomain = {props.yDomain}
                     decisionBoundary = {decisionBoundary}
+                    discreetBoundary = {discreetBoundary}
                 />}
                 {(!dataset || !network) && <CircularProgress/>}
                  {/* {dataset && <NNGraph 

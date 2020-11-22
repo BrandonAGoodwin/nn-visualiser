@@ -14,6 +14,7 @@ type GraphProps = {
     xDomain: number[];
     yDomain: number[];
     decisionBoundary?: number[];
+    discreetBoundary: boolean;
 }
 
 
@@ -129,6 +130,7 @@ function NNGraph (props: GraphProps): JSX.Element {
                     height = {props.canvasWidth}
                     numCells = {props.numCells}
                     decisionBoundary = {props.decisionBoundary}
+                    discreetBoundary = {props.discreetBoundary}
                 />
             </div>
         </>
