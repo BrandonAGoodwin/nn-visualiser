@@ -40,7 +40,7 @@ function LabeledSlider(props: sliderProps) {
             <Typography gutterBottom>{props.label}</Typography>
             <Slider
                 ValueLabelComponent={ValueLabelComponent}
-                aria-label="custom thumb label"
+                //aria-label="custom thumb label"
                 defaultValue={props.defaultValue}
                 step={0.1}
                 min={0}

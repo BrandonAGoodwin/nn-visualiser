@@ -125,7 +125,7 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         generateDataset();
-    }, [datasetType])
+    }, [datasetType, noise])
 
     const generateDataset = () => {
         console.log("Generating dataset");
@@ -153,7 +153,6 @@ function MainPage(props: PageProps) {
         generateDataset();
         updateDecisionBoundary();
     }
-
 
     const step = (noSteps: number) => {
         console.log(`MainPage step(${noSteps})`);
@@ -191,7 +190,7 @@ function MainPage(props: PageProps) {
     }
 
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
-        setNoise(e.target.value as number);
+        setNoise(newValue as number);
     }
 
     return (
