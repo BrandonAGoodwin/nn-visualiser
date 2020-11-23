@@ -33,7 +33,7 @@ function BackgroundCanvas(props: CanvasProps) {
     useEffect(() => {
         console.log(`BackgroundCanvas decisionBoundary useEffect`);
         updateCanvas()
-    }, [props.decisionBoundary])
+    }, [props.decisionBoundary, props.discreetBoundary])
     
     const updateCanvas = () => {
 

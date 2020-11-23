@@ -7,6 +7,7 @@ import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl } f
 import * as nn from './../NeuralNet';
 import './../MainPage.css'
 import styled from '@emotion/styled';
+import LabeledSlider from './Slider'
 
 export interface NNConfig {
     networkShape: number[];
@@ -174,7 +175,7 @@ function MainPage(props: PageProps) {
     }
 
     const toggleDiscreetOutput = () => {
-
+        setDiscreetBoundary(!discreetBoundary)
     }
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
@@ -187,6 +188,10 @@ function MainPage(props: PageProps) {
 
     const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setDatasetType(e.target.value as string);
+    }
+
+    const handleNoiseChange = (e: any, newValue: number | number[]) => {
+        setNoise(e.target.value as number);
     }
 
     return (
@@ -222,6 +227,11 @@ function MainPage(props: PageProps) {
                         <MenuItem value="XOR">XOR</MenuItem>
                     </Select>
                 </StyledFormControl>
+                <LabeledSlider
+                    label="Noise"
+                    defaultValue={noise}
+                    f={handleNoiseChange}
+                />
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
