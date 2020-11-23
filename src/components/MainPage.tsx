@@ -115,12 +115,16 @@ function MainPage(props: PageProps) {
         generateNetwork();
         generateDataset();
         updateDecisionBoundary();
-    },[config]);
+    }, [config]);
 
     useEffect(() => {
         console.log("Config change useEffect");
         updateDecisionBoundary();
-    },[network]);
+    }, [network]);
+
+    useEffect(() => {
+        generateDataset();
+    }, [datasetType])
 
     const generateDataset = () => {
         console.log("Generating dataset");
