@@ -301,19 +301,19 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
                 {/* <InputsGroup/> */}
                 <FormControl component="fieldset">
-                    <FormLabel component="legend">Assign responsibility</FormLabel>
+                    <FormLabel> Inputs </FormLabel>
                     <FormGroup>
                         <FormControlLabel
                             control={<Checkbox checked={config.inputs.includes("x")} onChange={handleInputChange} name="x" />}
-                            label="X_1"
+                            label="y"
                         />
                         <FormControlLabel
                             control={<Checkbox checked={config.inputs.includes("y")} onChange={handleInputChange} name="y" />}
-                            label="X_2"
+                            label="x"
                         />
                         <FormControlLabel
                             control={<Checkbox checked={config.inputs.includes("xSquared")} onChange={handleInputChange} name="xSquared" />}
-                            label="X_1^2"
+                            label="ySquared"
                         />
                     </FormGroup>
                 </FormControl>
