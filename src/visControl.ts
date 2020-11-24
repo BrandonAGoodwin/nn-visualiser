@@ -19,30 +19,30 @@ let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
 }
 
 
-let INPUTS: { [name: string]: InputFunc } = {
+export let INPUTS: { [name: string]: InputFunc } = {
     "x": { f: (x, y) => x, label: "X_1" },
     "y": { f: (x, y) => y, label: "X_2" },
-    // "xSquared": {f: (x, y) => x * x, label: "X_1^2"},
-    // "ySquared": {f: (x, y) => y * y,  label: "X_2^2"},
-    // "xTimesY": {f: (x, y) => x * y, label: "X_1X_2"},
-    // "sinX": {f: (x, y) => Math.sin(x), label: "sin(X_1)"},
-    // "sinY": {f: (x, y) => Math.sin(y), label: "sin(X_2)"},
+    "xSquared": {f: (x, y) => x * x, label: "X_1^2"},
+    "ySquared": {f: (x, y) => y * y,  label: "X_2^2"},
+    //"xTimesY": {f: (x, y) => x * y, label: "X_1X_2"},
+    "sinX": {f: (x, y) => Math.sin(x), label: "sin(X_1)"},
+    "sinY": {f: (x, y) => Math.sin(y), label: "sin(X_2)"},
 };
 
-// Unimplemented
+/* // Unimplemented
 export function generateInputIds(): string[] {
     // Hard coded for now to put all 2 input IDs
 
-    let inputIds: string[] = ["x", "y"];
+    let inputIds: string[] = ["x", "y", "xSquared", "ySquared", "xTimesY", "sinX", "sinY"];
 
     return inputIds;
-}
+} */
 
 export function start(config: NNConfig): nn.Node[][] {
 
     // GenerateInputId's might beable to come back in here
 
-    let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, generateInputIds());
+    let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, config.inputs);
     console.log(network);
 
     return network;
@@ -55,35 +55,36 @@ export function getDataset(datasetType: string, numSamples: number, noise: numbe
     return dataset;
 }
 
-export function constructInputs(x: number, y: number): number[] {
-    let inputs: number[] = [];
+export function constructInputs(x: number, y: number, inputs: string[]): number[] {
+    let constructedInputs: number[] = [];
     for (let inputName in INPUTS) {
-        inputs.push(INPUTS[inputName].f(x, y))
+        if(inputs.includes(inputName)) constructedInputs.push(INPUTS[inputName].f(x, y))
     }
-    return inputs;
+    //console.log(constructedInputs);
+    return constructedInputs;
 
 }
 
-export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number): void {
+export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: string[]): void {
     for (let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
-        nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2));
+        nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2, inputs));
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y);
     }
     nn.train(network, learningRate);
 }
 
-export function getCost(network: nn.Node[][], data: Dataset2D[]/* , costFunction: nn.CostFunction */): number {
+export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: string[]/* , costFunction: nn.CostFunction */): number {
     let totalCost = 0;
     for (let i = 0; i < data.length; i++) {
         let dataPoint = data[i];
-        totalCost += nn.Costs.SQUARE.cost(nn.forwardPropagate(network, constructInputs(dataPoint.x1, dataPoint.x2)), dataPoint.y);
+        totalCost += nn.Costs.SQUARE.cost(nn.forwardPropagate(network, constructInputs(dataPoint.x1, dataPoint.x2, inputs)), dataPoint.y);
     }
 
     return totalCost / data.length;
 }
 
-export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[]): Dataset2D[] {
+export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: string[]): Dataset2D[] {
 
     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
@@ -94,7 +95,7 @@ export function getOutputDecisionBoundary(network: nn.Node[][], density: number,
             let x = xScale(i);
             let y = yScale(j);
 
-            let input = constructInputs(x || 0, y || 0);
+            let input = constructInputs(x || 0, y || 0, inputs);
             nn.forwardPropagate(network, input);
 
             let dataPoint: Dataset2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
@@ -106,7 +107,7 @@ export function getOutputDecisionBoundary(network: nn.Node[][], density: number,
     return boundary;
 }
 
-export function getOutputDecisionBoundary1D(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[]): number[] {
+export function getOutputDecisionBoundary1D(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: string[]): number[] {
 
     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
@@ -118,7 +119,9 @@ export function getOutputDecisionBoundary1D(network: nn.Node[][], density: numbe
             let x = xScale(i);
             let y = yScale(j);
             
-            let input = constructInputs(x || 0, y || 0);
+            let input = constructInputs(x || 0, y || 0, inputs);
+            console.log(inputs)
+            console.log(network)
             nn.forwardPropagate(network, input);
 
             boundary[iter++] = nn.getOutputNode(network).output;

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import * as vis from '../visControl'
 import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
-import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl } from '@material-ui/core';
+import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core';
 import * as nn from './../NeuralNet';
 import './../MainPage.css'
 import styled from '@emotion/styled';
@@ -14,6 +14,7 @@ export interface NNConfig {
     activationFunction: string;
     noise: number;
     learningRate: number;
+    inputs: string[];
 }
 
 interface PageProps {
@@ -92,8 +93,41 @@ const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...p
     justify-content: space-around;
 `
 
+function removeItemOnce(arr: string[], value: string) {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return arr;
+  }
+
+function InputsGroup() {
+    const inputs = Object.keys(vis.INPUTS);
+    console.log(inputs)
+    const [checkedItems, setCheckedItems] = useState(new Map<string,boolean>())
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        const input = e.target.name;
+        setCheckedItems(checkedItems.set(input, checked));
+    }
+
+    return (
+        <FormControl component="fieldset">
+            <FormLabel> Inputs </FormLabel>
+            <FormGroup>
+                {inputs.map(input => {
+                    <FormControlLabel
+                        control={<Checkbox checked={checkedItems.get(input) || false} onChange={handleOnChange} name={input}/>}
+                        label={vis.INPUTS[input].label}
+                    />
+                })}
+            </FormGroup>
+        </FormControl>
+    );
+}
+
 function MainPage(props: PageProps) {
-    const [numSamples, setNumSamples] = useState<number>(200);
+    const [numSamples, setNumSamples] = useState<number>(20);
     const [noise, setNoise] = useState<number>(0);
     const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
@@ -103,6 +137,7 @@ function MainPage(props: PageProps) {
             activationFunction: "ReLU",
             noise: 0,
             learningRate: 0.03,
+            inputs: ["x", "y"],
         }
     );
     const [network, setNetwork]                     = useState<nn.Node[][]>();
@@ -115,7 +150,7 @@ function MainPage(props: PageProps) {
         console.log("Config change useEffect");
         generateNetwork();
         generateDataset();
-        updateDecisionBoundary();
+        //updateDecisionBoundary();
     }, [config]);
 
     useEffect(() => {
@@ -125,7 +160,8 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         generateDataset();
-    }, [datasetType, noise])
+    }, [datasetType, noise]);
+
 
     const generateDataset = () => {
         console.log("Generating dataset");
@@ -142,8 +178,8 @@ function MainPage(props: PageProps) {
         console.log("Updating decision boundary");
         // Don't like numcells having to be the same
         if(network) {
-            setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain));
-            dataset && setLoss(vis.getCost(network, dataset));
+            setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
+            dataset && setLoss(vis.getCost(network, dataset, config.inputs));
         }
     }
 
@@ -161,7 +197,7 @@ function MainPage(props: PageProps) {
         let start = Date.now();
         
         for (let i = 0; i < noSteps; i++) {
-            vis.step(network, dataset, config.learningRate);
+            vis.step(network, dataset, config.learningRate, config.inputs);
         }
 
         setEpochs(epochs + noSteps);
@@ -192,6 +228,29 @@ function MainPage(props: PageProps) {
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
         setNoise(newValue as number);
     }
+
+    
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        const input = e.target.name;
+
+        // THIS HAS GOT TO GOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+        // let newNetworkShape = config.networkShape;
+        let newInputs: string[];
+
+        if(checked) {
+            config.inputs.push(input)
+            newInputs = config.inputs;
+        } else {
+            newInputs = removeItemOnce(config.inputs, input)
+        }
+        let newNetworkShape = config.networkShape;
+        newNetworkShape[0] = newInputs.length;
+        console.log(newNetworkShape);
+        console.log(newInputs)
+        setConfig({...config, inputs: newInputs, networkShape: newNetworkShape})
+        
+    }
+
 
     return (
         <Container>
@@ -236,9 +295,28 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton>
+                <StyledButton variant={"contained"} onClick={() => step(10000)}> Step 10000</StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
+                {/* <InputsGroup/> */}
+                <FormControl component="fieldset">
+                    <FormLabel component="legend">Assign responsibility</FormLabel>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox checked={config.inputs.includes("x")} onChange={handleInputChange} name="x" />}
+                            label="X_1"
+                        />
+                        <FormControlLabel
+                            control={<Checkbox checked={config.inputs.includes("y")} onChange={handleInputChange} name="y" />}
+                            label="X_2"
+                        />
+                        <FormControlLabel
+                            control={<Checkbox checked={config.inputs.includes("xSquared")} onChange={handleInputChange} name="xSquared" />}
+                            label="X_1^2"
+                        />
+                    </FormGroup>
+                </FormControl>
             </ControlPanel>
             <ContainerSection gridArea="nn-graph">
                 {dataset && network && <NNGraph 
