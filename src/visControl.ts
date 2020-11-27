@@ -120,8 +120,6 @@ export function getOutputDecisionBoundary1D(network: nn.Node[][], density: numbe
             let y = yScale(j);
             
             let input = constructInputs(x || 0, y || 0, inputs);
-            console.log(inputs)
-            console.log(network)
             nn.forwardPropagate(network, input);
 
             boundary[iter++] = nn.getOutputNode(network).output;
