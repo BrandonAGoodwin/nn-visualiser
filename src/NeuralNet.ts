@@ -18,7 +18,7 @@ export class Node {
     totalInput: number = 0.0;
 
     /** AKA b */
-    bias: number = 0.1;
+    bias: number = 0.0;
     /** AKA a */
     output: number = 0.0;
 
@@ -213,23 +213,12 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
     // Special Case: Last Layer (Single output node) /////////////////////////////////////////
 
     let outputNode = network[network.length - 1][0];
+
     // outputDerivative = dc/da
     outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
-    // inputDerivative = dc/dz = dc/da . phi_d(z)
-    //outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput);
-
-    outputNode.accInputDererivatives += outputNode.inputDerivative;
-    outputNode.numInputDerivatives++;
-
-    // for (let i = 0; i < outputNode.linksIn.length; i++) {
-    //     let outputNodeLink = outputNode.linksIn[i];
-    //     outputNodeLink.derAcc += outputNodeLink.source.output * outputNode.inputDerivative;
-    //     outputNodeLink.noAccDer++;
-    // }
 
     // General Case: Hidden Layers //////////////////////////////////////////////////////////
 
-    // Tinker with layerNum > 1
     for (let layerNum = network.length - 1; layerNum > 0; layerNum--) {
         let currentLayer = network[layerNum];
         
@@ -237,34 +226,15 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
         for (let i = 0; i < network[layerNum].length; i++) {
             let node = currentLayer[i];
 
-            // let acc = 0.0;
-            // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
-
-            // node.linksIn.forEach(f);
             // Calculate input derivative for current node
+            // inputDerivative = dc/dz = dc/da . phi_d(z)
             node.inputDerivative = node.outputDerivative * node.activationFunction.derivative(outputNode.totalInput);
-            //node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
 
             // For average in gradient decent
+            // dc/db for the bias on the current node
             node.accInputDererivatives += node.inputDerivative;
             node.numInputDerivatives++;
 
-            // // dc/dw for each weight comming in
-            // for (let j = 0; j < node.linksIn.length; j++) {
-            //     let link = node.linksIn[j];
-            //     link.derAcc += link.source.output * node.inputDerivative;
-            //     link.noAccDer++;
-            // }
-
-            // dc/dc for the bias on the current node
-            //node.db = node.inputDerivative;
-            // let acc = 0.0;
-            // for(let j = 0; j < node.linksIn.length; j++) {
-            //     let link = node.linksIn[j];
-
-            // }
-
-            //outputNode.dw = outputNode.inputDerivative * outputNode.
         }
 
         // Parse through nodes again to calculate weight derivative for link
@@ -347,84 +317,3 @@ export function forEachNode(network: Node[][], f: (node: Node) => void, ignoreIn
 export function getOutputNode(network: Node[][]): Node {
     return network[network.length - 1][0];
 }
-
-// /**
-//  * Back propagation algorithm.
-//  * @param network The neural network to run backprogation on.
-//  * @param costFunction The cost function used to determing how well the neural network performs.
-//  * @param y The expected out put of the neural network.
-//  */
-// export function backPropagate(network: Node[][], costFunction: CostFunction, y: number): void {
-
-//     // Special Case: Last Layer (Single output node) /////////////////////////////////////////
-
-//     let outputNode = network[network.length-1][0];
-//     // outputDerivative = dc/da
-//     outputNode.outputDerivative = costFunction.derivative(outputNode.output, y);
-//     // inputDerivative = dc/dz = dc/da . phi_d(z)
-//     //outputNode.inputDerivative = outputNode.outputDerivative *  outputNode.activationFunction.derivative(outputNode.totalInput);
-
-//     outputNode.accInputDererivatives += outputNode.inputDerivative;
-//     outputNode.numInputDerivatives++;
-
-//     for(let i = 0; i < outputNode.linksIn.length; i++) {
-//         let outputNodeLink = outputNode.linksIn[i];
-//         outputNodeLink.derAcc += outputNodeLink.source.output * outputNode.inputDerivative;
-//         outputNodeLink.noAccDer++;
-//     }
-
-//     // General Case: Hidden Layers //////////////////////////////////////////////////////////
-
-//     // Tinker with layerNum > 1
-//     for(let layerNum = network.length - 1; layerNum > 0; layerNum--) {
-//         let currentLayer = network[layerNum];
-//         let node: Node;
-//         for(let i = 0; i < currentLayer.length; i++) {
-//             node = currentLayer[i];
-
-//             // let acc = 0.0;
-//             // let f: (link: Link) => void = (link: Link) => acc += link.weight * link.dest.inputDerivative;
-
-//             // node.linksOut.forEach(f);
-
-//             node.inputDerivative = node.outputDerivative *  node.activationFunction.derivative(outputNode.totalInput);
-//             //node.inputDerivative = node.activationFunction.derivative(node.totalInput) * acc;
-
-//             // dc/dw for each weight comming in
-//             for(let j = 0; j <  node.linksIn.length; j++) {
-//                 let link = node.linksIn[j];
-//                 link.derAcc += link.source.output * node.inputDerivative;
-//                 link.noAccDer++;
-//             }
-
-//             // For average in gradient decent
-//             node.accInputDererivatives += node.inputDerivative;
-//             node.numInputDerivatives++;
-
-
-//             // dc/dc for the bias on the current node
-//             node.db = node.inputDerivative;
-//             // let acc = 0.0;
-//             // for(let j = 0; j < node.linksIn.length; j++) {
-//             //     let link = node.linksIn[j];
-
-//             // }
-
-//             //outputNode.dw = outputNode.inputDerivative * outputNode.
-//         }
-
-//         for(let i = 0; i < currentLayer.length; i++) {
-//             node = currentLayer[i];
-//             for(let j = 0; j < node.linksIn.length; j++) {
-//                 let link = node.linksIn[j];
-
-//                 link.source.outputDerivative = 
-//             }
-//         }
-//         for(let i = 0; i < currentLayer.length; i++) {
-//             node = currentLayer[i];
-
-//         }
-//     }
-
-// }

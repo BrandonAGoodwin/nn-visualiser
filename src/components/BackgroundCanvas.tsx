@@ -43,7 +43,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
-            .range(["#621fa2", "#FFFFFF", "#fbfb39"])
+            .range(["#fbfb39", "#FFFFFF", "#621fa2"])
             .clamp(true);
 
         let numShades = props.numShades || 100;
@@ -65,6 +65,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         const data = imageData.data;
         let iter = -1;
+        console.log(props.decisionBoundary)
         for(let i = 0; i < props.decisionBoundary.length; i++) {
             let value: number = props.decisionBoundary[i];
             if(props.discreetBoundary) value = value > 0 ? 1 : -1;

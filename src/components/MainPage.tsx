@@ -206,6 +206,7 @@ function MainPage(props: PageProps) {
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
         
         console.log(loss)
+        console.log(network)
         updateDecisionBoundary();
     }
 
