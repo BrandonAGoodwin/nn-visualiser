@@ -15,6 +15,7 @@ export interface NNConfig {
     noise: number;
     learningRate: number;
     inputs: string[];
+    batchSize: number;
 }
 
 interface PageProps {
@@ -127,17 +128,18 @@ function InputsGroup() {
 }
 
 function MainPage(props: PageProps) {
-    const [numSamples, setNumSamples] = useState<number>(20);
+    const [numSamples, setNumSamples] = useState<number>(100);
     const [noise, setNoise] = useState<number>(0);
     const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2, 8, 8, 8, 8, 1],
+            networkShape: [2, 1],
             activationFunction: "ReLU",
             noise: 0,
             learningRate: 0.03,
             inputs: ["x", "y"],
+            batchSize: 10,
         }
     );
     const [network, setNetwork]                     = useState<nn.Node[][]>();
@@ -197,7 +199,7 @@ function MainPage(props: PageProps) {
         let start = Date.now();
         
         for (let i = 0; i < noSteps; i++) {
-            vis.step(network, dataset, config.learningRate, config.inputs);
+            vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
         }
 
         setEpochs(epochs + noSteps);

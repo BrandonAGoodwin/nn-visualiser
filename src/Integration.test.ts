@@ -12,12 +12,13 @@ describe("Gradient Decent", () => {
     let defaultNetworkShape = [2,1];
     let defaultInputIds = ["x", "y"];
     let defaultOutputActivation = nn.Activations.TANH;
+    let defaultBatchSize = 10;
 
 
     it("Sigmoid", () => {
         network = nn.generateNetwork(defaultNetworkShape, nn.Activations.SIGMOID, defaultOutputActivation, defaultInputIds);
         for (let i = 0; i < noSteps; i++) {
-            vis.step(network, trainingData, learningRate, defaultInputIds);
+            vis.step(network, trainingData, learningRate, defaultInputIds, defaultBatchSize);
         }
 
         for (let i = 0; i < trainingData.length; i++) {
@@ -31,7 +32,7 @@ describe("Gradient Decent", () => {
     it("ReLU", () => {
         network = nn.generateNetwork(defaultNetworkShape, nn.Activations.RELU, defaultOutputActivation, defaultInputIds);
         for (let i = 0; i < noSteps; i++) {
-            vis.step(network, trainingData, learningRate, defaultInputIds);
+            vis.step(network, trainingData, learningRate, defaultInputIds, defaultBatchSize);
         }
 
         for (let i = 0; i < trainingData.length; i++) {

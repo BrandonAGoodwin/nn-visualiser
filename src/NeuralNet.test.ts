@@ -27,9 +27,11 @@ describe("Back Propagation", () => {
         {x1: 4, x2: 0, y: 1}
     ];
     let learningRate = 0.03;
+    let inputIds = ["x"];
+    let batchSize = 1;
 
     beforeEach(() => {
-        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, ["x"]);
+        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputIds);
     })
 
     it("Check accumulators change", () => {
@@ -41,7 +43,7 @@ describe("Back Propagation", () => {
 
         let sample = trainingData[0]
 
-        vis.step(network, trainingData, learningRate, ["x"]);
+        vis.step(network, trainingData, learningRate, inputIds, batchSize);
         nn.forwardPropagate(network, [sample.x1]);
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y)
 
@@ -70,16 +72,18 @@ describe("SGD", () => {
         {x1: 4, x2: 0, y: 1}
     ];
     let learningRate = 0.03;
+    let batchSize = 1;
+    let inputs = ["x"];
 
     beforeEach(() => {
-        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, ["x"]);
+        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputs);
     })
 
     it("Weights change", () => {
         let startWeight = network[1][0].linksIn[0].weight;
         let startBias = network[1][0].bias;
 
-        vis.step(network, trainingData, learningRate, ["x"]);
+        vis.step(network, trainingData, learningRate, inputs, batchSize);
 
         let newWeight = network[1][0].linksIn[0].weight;
         let newBias = network[1][0].bias;
@@ -97,9 +101,10 @@ describe("Network Building", () => {
         {x1: 4, x2: 0, y: 1}
     ];
     let learningRate = 0.03;
+    let inputIds = ["x"]
 
     beforeEach(() => {
-        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, ["x"]);
+        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputIds);
     })
 
     it("Correct Input Nodes", () => {

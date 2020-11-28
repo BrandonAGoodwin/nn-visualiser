@@ -65,13 +65,14 @@ export function constructInputs(x: number, y: number, inputs: string[]): number[
 
 }
 
-export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: string[]): void {
+export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: string[], batchSize: number): void {
     for (let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
         nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2, inputs));
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y);
+        if((i + 1) % batchSize === 0) nn.train(network, learningRate);
     }
-    nn.train(network, learningRate);
+    
 }
 
 export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: string[]/* , costFunction: nn.CostFunction */): number {
