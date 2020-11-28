@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
-import * as vis from '../visControl'
+import * as vis from '../visControl';
 import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
 import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core';
 import * as nn from './../NeuralNet';
-import './../MainPage.css'
+import './../MainPage.css';
 import styled from '@emotion/styled';
 import LabeledSlider from './Slider'
 
@@ -52,7 +51,7 @@ const ContainerSection = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
-    grid-area: ${(props:{ gridArea: string }) => (props.gridArea)};
+    grid-area: ${(props: { gridArea: string }) => (props.gridArea)};
     background-color: white;
     margin: auto auto;
     width: 100%;
@@ -97,35 +96,11 @@ const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...p
 function removeItemOnce(arr: string[], value: string) {
     var index = arr.indexOf(value);
     if (index > -1) {
-      arr.splice(index, 1);
+        arr.splice(index, 1);
     }
     return arr;
-  }
-
-function InputsGroup() {
-    const inputs = Object.keys(vis.INPUTS);
-    console.log(inputs)
-    const [checkedItems, setCheckedItems] = useState(new Map<string,boolean>())
-
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        const input = e.target.name;
-        setCheckedItems(checkedItems.set(input, checked));
-    }
-
-    return (
-        <FormControl component="fieldset">
-            <FormLabel> Inputs </FormLabel>
-            <FormGroup>
-                {inputs.map(input => {
-                    <FormControlLabel
-                        control={<Checkbox checked={checkedItems.get(input) || false} onChange={handleOnChange} name={input}/>}
-                        label={vis.INPUTS[input].label}
-                    />
-                })}
-            </FormGroup>
-        </FormControl>
-    );
 }
+
 
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(100);
@@ -142,17 +117,16 @@ function MainPage(props: PageProps) {
             batchSize: 10,
         }
     );
-    const [network, setNetwork]                     = useState<nn.Node[][]>();
-    const [decisionBoundary, setDecisionBoundary]   = useState<number[]>([]);
-    const [loss, setLoss]                           = useState<number>(0);
-    const [epochs, setEpochs]                       = useState<number>(0);
-    const [discreetBoundary, setDiscreetBoundary]   = useState<boolean>(true);
+    const [network, setNetwork] = useState<nn.Node[][]>();
+    const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
+    const [loss, setLoss] = useState<number>(0);
+    const [epochs, setEpochs] = useState<number>(0);
+    const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(true);
 
     useEffect(() => {
         console.log("Config change useEffect");
         generateNetwork();
         generateDataset();
-        //updateDecisionBoundary();
     }, [config]);
 
     useEffect(() => {
@@ -179,7 +153,7 @@ function MainPage(props: PageProps) {
     const updateDecisionBoundary = () => {
         console.log("Updating decision boundary");
         // Don't like numcells having to be the same
-        if(network) {
+        if (network) {
             setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
             dataset && setLoss(vis.getCost(network, dataset, config.inputs));
         }
@@ -190,14 +164,14 @@ function MainPage(props: PageProps) {
         generateNetwork();
         generateDataset();
         updateDecisionBoundary();
-    }
+    };
 
     const step = (noSteps: number) => {
         console.log(`MainPage step(${noSteps})`);
-        if(!network ||!dataset) return;
+        if (!network || !dataset) return;
 
         let start = Date.now();
-        
+
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
         }
@@ -206,53 +180,50 @@ function MainPage(props: PageProps) {
 
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
-        
-        console.log(loss)
-        console.log(network)
+
+        console.log(network);
+
         updateDecisionBoundary();
-    }
+    };
 
     const toggleDiscreetOutput = () => {
-        setDiscreetBoundary(!discreetBoundary)
-    }
+        setDiscreetBoundary(!discreetBoundary);
+    };
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({...config, activationFunction: e.target.value as string});
-    }
+        setConfig({ ...config, activationFunction: e.target.value as string });
+    };
 
     const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({...config, learningRate: e.target.value as number});
-    }
+        setConfig({ ...config, learningRate: e.target.value as number });
+    };
 
     const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setDatasetType(e.target.value as string);
-    }
+    };
 
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
         setNoise(newValue as number);
-    }
+    };
 
-    
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         const input = e.target.name;
 
-        // THIS HAS GOT TO GOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-        // let newNetworkShape = config.networkShape;
+        // Change this implemntation input is highly coupled with visControl
         let newInputs: string[];
 
-        if(checked) {
-            config.inputs.push(input)
+        if (checked) {
+            config.inputs.push(input);
             newInputs = config.inputs;
         } else {
-            newInputs = removeItemOnce(config.inputs, input)
+            newInputs = removeItemOnce(config.inputs, input);
         }
+
         let newNetworkShape = config.networkShape;
         newNetworkShape[0] = newInputs.length;
-        console.log(newNetworkShape);
-        console.log(newInputs)
-        setConfig({...config, inputs: newInputs, networkShape: newNetworkShape})
-        
-    }
+        setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
+    };
 
 
     return (
@@ -302,7 +273,6 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
-                {/* <InputsGroup/> */}
                 <FormControl component="fieldset">
                     <FormLabel> Inputs </FormLabel>
                     <FormGroup>
@@ -322,41 +292,26 @@ function MainPage(props: PageProps) {
                 </FormControl>
             </ControlPanel>
             <ContainerSection gridArea="nn-graph">
-                {dataset && network && <NNGraph 
-                    dataset = {dataset}
-                    density = {100}
-                    canvasWidth = {500}
-                    margin = {20}
-                    numCells = {props.numCells}
-                    xDomain = {props.xDomain}
-                    yDomain = {props.yDomain}
-                    decisionBoundary = {decisionBoundary}
-                    discreetBoundary = {discreetBoundary}
+                {dataset && network && <NNGraph
+                    dataset={dataset}
+                    density={100}
+                    canvasWidth={500}
+                    margin={20}
+                    numCells={props.numCells}
+                    xDomain={props.xDomain}
+                    yDomain={props.yDomain}
+                    decisionBoundary={decisionBoundary}
+                    discreetBoundary={discreetBoundary}
                 />}
-                {(!dataset || !network) && <CircularProgress/>}
-                 {/* {dataset && <NNGraph 
-
-                    dataset = {dataset}
-                    density = {100}
-                    canvasWidth = {80}
-                    margin = {20}
-                    numCells = {props.numCells}
-                    xDomain = {props.xDomain}
-                    yDomain = {props.yDomain}
-                    decisionBoundary = {decisionBoundary}
-                />} */}
+                {(!dataset || !network) && <CircularProgress />}
             </ContainerSection>
             <StatsBar>
                 <h2> Epochs: {epochs} </h2>
                 <h2> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
             </StatsBar>
-            
+
         </Container>
     );
 }
-
-// Minimum information to NNGraph to render the correct immage
-// Don't necessarally want to re-render whole of NNGraph unless that is what you're supposed to do
-// In something like Java I'd expect to do NNGraph.updateBackground(decisionBoundary)
 
 export default MainPage;

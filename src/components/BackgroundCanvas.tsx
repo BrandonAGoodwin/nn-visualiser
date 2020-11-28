@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
 import * as d3 from "d3";
 import React, { useEffect, useRef } from "react";
+
 
 interface CanvasProps {
     width: number;
@@ -12,28 +12,13 @@ interface CanvasProps {
 }
 
 
-const CustomCanvas = styled.canvas`
-    width: ${(props: CanvasProps) => props.numCells};
-    height: ${(props: CanvasProps) => props.numCells};
-`
-
 function BackgroundCanvas(props: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-
-        init()
-        
-    }, []);
-
-    const init = () => {
-
-    }
-
-    useEffect(() => {
         console.log(`BackgroundCanvas decisionBoundary useEffect`);
-        updateCanvas()
-    }, [props.decisionBoundary, props.discreetBoundary])
+        updateCanvas();
+    }, [props.decisionBoundary, props.discreetBoundary]);
     
     const updateCanvas = () => {
 
@@ -58,18 +43,18 @@ function BackgroundCanvas(props: CanvasProps) {
 
         const canvas = canvasRef.current;
         const context = canvas?.getContext("2d");
-        if(!props.decisionBoundary || !context) return
+        if(!props.decisionBoundary || !context) return;
         let imageData = context.createImageData(props.numCells, props.numCells);
 
         if(!imageData) return;
 
         const data = imageData.data;
         let iter = -1;
-        console.log(props.decisionBoundary)
+
         for(let i = 0; i < props.decisionBoundary.length; i++) {
             let value: number = props.decisionBoundary[i];
             if(props.discreetBoundary) value = value > 0 ? 1 : -1;
-            let c = d3.rgb(color(value))
+            let c = d3.rgb(color(value));
             data[++iter] = c.r;
             data[++iter] = c.g;
             data[++iter] = c.b;
@@ -79,7 +64,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         let delta = Date.now() - start;
         console.log(`Finsihed updating canvas (Duration: ${delta}ms)`);
-    }
+    };
 
     return (
         <canvas

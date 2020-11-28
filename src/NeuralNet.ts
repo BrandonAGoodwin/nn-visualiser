@@ -4,7 +4,6 @@ export class Node {
 
     // Standardise no and num usage
 
-
     // Refactor to init variables in the constructor
 
     id: string;
@@ -221,7 +220,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
 
     for (let layerNum = network.length - 1; layerNum > 0; layerNum--) {
         let currentLayer = network[layerNum];
-        
+
         // Parse through nodes and calculate input derivatives
         for (let i = 0; i < network[layerNum].length; i++) {
             let node = currentLayer[i];
@@ -247,10 +246,10 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
                 link.noAccDer++;
             }
         }
-        
+
         // Don't bother computing ouput derivatives for input nodes (Saves on compuiation)
-        if(layerNum === 1) continue;
-    
+        if (layerNum === 1) continue;
+
         // Parse through the previous layer and calculate output derivative all the nodes
         let previousLayer = network[layerNum - 1];
         for (let i = 0; i < previousLayer.length; i++) {
@@ -278,7 +277,7 @@ export function train(network: Node[][], learningRate: number) {
     for (let layerNum = 1; layerNum < network.length; layerNum++) {
 
         let currentLayer = network[layerNum];
-        
+
         for (let i = 0; i < currentLayer.length; i++) {
             let node = currentLayer[i];
 
@@ -286,7 +285,6 @@ export function train(network: Node[][], learningRate: number) {
                 let link = node.linksIn[j];
 
                 let averageWeightGradient = link.derAcc / link.noAccDer;
-                //console.log(averageWeightGradient)
                 link.weight = link.weight - (learningRate * averageWeightGradient);
 
                 link.derAcc = 0;
@@ -294,7 +292,6 @@ export function train(network: Node[][], learningRate: number) {
             }
 
             let averageBiasGradient = node.accInputDererivatives / node.numInputDerivatives;
-            //console.log(`AVARAGEIASGDEINT = ${averageBiasGradient}\nNUMBIASSES = ${node.numInputDerivatives}`)
 
             node.bias = node.bias - (learningRate * averageBiasGradient);
 

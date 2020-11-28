@@ -1,15 +1,15 @@
 import * as nn from "./NeuralNet";
 import * as vis from "./visControl";
-import { Dataset, Dataset2D } from "./datasets";
+import { Dataset } from "./datasets";
 
 
 describe("Gradient Decent", () => {
     let network: nn.Node[][];
 
-    let trainingData = Dataset.GAUSSIAN(30, 0)
+    let trainingData = Dataset.GAUSSIAN(30, 0);
     let learningRate = 0.03;
     let noSteps = 300;
-    let defaultNetworkShape = [2,1];
+    let defaultNetworkShape = [2, 1];
     let defaultInputIds = ["x", "y"];
     let defaultOutputActivation = nn.Activations.TANH;
     let defaultBatchSize = 10;
@@ -24,7 +24,7 @@ describe("Gradient Decent", () => {
         for (let i = 0; i < trainingData.length; i++) {
             let datapoint = trainingData[i];
             let prediction = nn.forwardPropagate(network, vis.constructInputs(datapoint.x1, datapoint.x2, defaultInputIds)) > 0 ? 1 : -1;
-            expect(prediction).toEqual(datapoint.y)
+            expect(prediction).toEqual(datapoint.y);
         }
 
     })
@@ -38,7 +38,7 @@ describe("Gradient Decent", () => {
         for (let i = 0; i < trainingData.length; i++) {
             let datapoint = trainingData[i];
             let prediction = nn.forwardPropagate(network, vis.constructInputs(datapoint.x1, datapoint.x2, defaultInputIds)) > 0 ? 1 : -1;
-            expect(prediction).toEqual(datapoint.y)
+            expect(prediction).toEqual(datapoint.y);
         }
 
     })

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import * as d3 from 'd3'
 import { Dataset2D } from '../datasets';
 import BackgroundCanvas from './BackgroundCanvas';
-import styled from '@emotion/styled';
+
 
 type GraphProps = {
     dataset: Dataset2D[],
@@ -18,17 +18,15 @@ type GraphProps = {
 }
 
 
-function NNGraph (props: GraphProps): JSX.Element {
+function NNGraph(props: GraphProps): JSX.Element {
 
     const d3Container: any = useRef<any>(null);
     const containerRef: any = useRef<any>(null);
 
     const [initialised, setInitialised] = useState<boolean>(false);
 
-    let scale = props.canvasWidth / 16
+    let scale = props.canvasWidth / 16;
 
-    // Use effect watches for change in the decision boundary then calls updatebackground
-    //  Delete all d3 objects that are updated, can be done by using the classing
 
     const init = () => {
         console.log("NNGraph init")
@@ -45,7 +43,7 @@ function NNGraph (props: GraphProps): JSX.Element {
 
     useEffect(() => {
         console.log("props and props.decisionboundary NNGraph useEffect")
-        if(!initialised) {
+        if (!initialised) {
             init()
         } else {
             updateGraph()
@@ -59,7 +57,7 @@ function NNGraph (props: GraphProps): JSX.Element {
         let svg = d3.select(d3Container.currnet)
 
         svg.attr('width', props.canvasWidth + props.margin * 2)
-        .attr('height', props.canvasWidth + props.margin * 2)
+            .attr('height', props.canvasWidth + props.margin * 2)
 
     }
 
@@ -90,9 +88,9 @@ function NNGraph (props: GraphProps): JSX.Element {
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())));
 
         graph.append('g')
-        .attr("class", `axis`)
-        .attr('transform', `translate(${props.canvasWidth},0)`)
-        .call(d3.axisRight(y).tickValues([0].concat(y.ticks())));
+            .attr("class", `axis`)
+            .attr('transform', `translate(${props.canvasWidth},0)`)
+            .call(d3.axisRight(y).tickValues([0].concat(y.ticks())));
 
         graph.append('g')
             .attr("class", `axis`)
@@ -126,11 +124,11 @@ function NNGraph (props: GraphProps): JSX.Element {
                     style={{ position: "absolute" }}
                 />
                 <BackgroundCanvas
-                    width = {props.canvasWidth}
-                    height = {props.canvasWidth}
-                    numCells = {props.numCells}
-                    decisionBoundary = {props.decisionBoundary}
-                    discreetBoundary = {props.discreetBoundary}
+                    width={props.canvasWidth}
+                    height={props.canvasWidth}
+                    numCells={props.numCells}
+                    decisionBoundary={props.decisionBoundary}
+                    discreetBoundary={props.discreetBoundary}
                 />
             </div>
         </>

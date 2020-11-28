@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 
+
 export type Dataset2D = {
     x1: number,
     x2: number,
@@ -8,8 +9,9 @@ export type Dataset2D = {
 
 export type DatasetGenerator = (numSamples: number, noise: number) => Dataset2D[];
 
+
 export class Dataset {
-    
+
     // Could create 3 gauss data quite easily
     public static GAUSSIAN: DatasetGenerator = (numSamples, noise) => {
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
@@ -51,20 +53,14 @@ export class Dataset {
             }
         }
 
-        generateUniformData(-8 / 2, 8 / 2, 8, 8, 1) // Top left +1
-        generateUniformData(8 / 2, 8 / 2, 8, 8, -1) // Top right -1
-        generateUniformData(-8 / 2, -8 / 2, 8, 8, -1) // Bottom left -1
-        generateUniformData(8 / 2, -8 / 2, 8, 8, 1) // Bottom right +1
+        generateUniformData(-8 / 2, 8 / 2, 8, 8, 1)     // Top left +1
+        generateUniformData(8 / 2, 8 / 2, 8, 8, -1)     // Top right -1
+        generateUniformData(-8 / 2, -8 / 2, 8, 8, -1)   // Bottom left -1
+        generateUniformData(8 / 2, -8 / 2, 8, 8, 1)     // Bottom right +1
 
         return samples;
     }
 }
-
-// let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
-//     "Gaussian" : Dataset,
-//     "XOR": nn.Activations.SIGMOID,
-// }
-
 
 
 /**
@@ -76,10 +72,8 @@ export class Dataset {
 function normalDistribution(mean: number, variance: number): number {
     let x1, x2, y, w: number;
 
-    // check that the mean and variance have values
     mean = mean || 0;
     variance = variance || 1;
-    // check this works ^^
 
     do {
         x1 = 2 * Math.random() - 1;
