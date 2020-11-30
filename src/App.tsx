@@ -6,7 +6,8 @@ import MainPage from './components/MainPage';
 const Container = styled("div")`
   background: rgb(121,9,92);
   background: linear-gradient(41deg, rgba(121,9,92,1) 35%, rgba(0,212,255,1) 100%);
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
 `
 
 function App() {

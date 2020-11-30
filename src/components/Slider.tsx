@@ -30,7 +30,8 @@ function ValueLabelComponent(props: Props) {
 interface sliderProps {
     label?: string;
     defaultValue: number;
-    f: (e: React.ChangeEvent<{}>, value: number | number[]) => void;
+    onChange: (e: React.ChangeEvent<{}>, value: number | number[]) => void;
+    valueLabelDisplay?: "on" | "off" | "auto" | undefined;
 }
 
 function LabeledSlider(props: sliderProps) {
@@ -45,7 +46,8 @@ function LabeledSlider(props: sliderProps) {
                 step={0.1}
                 min={0}
                 max={1}
-                onChange={props.f}
+                onChange={props.onChange}
+                valueLabelDisplay={props.valueLabelDisplay || "auto"}
             />
         </StyledDiv>
     );

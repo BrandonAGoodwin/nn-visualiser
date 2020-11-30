@@ -2,16 +2,21 @@ import React, { useEffect, useState } from 'react';
 import * as vis from '../visControl';
 import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
-import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core';
+import { Button, InputLabel, MenuItem, Select, CircularProgress, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, Typography, Divider, IconButton } from '@material-ui/core';
 import * as nn from './../NeuralNet';
 import './../MainPage.css';
 import styled from '@emotion/styled';
-import LabeledSlider from './Slider'
+import LabeledSlider from './Slider';
+import InfoButton from './InfoButton';
+import DefaultInfoPanel from './InfoPanels/DefaultInfoPanel';
+import LearningInfoRatePanel from './InfoPanels/LearningRateInfoPanel';
+import ActivationInfoPanel from './InfoPanels/ActivationInfoPanel';
+import { GitHub } from '@material-ui/icons';
+import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 
 export interface NNConfig {
     networkShape: number[];
     activationFunction: string;
-    noise: number;
     learningRate: number;
     inputs: string[];
     batchSize: number;
@@ -25,27 +30,44 @@ interface PageProps {
 
 const StyledButton = styled(Button)`
     margin: 5px;
-`
+`;
 
 const StyledFormControl = styled(FormControl)`
-    margin: 5px;
+    margin: 10px;
     min-width: 130px;
-`
+    background-color: inherit;
+`;
+
+const StyledSelect = styled(Select)`
+    background-color: inherit;
+`;
 
 const Container = styled("div")`
     margin: auto auto;
     display: grid;
-    width: 800px;
-    height: 600px;
+    width: 900px;
+    min-height: 600px;
     padding: 20px;
-    grid-template-columns: 200px 1fr;
-    grid-template-rows: 90px 1fr 80px;
+    grid-template-columns: 230px 1fr;
+    grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
     grid-template-areas: 
         "config-bar config-bar"
         "control-panel nn-graph"
-        "stats stats";
-`
+        "stats stats"
+        "info info";
+    
+`;
+
+const StyledLinkButton = styled(IconButton)`
+    color: #ffffff;
+`;
+
+const LinksDiv = styled("div")`
+    display: flex;
+    align-content: flex-end;
+`;
+
 
 const ContainerSection = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -63,7 +85,7 @@ const ContainerSection = styled("div")`
     display: flex;
     flex-direction: row;
     justify-content: center;
-`
+`;
 
 // Fix so that this doesn't use hard coded paddings
 const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar" {...props} />)`
@@ -72,7 +94,7 @@ const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar"
     justify-content: left;
     padding-left: 30px;
     padding-top: 10px;
-`
+`;
 
 const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
     display: flex;
@@ -83,7 +105,7 @@ const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-
     padding-left: 10px;
     padding-right: 10px;
     justify-content: left;
-`
+`;
 
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
     display: flex;
@@ -91,7 +113,15 @@ const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...p
     align-items: stretch;
     padding: 0px;
     justify-content: space-around;
-`
+`;
+
+const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...props} />)`
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    padding-left: 30px;
+    padding-top: 10px;
+`;
 
 function removeItemOnce(arr: string[], value: string) {
     var index = arr.indexOf(value);
@@ -104,14 +134,13 @@ function removeItemOnce(arr: string[], value: string) {
 
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(100);
-    const [noise, setNoise] = useState<number>(0);
+    const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
             networkShape: [2, 1],
             activationFunction: "ReLU",
-            noise: 0,
             learningRate: 0.03,
             inputs: ["x", "y"],
             batchSize: 10,
@@ -121,7 +150,9 @@ function MainPage(props: PageProps) {
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
     const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
-    const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(true);
+    const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
+
+    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config}/>);
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -206,7 +237,6 @@ function MainPage(props: PageProps) {
         setNoise(newValue as number);
     };
 
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         const input = e.target.name;
 
@@ -225,45 +255,74 @@ function MainPage(props: PageProps) {
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     };
 
-
     return (
         <Container>
             <ConfigBar>
                 <StyledFormControl variant="filled">
                     <InputLabel>Activation</InputLabel>
-                    <Select
+                    <StyledSelect
                         value={config.activationFunction}
                         onChange={handleActivationChange}
                     >
                         <MenuItem value="ReLU">ReLU</MenuItem>
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
-                    </Select>
+                    </StyledSelect>
                 </StyledFormControl>
+                <InfoButton title="Activation Tooltip" setInfoPanel={setInfoPanel} infoPanel={<ActivationInfoPanel {...config}/>}>
+                    <React.Fragment>
+                        <Typography color="inherit">Activation Function (&Phi;)</Typography>
+                        This effects the rate at which the weights and biases change when training the neural network.<br />
+                        <u>Click the icon to get more information</u>
+                    </React.Fragment>
+                </InfoButton>
+                <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Learning Rate</InputLabel>
-                    <Select
+                    <StyledSelect
                         value={config.learningRate}
                         onChange={handleLearningRateChange}
                     >
                         <MenuItem value="0.03">0.03</MenuItem>
                         <MenuItem value="0.005">0.005</MenuItem>
-                    </Select>
+                    </StyledSelect>
                 </StyledFormControl>
+                <InfoButton title="Learning Rate Tooltip" setInfoPanel={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config}/>}>
+                    <React.Fragment>
+                        <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
+                        This affects the rate at which the weights and biases change when training the neural network.<br />
+                        <u>Click the icon to get more information</u>
+                    </React.Fragment>
+                </InfoButton>
+                <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Dataset</InputLabel>
-                    <Select
+                    <StyledSelect
                         value={datasetType}
                         onChange={handleDatasetChange}
                     >
                         <MenuItem value="Gaussian">Gaussian</MenuItem>
                         <MenuItem value="XOR">XOR</MenuItem>
-                    </Select>
+                    </StyledSelect>
                 </StyledFormControl>
+                <InfoButton title="Dataset Tooltip" setInfoPanel={setInfoPanel} infoPanel={<DatasetInfoPanel {...config}/>}>
+                    <React.Fragment>
+                        <Typography color="inherit">Datasets</Typography>
+                        Defines the shape of the dataset we want our neural network to solve.<br />
+                        <u>Click the icon to get more information</u>
+                    </React.Fragment>
+                </InfoButton>
+                <Divider orientation="vertical" flexItem />
                 <LabeledSlider
                     label="Noise"
                     defaultValue={noise}
-                    f={handleNoiseChange}
+                    onChange={handleNoiseChange}
                 />
+                <InfoButton title="Noise Tooltip">
+                    <React.Fragment>
+                        <Typography color="inherit">Noise</Typography>
+                        This sets the noise in the generated data set. The more noise the greater the variance in the generated data.
+                    </React.Fragment>
+                </InfoButton>
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
@@ -273,7 +332,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" style={{ marginTop: "10px"}}>
                     <FormLabel> Inputs </FormLabel>
                     <FormGroup>
                         <FormControlLabel
@@ -309,7 +368,16 @@ function MainPage(props: PageProps) {
                 <h2> Epochs: {epochs} </h2>
                 <h2> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
             </StatsBar>
-
+            <InfoPanel>
+                {infoPanel}
+            </InfoPanel>
+            <LinksDiv>
+                <a href="https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/bxg796" target="_blank">
+                    <StyledLinkButton>
+                        <GitHub color="inherit" />
+                    </StyledLinkButton>
+                </a>
+            </LinksDiv>
         </Container>
     );
 }

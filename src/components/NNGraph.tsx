@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
-import * as d3 from 'd3'
+import React, { useEffect, useState, useRef } from 'react';
+import * as d3 from 'd3';
 import { Dataset2D } from '../datasets';
 import BackgroundCanvas from './BackgroundCanvas';
 
@@ -135,4 +135,4 @@ function NNGraph(props: GraphProps): JSX.Element {
     );
 }
 
-export default NNGraph
+export default NNGraph;
