@@ -119,3 +119,30 @@ export function getOutputDecisionBoundary1D(network: nn.Node[][], density: numbe
 
     return boundary;
 }
+
+export function getAllDecisionBoundaries(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: string[]): { [nodeId: string]: number[] } {
+    let boundaries: {[nodeId:string]: number[]} = {};
+
+    let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
+    let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
+    let iter = 0;
+
+    for (let i = 0; i < density; i++) {
+        for (let j = 0; j < density; j++) {
+            let x = xScale(j);
+            let y = yScale(i);
+
+            let input = constructInputs(x || 0, y || 0, inputs);
+            nn.forwardPropagate(network, input);
+            nn.forEachNode(network, (node: nn.Node) => {
+                if (!boundaries[node.id]) boundaries[node.id] = [];
+                boundaries[node.id][iter] = node.output;
+            })
+            iter++;
+            //boundary[iter++] = nn.getOutputNode(network).output;
+        }
+    }
+
+    return boundaries;
+
+}

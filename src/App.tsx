@@ -7,7 +7,9 @@ const Container = styled("div")`
   background: rgb(121,9,92);
   background: linear-gradient(41deg, rgba(121,9,92,1) 35%, rgba(0,212,255,1) 100%);
   min-height: 100vh;
+  min-width: 100vw;
   height: auto;
+  width: auto;
 `
 
 function App() {

@@ -21,7 +21,6 @@ type GraphProps = {
 function NNGraph(props: GraphProps): JSX.Element {
 
     const d3Container: any = useRef<any>(null);
-    const containerRef: any = useRef<any>(null);
 
     const [initialised, setInitialised] = useState<boolean>(false);
 
@@ -38,7 +37,7 @@ function NNGraph(props: GraphProps): JSX.Element {
     useEffect(() => {
         console.log("NNGraph inital useEffect")
         init()
-    }, [])
+    }, []);
 
 
     useEffect(() => {
@@ -48,7 +47,7 @@ function NNGraph(props: GraphProps): JSX.Element {
         } else {
             updateGraph()
         }
-    }, [props, props.decisionBoundary])
+    }, [props.decisionBoundary]);
 
 
     const createGraph = () => {
@@ -116,7 +115,7 @@ function NNGraph(props: GraphProps): JSX.Element {
 
     return (
         <>
-            <div ref={containerRef}>
+            <div>
                 <svg
                     ref={d3Container}
                     width={props.canvasWidth + props.margin * 2}
@@ -127,6 +126,7 @@ function NNGraph(props: GraphProps): JSX.Element {
                     width={props.canvasWidth}
                     height={props.canvasWidth}
                     numCells={props.numCells}
+                    padding={true}
                     decisionBoundary={props.decisionBoundary}
                     discreetBoundary={props.discreetBoundary}
                 />

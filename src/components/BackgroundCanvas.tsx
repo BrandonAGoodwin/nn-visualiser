@@ -3,10 +3,12 @@ import React, { useEffect, useRef } from "react";
 
 
 interface CanvasProps {
+    id?: string;
     width: number;
     height: number;
     numCells: number;
     numShades?: number;
+    padding: boolean;
     decisionBoundary?: number[];
     discreetBoundary: boolean;
 }
@@ -16,13 +18,13 @@ function BackgroundCanvas(props: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        console.log(`BackgroundCanvas decisionBoundary useEffect`);
+        //console.log(`BackgroundCanvas decisionBoundary useEffect`);
         updateCanvas();
     }, [props.decisionBoundary, props.discreetBoundary]);
     
     const updateCanvas = () => {
 
-        console.log("Update canvas");
+        //console.log("Update canvas");
 
         let start = Date.now();
 
@@ -63,20 +65,20 @@ function BackgroundCanvas(props: CanvasProps) {
         context.putImageData(imageData, 0, 0);
 
         let delta = Date.now() - start;
-        console.log(`Finsihed updating canvas (Duration: ${delta}ms)`);
+        //console.log(`Finsihed updating canvas (Duration: ${delta}ms)`);
     };
 
     return (
         <canvas
             ref={canvasRef}
-            id={`${props.width}`}
+            id={props.id}
             className="background"
             width={props.numCells}
             height={props.numCells}
             style={{
                 width: `${props.width}px`,
                 height: `${props.height}px`,
-                padding: "20px"
+                padding: `${props.padding ? "20" : "0"}px`
             }}
         />);
 }

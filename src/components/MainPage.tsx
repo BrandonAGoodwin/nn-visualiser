@@ -13,6 +13,7 @@ import LearningInfoRatePanel from './InfoPanels/LearningRateInfoPanel';
 import ActivationInfoPanel from './InfoPanels/ActivationInfoPanel';
 import { GitHub } from '@material-ui/icons';
 import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
+import NeuralNetworkVis from './NeuralNetworkVis';
 
 export interface NNConfig {
     networkShape: number[];
@@ -45,17 +46,20 @@ const StyledSelect = styled(Select)`
 const Container = styled("div")`
     margin: auto auto;
     display: grid;
-    width: 900px;
+    width: inherit;
+    max-width: 1400px;
     min-height: 600px;
     padding: 20px;
-    grid-template-columns: 230px 1fr;
+    padding-right: 100px;
+    padding-left: 100px;
+    grid-template-columns: 230px 1fr auto;
     grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
     grid-template-areas: 
-        "config-bar config-bar"
-        "control-panel nn-graph"
-        "stats stats"
-        "info info";
+        "config-bar config-bar config-bar"
+        "control-panel network nn-graph"
+        "stats stats stats"
+        "info info info";
     
 `;
 
@@ -139,7 +143,7 @@ function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2, 1],
+            networkShape: [2,8,8,8, 1],
             activationFunction: "ReLU",
             learningRate: 0.03,
             inputs: ["x", "y"],
@@ -147,27 +151,32 @@ function MainPage(props: PageProps) {
         }
     );
     const [network, setNetwork] = useState<nn.Node[][]>();
+    const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
     const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
 
-    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config}/>);
+    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
 
     useEffect(() => {
         console.log("Config change useEffect");
         generateNetwork();
         generateDataset();
-    }, [config]);
+    }, [config])
 
     useEffect(() => {
         console.log("Config change useEffect");
+        updateDecisionBoundaries();
+    }, [network])
+
+    useEffect(() => {
         updateDecisionBoundary();
-    }, [network]);
+    }, [decisionBoundaries])
 
     useEffect(() => {
         generateDataset();
-    }, [datasetType, noise]);
+    }, [datasetType, noise])
 
 
     const generateDataset = () => {
@@ -181,20 +190,26 @@ function MainPage(props: PageProps) {
         setEpochs(0);
     }
 
-    const updateDecisionBoundary = () => {
-        console.log("Updating decision boundary");
-        // Don't like numcells having to be the same
+    const updateDecisionBoundaries = () => {
+        console.log("Updating decision boundaries");
         if (network) {
-            setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
+            // Don't like numcells having to be the same
+            setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, config.inputs));
             dataset && setLoss(vis.getCost(network, dataset, config.inputs));
         }
+    }
+
+    const updateDecisionBoundary = () => {
+        console.log("Updating decision boundary");
+        //network && setDecisionBoundary(decisionBoundaries[nn.getOutputNode(network).id]);
+        network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
     }
 
     const reset = () => {
         console.log("Reset");
         generateNetwork();
         generateDataset();
-        updateDecisionBoundary();
+        updateDecisionBoundaries();
     };
 
     const step = (noSteps: number) => {
@@ -214,7 +229,10 @@ function MainPage(props: PageProps) {
 
         console.log(network);
 
-        updateDecisionBoundary();
+        start = Date.now();
+        updateDecisionBoundaries();
+        delta = Date.now() - start;
+        console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
     };
 
     const toggleDiscreetOutput = () => {
@@ -268,7 +286,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Activation Tooltip" setInfoPanel={setInfoPanel} infoPanel={<ActivationInfoPanel {...config}/>}>
+                <InfoButton title="Activation Tooltip" setInfoPanel={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
                         This effects the rate at which the weights and biases change when training the neural network.<br />
@@ -286,7 +304,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="0.005">0.005</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Learning Rate Tooltip" setInfoPanel={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config}/>}>
+                <InfoButton title="Learning Rate Tooltip" setInfoPanel={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
                         This affects the rate at which the weights and biases change when training the neural network.<br />
@@ -304,7 +322,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="XOR">XOR</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Dataset Tooltip" setInfoPanel={setInfoPanel} infoPanel={<DatasetInfoPanel {...config}/>}>
+                <InfoButton title="Dataset Tooltip" setInfoPanel={setInfoPanel} infoPanel={<DatasetInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Datasets</Typography>
                         Defines the shape of the dataset we want our neural network to solve.<br />
@@ -332,7 +350,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
-                <FormControl component="fieldset" style={{ marginTop: "10px"}}>
+                <FormControl component="fieldset" style={{ marginTop: "10px" }}>
                     <FormLabel> Inputs </FormLabel>
                     <FormGroup>
                         <FormControlLabel
@@ -350,11 +368,18 @@ function MainPage(props: PageProps) {
                     </FormGroup>
                 </FormControl>
             </ControlPanel>
+            <ContainerSection gridArea="network">
+                {dataset && network && <NeuralNetworkVis
+                    network={network}
+                    decisionBoundaries={decisionBoundaries}
+                    discreetBoundary={discreetBoundary}
+                />}
+            </ContainerSection>
             <ContainerSection gridArea="nn-graph">
                 {dataset && network && <NNGraph
                     dataset={dataset}
-                    density={100}
-                    canvasWidth={500}
+                    density={25}
+                    canvasWidth={275}
                     margin={20}
                     numCells={props.numCells}
                     xDomain={props.xDomain}
