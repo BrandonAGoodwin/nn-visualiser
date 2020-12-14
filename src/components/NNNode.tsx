@@ -19,6 +19,8 @@ const NodeContainer = styled("div") <ContainerProps>`
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box;
     border: 2px solid black;
+    //background-color: black;
+    background-color: white;
     border-radius: 3px;
     max-height: ${props => props.nodeWidth + 2 * 2}px;
 `;

@@ -47,7 +47,7 @@ function NNGraph(props: GraphProps): JSX.Element {
         } else {
             updateGraph()
         }
-    }, [props.decisionBoundary]);
+    }, [props.decisionBoundary, props.dataset]);
 
 
     const createGraph = () => {
@@ -102,8 +102,8 @@ function NNGraph(props: GraphProps): JSX.Element {
             .attr("r", scale / 7)
             .attr("fill", function (datapoint: Dataset2D): string {
                 let colour = "black";
-                if (datapoint.y === 1) colour = "#621fa2";
-                if (datapoint.y === -1) colour = "#fbfb39";
+                if (datapoint.y === 1) colour = "#223781";
+                if (datapoint.y === -1) colour = "#ff7661";
 
                 return colour;
             })

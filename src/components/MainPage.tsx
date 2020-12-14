@@ -60,7 +60,6 @@ const Container = styled("div")`
         "control-panel network nn-graph"
         "stats stats stats"
         "info info info";
-    
 `;
 
 const StyledLinkButton = styled(IconButton)`
@@ -78,6 +77,7 @@ const ContainerSection = styled("div")`
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
     grid-area: ${(props: { gridArea: string }) => (props.gridArea)};
+    //background-color: #131516;
     background-color: white;
     margin: auto auto;
     width: 100%;
@@ -86,6 +86,7 @@ const ContainerSection = styled("div")`
     //padding: 30px; 
     border-radius: 30px;
     border: 2px solid #bdbdbd;
+    //border: 2px solid #353a3c;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -143,7 +144,7 @@ function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2,8,8,8, 1],
+            networkShape: [2,4, 4,1],
             activationFunction: "ReLU",
             learningRate: 0.03,
             inputs: ["x", "y"],
@@ -166,17 +167,21 @@ function MainPage(props: PageProps) {
     }, [config])
 
     useEffect(() => {
-        console.log("Config change useEffect");
-        updateDecisionBoundaries();
-    }, [network])
-
-    useEffect(() => {
         updateDecisionBoundary();
     }, [decisionBoundaries])
 
     useEffect(() => {
+        console.log("Config change useEffect");
+        updateDecisionBoundaries();
+    }, [network])
+
+   
+    useEffect(() => {
+        console.log("Dataset/Noise change useEffect");
         generateDataset();
     }, [datasetType, noise])
+
+
 
 
     const generateDataset = () => {

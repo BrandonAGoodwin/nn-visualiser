@@ -4,8 +4,8 @@ import './App.css';
 import MainPage from './components/MainPage';
 
 const Container = styled("div")`
-  background: rgb(121,9,92);
-  background: linear-gradient(41deg, rgba(121,9,92,1) 35%, rgba(0,212,255,1) 100%);
+  background: rgb(255,118,97);
+  background: linear-gradient(207deg, rgba(255,118,97,1) 0%, rgba(34,55,129,1) 100%);
   min-height: 100vh;
   min-width: 100vw;
   height: auto;

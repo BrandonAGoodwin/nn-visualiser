@@ -30,7 +30,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
-            .range(["#fbfb39", "#FFFFFF", "#621fa2"])
+            .range(["#ff7661", "#FFFFFF", "#223781"])
             .clamp(true);
 
         let numShades = props.numShades || 100;
