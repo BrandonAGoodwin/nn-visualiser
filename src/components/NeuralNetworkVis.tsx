@@ -15,6 +15,9 @@ interface NetworkProps {
 }
 
 const Container = styled("div")`
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -37,6 +40,8 @@ function NeuralNetworkVis(props: NetworkProps) {
     const nodeWidth = 40;
     const [links, setLinks] = useState<{[key:string]: any}>({});
     const [initalised, setInitalised] = useState<boolean>(false);
+    const [updatingLinks, setUpdatingLinks] = useState<boolean>(false);
+
     useEffect(() => {
         drawLinks();
         setInitalised(true);
@@ -66,6 +71,7 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     const drawLinks = () => {
         console.log("Draw Links");
+        setUpdatingLinks(true);
         // Optimise to only redraw the links for the layer that has been changed
         let start = Date.now();
         let newLinks: {[key:string]: any} = {}
@@ -88,6 +94,7 @@ function NeuralNetworkVis(props: NetworkProps) {
             }
         }
         setLinks(newLinks);
+        setUpdatingLinks(false);
         let delta = Date.now() - start;
         console.log(`Finished drawing links (Links Drawn: ${iter}) (Duration: ${delta}ms)`);
     }
@@ -96,6 +103,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         console.log("Updating Links");
         let start = Date.now();
         let iter = 0;
+        
         for (let layerNum = 0; layerNum < props.network.length; layerNum++) {
             let currentLayer = props.network[layerNum];
             for (let i = 0; i < currentLayer.length; i++) {
@@ -114,13 +122,14 @@ function NeuralNetworkVis(props: NetworkProps) {
             }
 
         }
+
         let delta = Date.now() - start;
         console.log(`Finished updating links (Links Updating: ${iter}) (Duration: ${delta}ms)`);
     }
 
     return (
         <Container>
-            {props.network.map(layer => <Layer>
+            {updatingLinks || props.network.map(layer => <Layer>
                 {layer.map(node => <NNNode
                     id={`node-${node.id}`}
                     nodeWidth={nodeWidth}

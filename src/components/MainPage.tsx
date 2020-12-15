@@ -14,6 +14,8 @@ import ActivationInfoPanel from './InfoPanels/ActivationInfoPanel';
 import { GitHub } from '@material-ui/icons';
 import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 
 export interface NNConfig {
     networkShape: number[];
@@ -112,6 +114,12 @@ const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-
     justify-content: left;
 `;
 
+const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network" {...props} />)`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+`
+
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
     display: flex;
     flex-direction: row;
@@ -126,6 +134,12 @@ const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...p
     justify-content: left;
     padding-left: 30px;
     padding-top: 10px;
+`;
+
+const NeuralNetworkControls = styled("div")`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 `;
 
 function removeItemOnce(arr: string[], value: string) {
@@ -278,6 +292,30 @@ function MainPage(props: PageProps) {
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     };
 
+    const removeLayer = () => {
+        console.log("Running removeLayer");
+        if(config.networkShape.length > 2) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape.pop();
+            newNetworkShape.pop();
+            newNetworkShape.push(1);
+            console.log(newNetworkShape);
+            setConfig({ ...config, networkShape: newNetworkShape});
+        }
+    }
+
+    const addLayer = () => {
+        console.log("Running addLayer");
+        if(config.networkShape.length < 6) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape.pop();
+            newNetworkShape.push(newNetworkShape[newNetworkShape.length-1]);
+            newNetworkShape.push(1);
+            console.log(newNetworkShape);
+            setConfig({ ...config, networkShape: newNetworkShape});
+        }
+    }
+
     return (
         <Container>
             <ConfigBar>
@@ -373,13 +411,21 @@ function MainPage(props: PageProps) {
                     </FormGroup>
                 </FormControl>
             </ControlPanel>
-            <ContainerSection gridArea="network">
+            <NetworkPanel>
+                <NeuralNetworkControls>
+                    <IconButton onClick={removeLayer}>
+                        <RemoveCircleIcon/>
+                    </IconButton>
+                    <IconButton onClick={addLayer}>
+                        <AddCircleIcon/>
+                    </IconButton>
+                </NeuralNetworkControls>
                 {dataset && network && <NeuralNetworkVis
                     network={network}
                     decisionBoundaries={decisionBoundaries}
                     discreetBoundary={discreetBoundary}
                 />}
-            </ContainerSection>
+            </NetworkPanel>
             <ContainerSection gridArea="nn-graph">
                 {dataset && network && <NNGraph
                     dataset={dataset}
