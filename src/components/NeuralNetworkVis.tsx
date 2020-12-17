@@ -7,6 +7,8 @@ import * as d3 from "d3";
 import BackgroundCanvas from "./BackgroundCanvas";
 import NNNode from "./NNNode";
 import { networkInterfaces } from "os";
+import { link } from "fs";
+import SVGPath from "./SVGPath";
 
 interface NetworkProps {
     network: nn.Node[][];
@@ -40,7 +42,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const nodeWidth = 40;
     const [links, setLinks] = useState<{[key:string]: any}>({});
     const [initalised, setInitalised] = useState<boolean>(false);
-    const [updatingLinks, setUpdatingLinks] = useState<boolean>(false);
+    // const [updatingLinks, setUpdatingLinks] = useState<boolean>(false);
 
     useEffect(() => {
         drawLinks();
@@ -71,7 +73,7 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     const drawLinks = () => {
         console.log("Draw Links");
-        setUpdatingLinks(true);
+        // setUpdatingLinks(true);
         // Optimise to only redraw the links for the layer that has been changed
         let start = Date.now();
         let newLinks: {[key:string]: any} = {}
@@ -87,14 +89,14 @@ function NeuralNetworkVis(props: NetworkProps) {
                     let endNodeElement = document.getElementById(`node-${link.dest.id}`);
 
                     let lineConfig = generateLineConfig(link);
-
+                    console.log(`link-${ node.id }-${ link.dest.id }`)
                     newLinks[`link-${node.id}-${link.dest.id}`] = new LeaderLine(startNodeElement, endNodeElement, lineConfig);
                     iter++;
                 }
             }
         }
         setLinks(newLinks);
-        setUpdatingLinks(false);
+        // setUpdatingLinks(false);
         let delta = Date.now() - start;
         console.log(`Finished drawing links (Links Drawn: ${iter}) (Duration: ${delta}ms)`);
     }
@@ -127,9 +129,26 @@ function NeuralNetworkVis(props: NetworkProps) {
         console.log(`Finished updating links (Links Updating: ${iter}) (Duration: ${delta}ms)`);
     }
 
+    const checkLinks = () => {
+        console.log("Checking links")
+        let expectedNoLines = 0;
+        for(let i = 0; i < props.network.length - 1; i++) {
+            expectedNoLines += props.network[i].length * props.network[i + 1].length;
+        }
+        return links.length === expectedNoLines;
+    }
+
     return (
         <Container>
-            {updatingLinks || props.network.map(layer => <Layer>
+            <canvas
+                style={{
+                    width:  "inherit",
+                    height: "inherit",
+                    backgroundColor: "white",
+                    position: "absolute"
+                }}
+            />
+            {props.network.map(layer => <Layer>
                 {layer.map(node => <NNNode
                     id={`node-${node.id}`}
                     nodeWidth={nodeWidth}
@@ -138,6 +157,14 @@ function NeuralNetworkVis(props: NetworkProps) {
                     discreetBoundary={props.discreetBoundary}
                 />)}
             </Layer>)}
+            {props.network.map(layer => 
+                {layer.map(node => 
+                    {node.linksOut.map(link => <SVGPath
+                        
+                    />)})
+                }
+            )}
+            {/* {props.network && drawLinks()} */}
         </Container>
     );
 }
