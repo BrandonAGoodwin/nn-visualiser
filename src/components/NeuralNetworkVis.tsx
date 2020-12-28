@@ -37,10 +37,13 @@ const Layer = styled("div")`
 
 // Could remove the output node and point straight to the graph
 function NeuralNetworkVis(props: NetworkProps) {
+    const svgContainer: any = useRef<any>(null);
     const container: any = useRef<any>(null);
     const nodeWidth = 40;
     // Draw network
     const RECT_SIZE = 40;
+    const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
+    const [network, setNetwork] = useState<nn.Node[][]>();
 
     // function getRelativeHeight(selection) {
     //     let node = selection.node() as HTMLAnchorElement;
@@ -48,18 +51,30 @@ function NeuralNetworkVis(props: NetworkProps) {
     // }
 
     useEffect(() => {
-        drawAllLinks();
-    }, [props.network, props.decisionBoundaries])
+        setLinksUpdated(false);
+        setNetwork(props.network)
+    }, [props.network])
 
-    const drawAllLinks = () => {
+    useEffect(() => {
+
+    },)
+
+    useEffect(() => {
+        drawAllLinks(props.network);
+    }, [props.decisionBoundaries])
+
+ 
+
+    const drawAllLinks = (network: nn.Node[][]) => {
         console.log("Draw Links");
         let start = Date.now();
-        
-        let node2Coord = getNodeCoords();
-
+        d3.selectAll(".link").remove();
+        let node2Coord = getNodeCoords(network);
+        console.log(node2Coord)
+        if(!node2Coord) return;
         let iter = 0;
-        for (let layerNum = 0; layerNum < props.network.length; layerNum++) {
-            let currentLayer = props.network[layerNum];
+        for (let layerNum = 0; layerNum < network.length; layerNum++) {
+            let currentLayer = network[layerNum];
             for (let i = 0; i < currentLayer.length; i++) {
                 let node: nn.Node = currentLayer[i];
                 // Instead store node positions in a dictionary to reduce elementSearches and increase speed
@@ -85,23 +100,23 @@ function NeuralNetworkVis(props: NetworkProps) {
         // }
         // setLinks(newLinks);
         // setUpdatingLinks(false);
+        setLinksUpdated(true);
         let delta = Date.now() - start;
         console.log(`Finished drawing links (Links Drawn: ${iter}) (Duration: ${delta}ms)`);
     
     }
 
-    const getNodeCoords = () => {
-
+    const getNodeCoords = (network: nn.Node[][]) => {
+        
         let containerCurrent = container.current;
+        if(!network || !containerCurrent) return null;
         let node2Coord: { [id: string]: { cx: number, cy: number } } = {}
-        if (!containerCurrent) return node2Coord;
-
         let containerLeft = containerCurrent.offsetLeft;
         let containerTop = containerCurrent.offsetTop;
         console.log(containerCurrent)
 
-        for (let layerNum = 0; layerNum < props.network.length; layerNum++) {
-            let currentLayer = props.network[layerNum];
+        for (let layerNum = 0; layerNum < network.length; layerNum++) {
+            let currentLayer = network[layerNum];
             for (let i = 0; i < currentLayer.length; i++) {
                 let node: nn.Node = currentLayer[i];
                 let nodeElement = document.getElementById(`node-${node.id}`);
@@ -121,9 +136,10 @@ function NeuralNetworkVis(props: NetworkProps) {
              console.log("Draw Link NEW")
              console.log(input)
              console.log(node2coord)
-        let line = d3.select(container.current).append("path");
+        let line = d3.select(svgContainer.current).append("path");
         let source = node2coord[input.source.id];
         let dest = node2coord[input.dest.id];
+        if(!(dest && source)) return;
         // Check X and Ys are reversed properlly
         let datum:any = {
             source: 
@@ -134,13 +150,17 @@ function NeuralNetworkVis(props: NetworkProps) {
         // let diagonal = d3.svg.diagonal().projection(d => [d.y, d.x]);
         let diagonal = d3.linkHorizontal()
             .x(function(d: any) { console.log(d)
-                return d; }).y(function(d: any) { return d; })
+                return d[0]; }).y(function(d: any) { return d[1]; })
         let d = diagonal(datum);
 
         d && line.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
-            .attr("id", "link" + input.source.id + "-" + input.dest.id)
-            .attr("d", d);
+            .attr("id", `link-${input.source.id}-${input.dest.id}`)
+            .attr("d", d)
+            .attr("fill", "none")
+            .attr("stroke","red")
+            .attr("stroke-width", "5")
+
 
         // Add an invisible thick link that will be used for
         // showing the weight value on hover.
@@ -155,27 +175,36 @@ function NeuralNetworkVis(props: NetworkProps) {
         return line;
     }
 
+    const drawLayer = () => {
+
+    }
+    const drawNode = () => {
+
+    }
+
     return (
-        <div>
+        <div ref={container}>
+            
             <svg
-                ref={container}
+                ref={svgContainer}
                 width={props.networkWidth}
                 height={props.networkHeight}
                 style={{ position: "absolute" }}
             />
-        <Container style={{width:props.networkWidth, height:props.networkHeight }} id={'lines-container'}>
+            {!network || !linksUpdated && <canvas width={props.networkWidth} height={props.networkHeight} color="blue" style={{ position: "absolute", backgroundColor: "blue"}}/>}
+            <Container style={{width:props.networkWidth, height:props.networkHeight }} id={'lines-container'}>
 
-            {props.network.map(layer => <Layer>
-                {layer.map(node => <NNNode
-                    id={`node-${node.id}`}
-                    nodeWidth={nodeWidth}
-                    numCells={20}
-                    decisionBoundary={props.decisionBoundaries[node.id]}
-                    discreetBoundary={props.discreetBoundary}
-                />)}
-            </Layer>)}
+                {network && network.map(layer => <Layer>
+                    {layer.map(node => <NNNode
+                        id={`node-${node.id}`}
+                        nodeWidth={nodeWidth}
+                        numCells={20}
+                        decisionBoundary={props.decisionBoundaries[node.id]}
+                        discreetBoundary={props.discreetBoundary}
+                    />)}
+                </Layer>)}
 
-        </Container>
+            </Container>
         </div>
     );
 }

@@ -414,14 +414,14 @@ function MainPage(props: PageProps) {
                 </FormControl>
             </ControlPanel>
             <NetworkPanel>
-                {/* <NeuralNetworkControls>
+                <NeuralNetworkControls>
                     <IconButton onClick={removeLayer}>
                         <RemoveCircleIcon/>
                     </IconButton>
                     <IconButton onClick={addLayer}>
                         <AddCircleIcon/>
                     </IconButton>
-                </NeuralNetworkControls> */}
+                </NeuralNetworkControls>
                 {dataset && network && <NeuralNetworkVis
                     network={network}
                     decisionBoundaries={decisionBoundaries}
