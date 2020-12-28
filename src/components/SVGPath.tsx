@@ -14,6 +14,8 @@ interface PathProps {
     width: number;
     trace: boolean;
     progress: number;  
+    containerLeft: number;
+    containerTop: number;
 }
 
 /**
@@ -92,11 +94,11 @@ export default function SVGPath(props: PathProps) {
         let startNode = document.getElementById(props.startElementId);
         let endNode = document.getElementById(props.endElementId);
         if (startNode && endNode) {
-            // Change to not used hardcoded half of node height
-            points.push({x: startNode.offsetLeft + 40, y: startNode.offsetTop + 20});
-            points.push({x: endNode.offsetLeft, y: endNode.offsetTop + 20})
+            // Change to not use hardcoded half of node height
+            points.push({x: startNode.offsetLeft - props.containerLeft, y: startNode.offsetTop + 20 - props.containerTop});
+            points.push({x: endNode.offsetLeft - props.containerLeft - 40, y: endNode.offsetTop + 20 - props.containerTop})
         }
-
+        console.log(points)
         return points.reduce(
             (d, point) => `${d}L${point.x},${point.y}`,
             `M${points[0].x},${points[0].y}`

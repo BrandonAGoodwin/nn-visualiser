@@ -39,6 +39,7 @@ const Layer = styled("div")`
 
 // Could remove the output node and point straight to the graph
 function NeuralNetworkVis(props: NetworkProps) {
+    const container: any = useRef<any>(null);
     const nodeWidth = 40;
     const [links, setLinks] = useState<{[key:string]: any}>({});
     const [initalised, setInitalised] = useState<boolean>(false);
@@ -95,6 +96,13 @@ function NeuralNetworkVis(props: NetworkProps) {
                 }
             }
         }
+        let lines = document.querySelectorAll(".leader-line");
+        let networkContainer = document.getElementById("lines-container");
+        if(lines) {
+            console.log("Appending lines")
+            lines.forEach((value, index, array) => {networkContainer && networkContainer.append(value)})
+    
+        }
         setLinks(newLinks);
         // setUpdatingLinks(false);
         let delta = Date.now() - start;
@@ -137,9 +145,11 @@ function NeuralNetworkVis(props: NetworkProps) {
         }
         return links.length === expectedNoLines;
     }
-
+    //Have a method that checks if the links matches the current network before rendering
+    //Make a link into a component
+    //Reimplement the way the network is formed
     return (
-        <Container>
+        <div>
             <canvas
                 style={{
                     width:  "inherit",
@@ -148,6 +158,9 @@ function NeuralNetworkVis(props: NetworkProps) {
                     position: "absolute"
                 }}
             />
+        <Container ref={container} id={'lines-container'}>
+            
+            
             {props.network.map(layer => <Layer>
                 {layer.map(node => <NNNode
                     id={`node-${node.id}`}
@@ -157,15 +170,37 @@ function NeuralNetworkVis(props: NetworkProps) {
                     discreetBoundary={props.discreetBoundary}
                 />)}
             </Layer>)}
-            {props.network.map(layer => 
-                {layer.map(node => 
-                    {node.linksOut.map(link => <SVGPath
-                        
-                    />)})
-                }
-            )}
+                {/* <svg width="100%" height="100%"  style={{ position: "absolute" }}>
+                    {container.current && props.network.map(layer => {
+                        layer.map(node => {
+                            node.linksOut.map(link => <SVGPath
+                                startElementId={`node-x`}
+                                endElementId={`node-1`}
+                                points={[]}
+                                color={"white"}
+                                width={3}
+                                trace={false}
+                                progress={0}
+                                containerLeft={container.current.offsetLeft||0}
+                                containerTop={container.current.offsetTop||0}
+                            />)
+                        })
+                    }
+                    )}
+                    {container.current && <SVGPath
+                        startElementId={`node-x`}
+                        endElementId={`node-1`}
+                        points={[]}
+                        color={"red"}
+                        width={3}
+                        trace={false}
+                        progress={0}
+                        containerLeft={container.current.offsetLeft||0}
+                        containerTop={container.current.offsetTop||0}
+                    />}</svg> */}
             {/* {props.network && drawLinks()} */}
         </Container>
+        </div>
     );
 }
 
