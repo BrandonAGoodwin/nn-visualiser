@@ -27,7 +27,7 @@ const NodeContainer = styled("div") <ContainerProps>`
 
 
 function NNNode(props: NNNodeProps) {
-
+    
     return (
         <NodeContainer id={`${props.id}`} nodeWidth={props.nodeWidth}>
             <BackgroundCanvas

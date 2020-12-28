@@ -118,6 +118,8 @@ const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network"
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: auto;
+    height: auto;
 `
 
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
@@ -412,18 +414,20 @@ function MainPage(props: PageProps) {
                 </FormControl>
             </ControlPanel>
             <NetworkPanel>
-                <NeuralNetworkControls>
+                {/* <NeuralNetworkControls>
                     <IconButton onClick={removeLayer}>
                         <RemoveCircleIcon/>
                     </IconButton>
                     <IconButton onClick={addLayer}>
                         <AddCircleIcon/>
                     </IconButton>
-                </NeuralNetworkControls>
+                </NeuralNetworkControls> */}
                 {dataset && network && <NeuralNetworkVis
                     network={network}
                     decisionBoundaries={decisionBoundaries}
                     discreetBoundary={discreetBoundary}
+                    networkWidth={650}
+                    networkHeight={550}
                 />}
             </NetworkPanel>
             <ContainerSection gridArea="nn-graph">
