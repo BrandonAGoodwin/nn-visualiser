@@ -413,7 +413,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
-                <FormControl component="fieldset" style={{ marginTop: "10px" }}>
+                {/* <FormControl component="fieldset" style={{ marginTop: "10px" }}>
                     <FormLabel> Inputs </FormLabel>
                     <FormGroup>
                         <FormControlLabel
@@ -429,7 +429,7 @@ function MainPage(props: PageProps) {
                             label="ySquared"
                         />
                     </FormGroup>
-                </FormControl>
+                </FormControl> */}
             </ControlPanel>
             <NetworkPanel>
                 <NeuralNetworkControls>

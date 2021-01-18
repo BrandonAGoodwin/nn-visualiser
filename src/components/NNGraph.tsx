@@ -126,6 +126,7 @@ function NNGraph(props: GraphProps): JSX.Element {
                     width={props.canvasWidth}
                     height={props.canvasWidth}
                     numCells={props.numCells}
+                    disabled={false}
                     padding={true}
                     decisionBoundary={props.decisionBoundary}
                     discreetBoundary={props.discreetBoundary}

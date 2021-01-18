@@ -11,6 +11,7 @@ interface CanvasProps {
     padding: boolean;
     decisionBoundary?: number[];
     discreetBoundary: boolean;
+    disabled: boolean;
 }
 
 
@@ -30,7 +31,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
-            .range(["#ff7661", "#FFFFFF", "#223781"])
+            .range(props.disabled ? ["#606060", "#FFFFFF", "#202020" ] : ["#ff7661", "#FFFFFF", "#223781"])
             .clamp(true);
 
         let numShades = props.numShades || 100;
