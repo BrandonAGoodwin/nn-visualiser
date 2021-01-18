@@ -196,15 +196,9 @@ function NeuralNetworkVis(props: NetworkProps) {
                 nodeNotDrawnYet = true;
                 return;
             }
-            // let datum:any = {
-            //     source: 
-            //         [source.cx + RECT_SIZE / 2 + 2, source.cy]
-            //     ,
-            //     target: [dest.cx - RECT_SIZE / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
-            // };
 
             let label = INPUTS[nodeId].label != null ? INPUTS[nodeId].label : nodeId;
-            // Draw the input label.
+
             let text = svg.append("text")
                 .attr("x", source.cx - (RECT_SIZE / 2 + 2))
                 .attr("y", source.cy)
@@ -232,26 +226,10 @@ function NeuralNetworkVis(props: NetworkProps) {
             } else {
                 text.append("tspan").text(label);  
             }
-
-            //nodeGroup.classed(activeOrNotClass, true);
     
         })
         if(!nodeNotDrawnYet)setLabelsDrawn(true);
     }
-
-
-    // const getInputNodes = (nodeId: string, onClick: any) => {
-    //    return(<div>
-    //        <p></p>
-    //        <NNNode
-    //             id={`node-${nodeId}`}
-    //             nodeWidth={nodeWidth}
-    //             numCells={20}
-    //             decisionBoundary={props.decisionBoundaries[nodeId]}
-    //             discreetBoundary={props.discreetBoundary}
-    //         />
-    //    </div>);
-    // }
 
     return (
         <div ref={container}>

@@ -276,27 +276,9 @@ function MainPage(props: PageProps) {
         setNoise(newValue as number);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        const input = e.target.name;
-
-        // Change this implemntation input is highly coupled with visControl
-        let newInputs: string[];
-
-        if (checked) {
-            config.inputs.push(input);
-            newInputs = config.inputs;
-        } else {
-            newInputs = removeItemOnce(config.inputs, input);
-        }
-
-        let newNetworkShape = config.networkShape;
-        newNetworkShape[0] = newInputs.length;
-        setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
-    };
-
     const handleInputNodeClick = (nodeId: string, active: boolean) => {
-        console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
-        console.log(config.inputs) 
+        // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
+        // console.log(config.inputs) 
         // Change this implemntation input is highly coupled with visControl
          let newInputs: string[];
 
@@ -413,23 +395,6 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
-                {/* <FormControl component="fieldset" style={{ marginTop: "10px" }}>
-                    <FormLabel> Inputs </FormLabel>
-                    <FormGroup>
-                        <FormControlLabel
-                            control={<Checkbox checked={config.inputs.includes("x")} onChange={handleInputChange} name="x" />}
-                            label="y"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox checked={config.inputs.includes("y")} onChange={handleInputChange} name="y" />}
-                            label="x"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox checked={config.inputs.includes("xSquared")} onChange={handleInputChange} name="xSquared" />}
-                            label="ySquared"
-                        />
-                    </FormGroup>
-                </FormControl> */}
             </ControlPanel>
             <NetworkPanel>
                 <NeuralNetworkControls>
