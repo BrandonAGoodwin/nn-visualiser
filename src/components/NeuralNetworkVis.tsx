@@ -40,7 +40,7 @@ interface CanvasProps {
 const FadeCanvas = styled("canvas")<CanvasProps>`
     position: absolute;
     background-color: white;
-    
+
     ${ ({visible}) => visible && `
     transition: opacity 1.1s;
     `}
@@ -144,6 +144,17 @@ function NeuralNetworkVis(props: NetworkProps) {
         return node2Coord;
     }
 
+    // Implement something so that the distributed widths are proportional to each other
+    // or
+    // Set a max width
+    const generateLineConfig = (link: nn.Link) => {
+        let weightToSize = d3.scaleLinear().domain([-1, 0, 1]).range([4, 1, 4]);
+        return {
+            color: (link.weight > 0 ? "#223781" : "#ff7661"),
+            size: weightToSize(link.weight),
+        }
+    }
+
     function drawLink(
         input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } },
          index: number, length: number) {
@@ -167,13 +178,15 @@ function NeuralNetworkVis(props: NetworkProps) {
                 return d[0]; }).y(function(d: any) { return d[1]; })
         let d = diagonal(datum);
 
+        let linkConfig = generateLineConfig(input);
+
         d && line.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
             .attr("d", d)
             .attr("fill", "none")
-            .attr("stroke","red")
-            .attr("stroke-width", "5")
+            .attr("stroke", linkConfig.color)
+            .attr("stroke-width", linkConfig.size || 0)
 
 
         // Add an invisible thick link that will be used for
