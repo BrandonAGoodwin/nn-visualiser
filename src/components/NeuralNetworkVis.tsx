@@ -34,6 +34,20 @@ const Layer = styled("div")`
     align-items: center;
 `;
 
+interface CanvasProps {
+    visible: boolean;
+}
+const FadeCanvas = styled("canvas")<CanvasProps>`
+    position: absolute;
+    background-color: white;
+    
+    ${ ({visible}) => visible && `
+    transition: opacity 1.1s;
+    `}
+    ${ ({visible}) => !visible && `
+    transition: opacity 0.1s;
+    `}
+`;
 
 // Could remove the output node and point straight to the graph
 function NeuralNetworkVis(props: NetworkProps) {
@@ -191,7 +205,9 @@ function NeuralNetworkVis(props: NetworkProps) {
                 height={props.networkHeight}
                 style={{ position: "absolute" }}
             />
-            {!network || !linksUpdated && <canvas width={props.networkWidth} height={props.networkHeight} color="blue" style={{ position: "absolute", backgroundColor: "blue"}}/>}
+            {/* {!network || !linksUpdated && <canvas width={props.networkWidth} height={props.networkHeight} color="blue" style={{ position: "absolute", backgroundColor: "blue"}}/>} */}
+            {!network || !linksUpdated && <FadeCanvas visible={true} width={props.networkWidth} height={props.networkHeight} />}
+
             <Container style={{width:props.networkWidth, height:props.networkHeight }} id={'lines-container'}>
 
                 {network && network.map(layer => <Layer>
