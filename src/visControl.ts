@@ -20,7 +20,7 @@ let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
 }
 
 
-let INPUTS: { [name: string]: InputFunc } = {
+export let INPUTS: { [name: string]: InputFunc } = {
     "x": { f: (x, y) => x, label: "X_1" },
     "y": { f: (x, y) => y, label: "X_2" },
     "xSquared": { f: (x, y) => x * x, label: "X_1^2" },
@@ -127,6 +127,8 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
     let iter = 0;
 
+    let inputNodeIds = Object.keys(INPUTS);
+
     for (let i = 0; i < density; i++) {
         for (let j = 0; j < density; j++) {
             let x = xScale(j);
@@ -138,6 +140,10 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
                 if (!boundaries[node.id]) boundaries[node.id] = [];
                 boundaries[node.id][iter] = node.output;
             })
+            inputNodeIds.forEach((nodeId) => {
+                if (!boundaries[nodeId]) boundaries[nodeId] = [];
+                boundaries[nodeId][iter] = INPUTS[nodeId].f(x || 0, y || 0);
+            })
             iter++;
             //boundary[iter++] = nn.getOutputNode(network).output;
         }
@@ -145,4 +151,10 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
 
     return boundaries;
 
+}
+
+function forEachInputNode() {
+    Object.keys(INPUTS).forEach((nodeId) => {
+
+    })
 }

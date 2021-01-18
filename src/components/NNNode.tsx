@@ -5,7 +5,7 @@ import BackgroundCanvas from "./BackgroundCanvas";
 interface NNNodeProps {
     nodeWidth: number;
     id: string;
-    decisionBoundary: number[];
+    decisionBoundary?: number[];
     discreetBoundary: boolean;
     numCells: number;
 }

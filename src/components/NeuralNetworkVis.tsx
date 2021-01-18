@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import LeaderLine from "react-leader-line";
 import * as d3 from "d3";
 import NNNode from "./NNNode";
+import { INPUTS } from "../visControl"
 
 
 interface NetworkProps {
@@ -21,7 +22,7 @@ const Container = styled("div")`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-left: 40px;
+    padding-left: 50px;
     padding-right: 0px;
     width: inherit;
     height: inherit;
@@ -57,6 +58,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const RECT_SIZE = 40;
     const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
     const [network, setNetwork] = useState<nn.Node[][]>();
+    const [labelsDrawn, setLabelsDrawn] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -96,6 +98,8 @@ function NeuralNetworkVis(props: NetworkProps) {
             }
         }
 
+        if(!labelsDrawn) drawLabels(node2Coord);
+
         setLinksUpdated(true);
         let delta = Date.now() - start;
         console.log(`Finished drawing links (Links Drawn: ${iter}) (Duration: ${delta}ms)`);
@@ -112,11 +116,21 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         for (let layerNum = 0; layerNum < network.length; layerNum++) {
             let currentLayer = network[layerNum];
-            for (let i = 0; i < currentLayer.length; i++) {
-                let node: nn.Node = currentLayer[i];
-                let nodeElement = document.getElementById(`node-${node.id}`);
-                // Right now they aren't actually the centre
-                if (nodeElement) node2Coord[node.id] = {cx: nodeElement.offsetLeft - containerLeft + nodeWidth/2, cy: nodeElement.offsetTop - containerTop + nodeWidth/2}
+            if(layerNum === 0) {
+                let iter = 0;
+                Object.keys(INPUTS).forEach((nodeId) => {
+                
+                    let nodeElement = document.getElementById(`node-${nodeId}`);
+                    // Right now they aren't actually the centre
+                    if (nodeElement) node2Coord[nodeId] = {cx: nodeElement.offsetLeft - containerLeft + nodeWidth/2, cy: nodeElement.offsetTop - containerTop + nodeWidth/2}
+                })
+            } else {
+                for (let i = 0; i < currentLayer.length; i++) {
+                    let node: nn.Node = currentLayer[i];
+                    let nodeElement = document.getElementById(`node-${node.id}`);
+                    // Right now they aren't actually the centre
+                    if (nodeElement) node2Coord[node.id] = {cx: nodeElement.offsetLeft - containerLeft + nodeWidth/2, cy: nodeElement.offsetTop - containerTop + nodeWidth/2}
+                }
             }
         }
         return node2Coord;
@@ -167,11 +181,73 @@ function NeuralNetworkVis(props: NetworkProps) {
         return line;
     }
 
-    const drawLayer = () => {
+    function drawLabels(node2coord: { [id: string]: { cx: number, cy: number } }) {
+        console.log("Draw Labels");
+        let nodeIds = Object.keys(INPUTS);
+        let nodeNotDrawnYet = false;
+        let svg = d3.select(svgContainer.current);
 
+        nodeIds.forEach((nodeId) => {
+            let source = node2coord[nodeId];
+            if(!source) {
+                nodeNotDrawnYet = true;
+                return;
+            }
+            // let datum:any = {
+            //     source: 
+            //         [source.cx + RECT_SIZE / 2 + 2, source.cy]
+            //     ,
+            //     target: [dest.cx - RECT_SIZE / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
+            // };
+
+            let label = INPUTS[nodeId].label != null ? INPUTS[nodeId].label : nodeId;
+            // Draw the input label.
+            let text = svg.append("text")
+                .attr("x", source.cx - (RECT_SIZE / 2 + 2))
+                .attr("y", source.cy)
+                .attr("text-anchor", "end")
+            if (/[_^]/.test(label)) {
+                let myRe = /(.*?)([_^])(.)/g;
+                let myArray;
+                let lastIndex;
+                while ((myArray = myRe.exec(label)) != null) {
+                    lastIndex = myRe.lastIndex;
+                    let prefix = myArray[1];
+                    let sep = myArray[2];
+                    let suffix = myArray[3];
+                    if (prefix) {
+                    text.append("tspan").text(prefix);
+                    }
+                    text.append("tspan")
+                    .attr("baseline-shift", sep === "_" ? "sub" : "super")
+                    .style("font-size", "9px")
+                    .text(suffix);
+                }
+                if (lastIndex && label.substring(lastIndex)) {
+                    text.append("tspan").text(label.substring(lastIndex));
+                }
+            } else {
+                text.append("tspan").text(label);  
+            }
+
+            //nodeGroup.classed(activeOrNotClass, true);
+    
+        })
+        if(!nodeNotDrawnYet)setLabelsDrawn(true);
     }
-    const drawNode = () => {
 
+
+    const getInputNodes = (nodeId: string, onClick: any) => {
+       return(<div>
+           <p></p>
+           <NNNode
+                id={`node-${nodeId}`}
+                nodeWidth={nodeWidth}
+                numCells={20}
+                decisionBoundary={props.decisionBoundaries[nodeId]}
+                discreetBoundary={props.discreetBoundary}
+            />
+       </div>);
     }
 
     return (
@@ -187,7 +263,19 @@ function NeuralNetworkVis(props: NetworkProps) {
 
             <Container style={{width:props.networkWidth, height:props.networkHeight }} id={'lines-container'}>
 
-                {network && network.map(layer => <Layer>
+                <Layer>
+                    {network && Object.keys(INPUTS).map(nodeId => 
+                        <NNNode
+                        id={`node-${nodeId}`}
+                        nodeWidth={nodeWidth}
+                        numCells={20}
+                        decisionBoundary={props.decisionBoundaries[nodeId]}
+                        discreetBoundary={props.discreetBoundary}
+                        />
+                    )}
+                </Layer>
+                
+                {network && network.slice(1).map(layer => <Layer>
                     {layer.map(node => <NNNode
                         id={`node-${node.id}`}
                         nodeWidth={nodeWidth}
