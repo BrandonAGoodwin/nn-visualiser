@@ -294,6 +294,24 @@ function MainPage(props: PageProps) {
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     };
 
+    const handleInputNodeClick = (nodeId: string, active: boolean) => {
+        console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
+        console.log(config.inputs) 
+        // Change this implemntation input is highly coupled with visControl
+         let newInputs: string[];
+
+         if (!active) {
+             config.inputs.push(nodeId);
+             newInputs = config.inputs;
+         } else {
+             newInputs = removeItemOnce(config.inputs, nodeId);
+         }
+ 
+         let newNetworkShape = config.networkShape;
+         newNetworkShape[0] = newInputs.length;
+         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
+    }
+
     const removeLayer = () => {
         console.log("Running removeLayer");
         if(config.networkShape.length > 2) {
@@ -426,8 +444,10 @@ function MainPage(props: PageProps) {
                     network={network}
                     decisionBoundaries={decisionBoundaries}
                     discreetBoundary={discreetBoundary}
+                    inputs={config.inputs}
                     networkWidth={650}
                     networkHeight={550}
+                    handleOnClick={handleInputNodeClick}
                 />}
             </NetworkPanel>
             <ContainerSection gridArea="nn-graph">

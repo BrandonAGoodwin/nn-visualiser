@@ -5,6 +5,7 @@ import LeaderLine from "react-leader-line";
 import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
+import { InputSharp } from "@material-ui/icons";
 
 
 interface NetworkProps {
@@ -13,6 +14,8 @@ interface NetworkProps {
     discreetBoundary: boolean;
     networkWidth: number;
     networkHeight: number;
+    handleOnClick: any;
+    inputs: string[];
 }
 
 const Container = styled("div")`
@@ -237,18 +240,18 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
 
-    const getInputNodes = (nodeId: string, onClick: any) => {
-       return(<div>
-           <p></p>
-           <NNNode
-                id={`node-${nodeId}`}
-                nodeWidth={nodeWidth}
-                numCells={20}
-                decisionBoundary={props.decisionBoundaries[nodeId]}
-                discreetBoundary={props.discreetBoundary}
-            />
-       </div>);
-    }
+    // const getInputNodes = (nodeId: string, onClick: any) => {
+    //    return(<div>
+    //        <p></p>
+    //        <NNNode
+    //             id={`node-${nodeId}`}
+    //             nodeWidth={nodeWidth}
+    //             numCells={20}
+    //             decisionBoundary={props.decisionBoundaries[nodeId]}
+    //             discreetBoundary={props.discreetBoundary}
+    //         />
+    //    </div>);
+    // }
 
     return (
         <div ref={container}>
@@ -257,7 +260,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 ref={svgContainer}
                 width={props.networkWidth}
                 height={props.networkHeight}
-                style={{ position: "absolute" }}
+                style={{ position: "absolute", pointerEvents: "none"}}
             />
             {!network || !linksUpdated && <FadeCanvas visible={true} width={props.networkWidth} height={props.networkHeight} />}
 
@@ -267,10 +270,13 @@ function NeuralNetworkVis(props: NetworkProps) {
                     {network && Object.keys(INPUTS).map(nodeId => 
                         <NNNode
                         id={`node-${nodeId}`}
+                        nodeId={nodeId}
+                        active={props.inputs.includes(nodeId)}
                         nodeWidth={nodeWidth}
                         numCells={20}
                         decisionBoundary={props.decisionBoundaries[nodeId]}
                         discreetBoundary={props.discreetBoundary}
+                        handleOnClick={props.handleOnClick}
                         />
                     )}
                 </Layer>
@@ -280,6 +286,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                         id={`node-${node.id}`}
                         nodeWidth={nodeWidth}
                         numCells={20}
+                        active={true}
                         decisionBoundary={props.decisionBoundaries[node.id]}
                         discreetBoundary={props.discreetBoundary}
                     />)}

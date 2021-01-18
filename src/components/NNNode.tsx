@@ -1,13 +1,16 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import BackgroundCanvas from "./BackgroundCanvas";
 
 interface NNNodeProps {
     nodeWidth: number;
     id: string;
+    nodeId?: string;
     decisionBoundary?: number[];
     discreetBoundary: boolean;
     numCells: number;
+    handleOnClick?: (nodeId: string, active: boolean) => any;
+    active: boolean;
 }
 
 interface ContainerProps {
@@ -27,9 +30,16 @@ const NodeContainer = styled("div") <ContainerProps>`
 
 
 function NNNode(props: NNNodeProps) {
-    
+    // let [active, setActive] = useState<boolean>(true);
+
+    // useEffect(() => {
+
+    // }, []);
+
     return (
-        <NodeContainer id={`${props.id}`} nodeWidth={props.nodeWidth}>
+        <NodeContainer id={`${props.id}`}
+            nodeWidth={props.nodeWidth}
+            onClick={() => (props.handleOnClick && props.nodeId && props.handleOnClick(props.nodeId, props.active))}>
             <BackgroundCanvas
                 width={props.nodeWidth}
                 height={props.nodeWidth}
