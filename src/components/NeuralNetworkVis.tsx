@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import { InputSharp } from "@material-ui/icons";
+import MouseToolTip from "react-sticky-mouse-tooltip";
 
 
 interface NetworkProps {
@@ -15,8 +16,16 @@ interface NetworkProps {
     networkWidth: number;
     networkHeight: number;
     handleOnClick: any;
+    // handleOnHover: any;
     inputs: string[];
 }
+
+const HoverCard = styled(MouseToolTip)`
+    display: 'none';
+&:hover {
+    display: 'block';
+}
+`
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -231,9 +240,26 @@ function NeuralNetworkVis(props: NetworkProps) {
         if(!nodeNotDrawnYet)setLabelsDrawn(true);
     }
 
+    const handleHover = (nodeId: string, active: boolean) => {
+
+    }
+
+    const nodeId2Node = (nodeId: string) => {
+        let id = nodeId.substring(5);
+        if(!network) return null;
+        for(let layerNum = 1; layerNum < network.length; layerNum++) {
+            for(let nodeNum = 0; nodeNum < network[layerNum].length; nodeNum++) {
+                let node = network[layerNum][nodeNum];
+                if(node.id === id) return node;
+            }
+        }
+    }
+
     return (
         <div ref={container}>
-            
+            <MouseToolTip>
+                
+            </MouseToolTip>
             <svg
                 ref={svgContainer}
                 width={props.networkWidth}
@@ -267,6 +293,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                         active={true}
                         decisionBoundary={props.decisionBoundaries[node.id]}
                         discreetBoundary={props.discreetBoundary}
+                        handleOnHover={handleHover}
                     />)}
                 </Layer>)}
 

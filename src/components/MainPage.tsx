@@ -294,6 +294,10 @@ function MainPage(props: PageProps) {
          setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
 
+    // const handleHover = (nodeId: string, active: boolean) => {
+
+    // }
+
     const removeLayer = () => {
         console.log("Running removeLayer");
         if(config.networkShape.length > 2) {
@@ -413,6 +417,7 @@ function MainPage(props: PageProps) {
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={handleInputNodeClick}
+                    // handleOnHover={handleHover}
                 />}
             </NetworkPanel>
             <ContainerSection gridArea="nn-graph">
