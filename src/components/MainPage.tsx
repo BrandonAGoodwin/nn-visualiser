@@ -16,6 +16,7 @@ import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import LossGraph, { LossData } from './LossGraph';
 
 export interface NNConfig {
     networkShape: number[];
@@ -122,12 +123,17 @@ const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network"
     height: auto;
 `
 
+const GraphPanel = styled((props: any) => <ContainerSection gridArea="nn-graph" {...props} />)`
+    display: block;
+`
+
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
     display: flex;
     flex-direction: row;
     align-items: stretch;
     padding: 0px;
     justify-content: space-around;
+    align-items: center;
 `;
 
 const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...props} />)`
@@ -173,6 +179,7 @@ function MainPage(props: PageProps) {
     const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
+    const [lossData, setLossData] = useState<[number, number][]>([]);
 
     const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
 
@@ -209,6 +216,7 @@ function MainPage(props: PageProps) {
         console.log("Generating network");
         setNetwork(vis.start(config));
         setEpochs(0);
+        setLossData([]);
     }
 
     const updateDecisionBoundaries = () => {
@@ -238,13 +246,14 @@ function MainPage(props: PageProps) {
         if (!network || !dataset) return;
 
         let start = Date.now();
-
+        let newLossData: [number, number][] = [];
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
+            newLossData.push([epochs + i + 1, vis.getCost(network, dataset, config.inputs)])
         }
 
         setEpochs(epochs + noSteps);
-
+        setLossData(lossData.concat(newLossData));
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
 
@@ -420,7 +429,7 @@ function MainPage(props: PageProps) {
                     // handleOnHover={handleHover}
                 />}
             </NetworkPanel>
-            <ContainerSection gridArea="nn-graph">
+            <GraphPanel>
                 {dataset && network && <NNGraph
                     dataset={dataset}
                     density={25}
@@ -432,11 +441,23 @@ function MainPage(props: PageProps) {
                     decisionBoundary={decisionBoundary}
                     discreetBoundary={discreetBoundary}
                 />}
-                {(!dataset || !network) && <CircularProgress />}
-            </ContainerSection>
+                {/* {(!dataset || !network) && <CircularProgress />} */}
+                <h3> Epochs: {epochs} </h3>
+                <h3> Loss: {loss.toFixed(3)} </h3>
+                <LossGraph
+                    height={60}
+                    width={170}
+                    margin={5}
+                    dataset={lossData}/>
+            </GraphPanel>
             <StatsBar>
-                <h2> Epochs: {epochs} </h2>
-                <h2> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
+                {/* <h2> Epochs: {epochs} </h2>
+                <h2 style={{minWidth: 200}}> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
+                <LossGraph
+                    height={30}
+                    width={100}
+                    margin={5}
+                    dataset={lossData}/> */}
             </StatsBar>
             <InfoPanel>
                 {infoPanel}
