@@ -7,9 +7,13 @@ const Container = styled("div")`
   background: rgb(255,118,97);
   background: linear-gradient(207deg, rgba(255,118,97,1) 0%, rgba(34,55,129,1) 100%);
   min-height: 100vh;
-  min-width: 100vw;
-  height: auto;
-  width: auto;
+  min-width: 100vw; 
+  background-attachment: fixed;
+  top: 0;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  position: absolute;
 `
 
 function App() {

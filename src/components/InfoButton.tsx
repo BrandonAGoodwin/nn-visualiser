@@ -6,7 +6,7 @@ import React from "react";
 interface InfoButtonProps {
     title: string;
     children?: React.ReactElement;
-    setInfoPanel?: (panel: JSX.Element) => void;
+    onClick?: (panel: JSX.Element) => void;
     infoPanel?: JSX.Element;
 }
 
@@ -49,17 +49,23 @@ const HtmlTooltip = styled(Tooltip)`
     //background-color: #f5f5f9;
     //color: rgba(0, 0, 0, 0.87);
     //max-width: 220;
-    font-size: 12px;
+    && {
+        font-size: 20px;
+    }
     margin-right: 10px;
+    margin-left: 10px;
     //border: 1px solid #dadde9;
+    & p {
+        font-size: 200px;
+    }
 `
 
 function InfoButton(props: InfoButtonProps) {
     //const classes = useStyles();
     return (
-        <HtmlTooltip arrow
+        <HtmlTooltip interactive arrow
             title={props.children || props.title}
-            onClick={() => props.setInfoPanel && props.infoPanel && props.setInfoPanel(props.infoPanel)}
+            onClick={() => props.onClick && props.infoPanel && props.onClick(props.infoPanel)}
         >
             <StyledIconButton>
                 <Info/>
