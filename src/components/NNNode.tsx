@@ -10,6 +10,7 @@ interface NNNodeProps {
     discreetBoundary: boolean;
     numCells: number;
     handleOnClick?: (nodeId: string, active: boolean) => any;
+    handleOnHover?: (nodeId: string, active: boolean) => any;
     active: boolean;
 }
 
@@ -38,7 +39,9 @@ function NNNode(props: NNNodeProps) {
         <NodeContainer id={`${props.id}`}
             nodeWidth={props.nodeWidth}
             active={props.active}
-            onClick={() => (props.handleOnClick && props.nodeId && props.handleOnClick(props.nodeId, props.active))}>
+            onClick={() => (props.handleOnClick && props.nodeId && props.handleOnClick(props.nodeId, props.active))}
+            onMouseOver={() => (props.handleOnHover && props.nodeId && props.handleOnHover(props.nodeId, props.active))}
+        >
             <BackgroundCanvas
                 width={props.nodeWidth}
                 height={props.nodeWidth}

@@ -8,3 +8,5 @@ declare module "react-mathjax";
 declare module "react-mathjax2";
 
 declare module "react-leader-line";
+
+declare module "react-sticky-mouse-tooltip";

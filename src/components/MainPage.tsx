@@ -16,6 +16,8 @@ import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import LossGraph, { LossData } from './LossGraph';
+import LossInfoPanel from './InfoPanels/LossInfoPanel';
 
 export interface NNConfig {
     networkShape: number[];
@@ -36,7 +38,7 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledFormControl = styled(FormControl)`
-    margin: 10px;
+    margin-left: 10px;
     min-width: 130px;
     background-color: inherit;
 `;
@@ -122,12 +124,17 @@ const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network"
     height: auto;
 `
 
+const GraphPanel = styled((props: any) => <ContainerSection gridArea="nn-graph" {...props} />)`
+    display: block;
+`
+
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
     display: flex;
     flex-direction: row;
     align-items: stretch;
     padding: 0px;
     justify-content: space-around;
+    align-items: center;
 `;
 
 const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...props} />)`
@@ -143,6 +150,10 @@ const NeuralNetworkControls = styled("div")`
     flex-direction: row;
     justify-content: space-around;
 `;
+
+const StyledInfoButton = styled(InfoButton)`
+    font-size: 14px;
+`
 
 function removeItemOnce(arr: string[], value: string) {
     var index = arr.indexOf(value);
@@ -173,6 +184,9 @@ function MainPage(props: PageProps) {
     const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
+    const [lossData, setLossData] = useState<[number, number][]>([]);
+    const [training, setTraining] = useState<boolean>(false);
+    const [trainingInterval, setTrainingInterval] = useState<number>();
 
     const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
 
@@ -197,7 +211,10 @@ function MainPage(props: PageProps) {
         generateDataset();
     }, [datasetType, noise])
 
-
+    useEffect(() => {
+        if(epochs === 0 || !network) return;
+            setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
+    }, [epochs])
 
 
     const generateDataset = () => {
@@ -209,6 +226,7 @@ function MainPage(props: PageProps) {
         console.log("Generating network");
         setNetwork(vis.start(config));
         setEpochs(0);
+        setLossData([]);
     }
 
     const updateDecisionBoundaries = () => {
@@ -228,6 +246,7 @@ function MainPage(props: PageProps) {
 
     const reset = () => {
         console.log("Reset");
+        if(training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
         updateDecisionBoundaries();
@@ -238,13 +257,15 @@ function MainPage(props: PageProps) {
         if (!network || !dataset) return;
 
         let start = Date.now();
-
+        let newLossData: [number, number][] = [];
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
+            // newLossData.push([epochs + i + 1, vis.getCost(network, dataset, config.inputs)])
+            setEpochs(epochs => epochs + 1);
         }
 
-        setEpochs(epochs + noSteps);
-
+        
+        // setLossData(() => lossData.concat(newLossData));
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
 
@@ -254,6 +275,7 @@ function MainPage(props: PageProps) {
         updateDecisionBoundaries();
         delta = Date.now() - start;
         console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
+        console.log(lossData);
     };
 
     const toggleDiscreetOutput = () => {
@@ -270,6 +292,11 @@ function MainPage(props: PageProps) {
 
     const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setDatasetType(e.target.value as string);
+    };
+
+    const handleRegenerateDataset = () => {
+        generateDataset();
+        if(training) toggleAutoTrain();
     };
 
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
@@ -293,6 +320,10 @@ function MainPage(props: PageProps) {
          newNetworkShape[0] = newInputs.length;
          setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
+
+    // const handleHover = (nodeId: string, active: boolean) => {
+
+    // }
 
     const removeLayer = () => {
         console.log("Running removeLayer");
@@ -318,6 +349,17 @@ function MainPage(props: PageProps) {
         }
     }
 
+    const toggleAutoTrain = () => {
+        if(training) {
+            clearInterval(trainingInterval);
+        } else {
+            setTrainingInterval(setInterval(() => {
+                step(1);
+            }, 500));
+        }
+        setTraining(!training);
+    }
+
     return (
         <Container>
             <ConfigBar>
@@ -331,13 +373,13 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Activation Tooltip" setInfoPanel={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
+                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
-                        This effects the rate at which the weights and biases change when training the neural network.<br />
+                        <Typography variant="body2">The activation defines the output of a neuron (node).<br/>Given the inputs should the given neuron output.</Typography><br/>
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
-                </InfoButton>
+                </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Learning Rate</InputLabel>
@@ -349,13 +391,13 @@ function MainPage(props: PageProps) {
                         <MenuItem value="0.005">0.005</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Learning Rate Tooltip" setInfoPanel={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config} />}>
+                <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
-                        This affects the rate at which the weights and biases change when training the neural network.<br />
+                        <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br/>
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
-                </InfoButton>
+                </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Dataset</InputLabel>
@@ -367,33 +409,33 @@ function MainPage(props: PageProps) {
                         <MenuItem value="XOR">XOR</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <InfoButton title="Dataset Tooltip" setInfoPanel={setInfoPanel} infoPanel={<DatasetInfoPanel {...config} />}>
+                <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanel} infoPanel={<DatasetInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Datasets</Typography>
-                        Defines the shape of the dataset we want our neural network to solve.<br />
+                        <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br/>
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
-                </InfoButton>
+                </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
                 <LabeledSlider
                     label="Noise"
                     defaultValue={noise}
                     onChange={handleNoiseChange}
                 />
-                <InfoButton title="Noise Tooltip">
+                <StyledInfoButton title="Noise Tooltip">
                     <React.Fragment>
                         <Typography color="inherit">Noise</Typography>
-                        This sets the noise in the generated data set. The more noise the greater the variance in the generated data.
+                        <Typography variant="body2">This sets the noise in the generated data set. The more noise the greater the variance in the generated data.</Typography>
                     </React.Fragment>
-                </InfoButton>
+                </StyledInfoButton>
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(10000)}> Step 10000</StyledButton>
+                {/* <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
+                <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton> */}
+                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: {training? "On" : "Off"}</StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
-                <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
+                <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
             </ControlPanel>
             <NetworkPanel>
@@ -413,9 +455,10 @@ function MainPage(props: PageProps) {
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={handleInputNodeClick}
+                    // handleOnHover={handleHover}
                 />}
             </NetworkPanel>
-            <ContainerSection gridArea="nn-graph">
+            <GraphPanel>
                 {dataset && network && <NNGraph
                     dataset={dataset}
                     density={25}
@@ -427,11 +470,32 @@ function MainPage(props: PageProps) {
                     decisionBoundary={decisionBoundary}
                     discreetBoundary={discreetBoundary}
                 />}
-                {(!dataset || !network) && <CircularProgress />}
-            </ContainerSection>
+                {/* {(!dataset || !network) && <CircularProgress />} */}
+                <h3> Epochs: {epochs} </h3>
+                <div style={{display: "flex", justifyContent: "flex-start"}}>
+                    <h3> Loss: {loss.toFixed(3)} </h3>
+                    <StyledInfoButton title="Loss Tooltip" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                        <React.Fragment>
+                            <Typography color="inherit">Loss</Typography>
+                            <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br/>
+                            <u>Click the icon to get more information</u>
+                        </React.Fragment>
+                    </StyledInfoButton>
+                </div>
+                <LossGraph
+                    height={60}
+                    width={170}
+                    margin={5}
+                    dataset={lossData}/>
+            </GraphPanel>
             <StatsBar>
-                <h2> Epochs: {epochs} </h2>
-                <h2> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
+                {/* <h2> Epochs: {epochs} </h2>
+                <h2 style={{minWidth: 200}}> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
+                <LossGraph
+                    height={30}
+                    width={100}
+                    margin={5}
+                    dataset={lossData}/> */}
             </StatsBar>
             <InfoPanel>
                 {infoPanel}
