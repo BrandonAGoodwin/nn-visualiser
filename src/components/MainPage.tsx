@@ -128,8 +128,6 @@ const GraphPanel = styled((props: any) => <ContainerSection gridArea="nn-graph" 
     display: block;
 `
 
-
-
 const StatsBar = styled((props: any) => <ContainerSection gridArea="stats" {...props} />)`
     display: flex;
     flex-direction: row;
@@ -213,7 +211,10 @@ function MainPage(props: PageProps) {
         generateDataset();
     }, [datasetType, noise])
 
-
+    useEffect(() => {
+        if(epochs === 0 || !network) return;
+            setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
+    }, [epochs])
 
 
     const generateDataset = () => {
@@ -245,6 +246,7 @@ function MainPage(props: PageProps) {
 
     const reset = () => {
         console.log("Reset");
+        if(training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
         updateDecisionBoundaries();
@@ -258,12 +260,12 @@ function MainPage(props: PageProps) {
         let newLossData: [number, number][] = [];
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
-            newLossData.push([epochs + i + 1, vis.getCost(network, dataset, config.inputs)])
+            // newLossData.push([epochs + i + 1, vis.getCost(network, dataset, config.inputs)])
             setEpochs(epochs => epochs + 1);
         }
 
         
-        setLossData(lossData.concat(newLossData));
+        // setLossData(() => lossData.concat(newLossData));
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
 
@@ -273,6 +275,7 @@ function MainPage(props: PageProps) {
         updateDecisionBoundaries();
         delta = Date.now() - start;
         console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
+        console.log(lossData);
     };
 
     const toggleDiscreetOutput = () => {
@@ -289,6 +292,11 @@ function MainPage(props: PageProps) {
 
     const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setDatasetType(e.target.value as string);
+    };
+
+    const handleRegenerateDataset = () => {
+        generateDataset();
+        if(training) toggleAutoTrain();
     };
 
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
@@ -423,11 +431,11 @@ function MainPage(props: PageProps) {
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton>
+                {/* <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
+                <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton> */}
                 <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: {training? "On" : "Off"}</StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
-                <StyledButton variant={"contained"} color={"primary"} onClick={generateDataset}> Regenerate Dataset </StyledButton>
+                <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
             </ControlPanel>
             <NetworkPanel>
