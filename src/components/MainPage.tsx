@@ -433,7 +433,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
                 {/* <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton> */}
-                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: {training? "On" : "Off"}</StyledButton>
+                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training? "On" : "Off"}</b></StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>

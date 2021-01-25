@@ -5,7 +5,7 @@ function DefaultInfoPanel(props: NNConfig) {
 
     return (
         <div>
-            <h1>Default Panel</h1>
+            <h1>How To Get Started</h1>
             <p></p>
         </div>
     );
