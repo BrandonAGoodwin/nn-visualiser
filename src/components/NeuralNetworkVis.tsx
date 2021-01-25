@@ -7,7 +7,12 @@ import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import { InputSharp } from "@material-ui/icons";
 import MouseToolTip from "react-sticky-mouse-tooltip";
+import { EAGAIN } from "constants";
 
+interface Offset {
+    top: number;
+    left: number;
+}
 
 interface NetworkProps {
     network: nn.Node[][];
@@ -20,11 +25,33 @@ interface NetworkProps {
     inputs: string[];
 }
 
-const HoverCard = styled(MouseToolTip)`
-    display: 'none';
-&:hover {
-    display: 'block';
+enum HoverCardType {
+    BIAS,
+    WEIGHT
 }
+
+interface HoverCardConfig {
+    type: HoverCardType;
+    value: number;
+}
+
+const HoverCard = styled("div")`
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box; 
+    background-color: white;
+    margin: auto auto;
+    padding: 10px;
+    border-radius: 30px;
+    border: 2px solid #bdbdbd;
+    //border: 2px solid #353a3c;
+    width: 200px;
+    height:180px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    z-index: 10000;
+    position: absolute;
 `
 
 const Container = styled("div")`
@@ -71,7 +98,66 @@ function NeuralNetworkVis(props: NetworkProps) {
     const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [labelsDrawn, setLabelsDrawn] = useState<boolean>(false);
+    const [containerOffset, setContainerOffset] = useState<Offset>({top: 0, left: 0});
+    const [showHoverCard, setShowHoverCard] = useState<boolean>(false);
+    const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({type: HoverCardType.WEIGHT, value: 0});
 
+
+    useEffect(() => {
+        // setNetwork(props.network);
+        
+        updateContainerOffset();
+
+        window.addEventListener('resize', updateContainerOffset);
+
+        // const linesContainer = document.querySelector('path.testg');//container.current;//document.getElementById('lines-container');
+        // if(linesContainer) {
+            console.log("Lines container exists")
+            document.addEventListener('mouseenter', updateHovercard, true);
+            document.addEventListener('mouseleave', hideHoverCard, true);
+        // }
+
+        return () => {
+            window.removeEventListener('resize', updateContainerOffset);
+
+            // if(linesContainer) {
+                document.removeEventListener('mouseenter', updateHovercard);
+                document.removeEventListener('mouseleave', hideHoverCard);
+            // }
+        }
+    }, [])
+
+    const updateHovercard = (event: any) => {
+        let targetId = event.target.id;
+        // console.log(event);
+        // console.log(targetId);
+        if(!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+        console.log("updatehovercard");
+        // If a node
+        if(targetId.indexOf("link") === -1) {
+            let node = nodeId2Node(targetId);
+            console.log(node)
+            if(node) {
+                setHoverCardConfig({type: HoverCardType.BIAS, value: node.bias});
+            }
+        } else { // If a link
+            let link = linkId2Link(targetId);
+            console.log(link)
+            if(link) {
+                setHoverCardConfig({type: HoverCardType.WEIGHT, value: link.weight});
+            }
+        }
+        setShowHoverCard(true);
+    }
+
+    const hideHoverCard = (event: any) => {
+        let targetId = event.target.id;
+        // console.log(event);
+        // console.log(targetId);
+        if(!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+        // console.log("hidehovercard");
+        setShowHoverCard(false);
+    }
 
     useEffect(() => {
         setLinksUpdated(false);
@@ -186,7 +272,8 @@ function NeuralNetworkVis(props: NetworkProps) {
             .attr("class", "link")
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
             .attr("d", d)
-            .attr("fill", "none")
+            .attr("fill", "transparent")
+            .attr("pointer-events", "all")
             .attr("stroke", linkConfig.color)
             .attr("stroke-width", linkConfig.size || 0)
 
@@ -244,9 +331,15 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     }
 
+    const updateContainerOffset = () => {
+        let containerCurrent = container.current;
+        if(/* !network ||  */!containerCurrent) return;
+        setContainerOffset({left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop});
+    }
+
     const nodeId2Node = (nodeId: string) => {
-        let id = nodeId.substring(5);
         if(!network) return null;
+        let id = nodeId.substring(5);
         for(let layerNum = 1; layerNum < network.length; layerNum++) {
             for(let nodeNum = 0; nodeNum < network[layerNum].length; nodeNum++) {
                 let node = network[layerNum][nodeNum];
@@ -255,20 +348,46 @@ function NeuralNetworkVis(props: NetworkProps) {
         }
     }
 
+    const linkId2Link = (linkId: string) => {
+        console.log(network)
+        if(!network) return null;
+        let splitId = linkId.split("-");
+        console.log(linkId);
+        console.log(splitId);
+        let fromNodeId = splitId[1];
+        let toNodeId = splitId[2];
+        let fromNode = nodeId2Node("node-"+ fromNodeId);
+        console.log(fromNode);
+        if(!fromNode) return null;
+        for(let i = 0; i < fromNode.linksOut.length; i++) {
+            let link = fromNode.linksOut[i];
+            if(link.dest.id === toNodeId) return link;
+        }
+        return null;
+    }
+
     return (
         <div ref={container}>
-            <MouseToolTip>
-                
+            <MouseToolTip
+                visible={showHoverCard}
+                offsetX={-1 * containerOffset.left}
+                offsetY={-1 * containerOffset.top}
+                style={{position: "relative"}}>
+                <HoverCard>
+                    {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value}</p>}
+                </HoverCard>
             </MouseToolTip>
             <svg
                 ref={svgContainer}
                 width={props.networkWidth}
                 height={props.networkHeight}
                 style={{ position: "absolute", pointerEvents: "none"}}
+                id={'lines-container'}
+                className={"testg"}
             />
             {!network || !linksUpdated && <FadeCanvas visible={true} width={props.networkWidth} height={props.networkHeight} />}
 
-            <Container style={{width:props.networkWidth, height:props.networkHeight }} id={'lines-container'}>
+            <Container style={{width:props.networkWidth, height:props.networkHeight }}>
 
                 <Layer>
                     {network && Object.keys(INPUTS).map(nodeId => 
