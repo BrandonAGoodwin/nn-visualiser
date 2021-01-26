@@ -1,11 +1,9 @@
 import * as nn from "../NeuralNet";
 import styled from "@emotion/styled";
 import React, { useEffect, useRef, useState } from "react";
-import LeaderLine from "react-leader-line";
 import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
-import { InputSharp } from "@material-ui/icons";
 import MouseToolTip from "react-sticky-mouse-tooltip";
 
 interface Offset {
@@ -20,7 +18,6 @@ interface NetworkProps {
     networkWidth: number;
     networkHeight: number;
     handleOnClick: any;
-    // handleOnHover: any;
     inputs: string[];
 }
 
@@ -76,14 +73,14 @@ const Layer = styled("div")`
 interface CanvasProps {
     visible: boolean;
 }
-const FadeCanvas = styled("canvas")<CanvasProps>`
+const FadeCanvas = styled("canvas") <CanvasProps>`
     position: absolute;
     background-color: white;
 
-    ${ ({visible}) => visible && `
+    ${({ visible }) => visible && `
     transition: opacity 1.1s;
     `}
-    ${ ({visible}) => !visible && `
+    ${({ visible }) => !visible && `
     transition: opacity 0.1s;
     `}
 `;
@@ -97,71 +94,54 @@ function NeuralNetworkVis(props: NetworkProps) {
     const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [labelsDrawn, setLabelsDrawn] = useState<boolean>(false);
-    const [containerOffset, setContainerOffset] = useState<Offset>({top: 0, left: 0});
+    const [containerOffset, setContainerOffset] = useState<Offset>({ top: 0, left: 0 });
     const [showHoverCard, setShowHoverCard] = useState<boolean>(false);
-    const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({type: HoverCardType.WEIGHT, value: 0});
+    const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({ type: HoverCardType.WEIGHT, value: 0 });
 
 
     useEffect(() => {
-        // setNetwork(props.network);
-        
+
         updateContainerOffset();
 
         window.addEventListener('resize', updateContainerOffset);
 
-        // const linesContainer = document.querySelector('path.testg');//container.current;//document.getElementById('lines-container');
-        // if(linesContainer) {
-            console.log("Lines container exists")
-            document.addEventListener('mouseenter', updateHovercard, true);
-            document.addEventListener('mouseleave', hideHoverCard, true);
-        // }
+        document.addEventListener('mouseenter', updateHovercard, true);
+        document.addEventListener('mouseleave', hideHoverCard, true);
 
         return () => {
             window.removeEventListener('resize', updateContainerOffset);
 
-            // if(linesContainer) {
-                document.removeEventListener('mouseenter', updateHovercard);
-                document.removeEventListener('mouseleave', hideHoverCard);
-            // }
+            document.removeEventListener('mouseenter', updateHovercard);
+            document.removeEventListener('mouseleave', hideHoverCard);
         }
     }, [])
 
     const updateHovercard = (event: any) => {
         let targetId = event.target.id;
-        // console.log(event);
-        // console.log(targetId);
-        if(!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
-        console.log("updatehovercard");
-        // If a node
-        if(targetId.indexOf("link") === -1) {
+
+        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+
+        if (targetId.indexOf("link") === -1) {
+            // If a node
             let node = nodeId2Node(targetId);
-            console.log(node)
-            if(node) {
-                setHoverCardConfig({type: HoverCardType.BIAS, value: node.bias});
-            }
-        } else { // If a link
+            if (node) setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+        } else {
+            // If a link
             let link = linkId2Link(targetId);
-            console.log(link)
-            if(link) {
-                setHoverCardConfig({type: HoverCardType.WEIGHT, value: link.weight});
-            }
+            if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
         }
+
         setShowHoverCard(true);
     }
 
     const hideHoverCard = (event: any) => {
         let targetId = event.target.id;
-        // console.log(event);
-        // console.log(targetId);
-        if(!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
-        // console.log("hidehovercard");
+        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
         setShowHoverCard(false);
     }
 
     useEffect(() => {
         setLinksUpdated(false);
-        console.log("Setting network")
-        console.log(props.network)
         setNetwork(props.network);
     }, [props.network])
 
@@ -170,7 +150,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         drawAllLinks(props.network);
     }, [props.decisionBoundaries])
 
- 
+
     const drawAllLinks = (network: nn.Node[][]) => {
         console.log("Draw Links");
         let start = Date.now();
@@ -178,7 +158,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         d3.selectAll(".link").remove();
 
         let node2Coord = getNodeCoords(network);
-        if(!node2Coord) return;
+        if (!node2Coord) return;
 
         let iter = 0;
         for (let layerNum = 0; layerNum < network.length; layerNum++) {
@@ -188,47 +168,47 @@ function NeuralNetworkVis(props: NetworkProps) {
                 // Instead store node positions in a dictionary to reduce elementSearches and increase speed
                 for (let j = 0; j < node.linksOut.length; j++) {
                     let link: nn.Link = node.linksOut[j];
-                    
+
                     drawLink(link, node2Coord, j, node.linksOut.length);
 
                     iter++;
                 }
-                
+
             }
         }
 
-        if(!labelsDrawn) drawLabels(node2Coord);
+        if (!labelsDrawn) drawLabels(node2Coord);
 
         setLinksUpdated(true);
         let delta = Date.now() - start;
         console.log(`Finished drawing links (Links Drawn: ${iter}) (Duration: ${delta}ms)`);
-    
+
     }
 
     const getNodeCoords = (network: nn.Node[][]) => {
-        
+
         let containerCurrent = container.current;
-        if(!network || !containerCurrent) return null;
+        if (!network || !containerCurrent) return null;
         let node2Coord: { [id: string]: { cx: number, cy: number } } = {}
         let containerLeft = containerCurrent.offsetLeft;
         let containerTop = containerCurrent.offsetTop;
 
         for (let layerNum = 0; layerNum < network.length; layerNum++) {
             let currentLayer = network[layerNum];
-            if(layerNum === 0) {
+            if (layerNum === 0) {
                 let iter = 0;
                 Object.keys(INPUTS).forEach((nodeId) => {
-                
+
                     let nodeElement = document.getElementById(`node-${nodeId}`);
                     // Right now they aren't actually the centre
-                    if (nodeElement) node2Coord[nodeId] = {cx: nodeElement.offsetLeft - containerLeft + nodeWidth/2, cy: nodeElement.offsetTop - containerTop + nodeWidth/2}
+                    if (nodeElement) node2Coord[nodeId] = { cx: nodeElement.offsetLeft - containerLeft + nodeWidth / 2, cy: nodeElement.offsetTop - containerTop + nodeWidth / 2 }
                 })
             } else {
                 for (let i = 0; i < currentLayer.length; i++) {
                     let node: nn.Node = currentLayer[i];
                     let nodeElement = document.getElementById(`node-${node.id}`);
                     // Right now they aren't actually the centre
-                    if (nodeElement) node2Coord[node.id] = {cx: nodeElement.offsetLeft - containerLeft + nodeWidth/2, cy: nodeElement.offsetTop - containerTop + nodeWidth/2}
+                    if (nodeElement) node2Coord[node.id] = { cx: nodeElement.offsetLeft - containerLeft + nodeWidth / 2, cy: nodeElement.offsetTop - containerTop + nodeWidth / 2 }
                 }
             }
         }
@@ -248,23 +228,24 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     function drawLink(
         input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } },
-         index: number, length: number) {
+        index: number, length: number) {
         let line = d3.select(svgContainer.current).append("path");
         let source = node2coord[input.source.id];
         let dest = node2coord[input.dest.id];
-        if(!(dest && source)) return;
+        if (!(dest && source)) return;
 
         // Check X and Ys are reversed properlly
-        let datum:any = {
-            source: 
+        let datum: any = {
+            source:
                 [source.cx + RECT_SIZE / 2 + 2, source.cy]
             ,
             target: [dest.cx - RECT_SIZE / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
         };
 
         let diagonal = d3.linkHorizontal()
-            .x(function(d: any) {
-                return d[0]; }).y(function(d: any) { return d[1]; })
+            .x(function (d: any) {
+                return d[0];
+            }).y(function (d: any) { return d[1]; })
         let d = diagonal(datum);
 
         let linkConfig = generateLineConfig(input);
@@ -289,7 +270,7 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         nodeIds.forEach((nodeId) => {
             let source = node2coord[nodeId];
-            if(!source) {
+            if (!source) {
                 nodeNotDrawnYet = true;
                 return;
             }
@@ -310,22 +291,22 @@ function NeuralNetworkVis(props: NetworkProps) {
                     let sep = myArray[2];
                     let suffix = myArray[3];
                     if (prefix) {
-                    text.append("tspan").text(prefix);
+                        text.append("tspan").text(prefix);
                     }
                     text.append("tspan")
-                    .attr("baseline-shift", sep === "_" ? "sub" : "super")
-                    .style("font-size", "9px")
-                    .text(suffix);
+                        .attr("baseline-shift", sep === "_" ? "sub" : "super")
+                        .style("font-size", "9px")
+                        .text(suffix);
                 }
                 if (lastIndex && label.substring(lastIndex)) {
                     text.append("tspan").text(label.substring(lastIndex));
                 }
             } else {
-                text.append("tspan").text(label);  
+                text.append("tspan").text(label);
             }
-    
+
         })
-        if(!nodeNotDrawnYet)setLabelsDrawn(true);
+        if (!nodeNotDrawnYet) setLabelsDrawn(true);
     }
 
     const handleHover = (nodeId: string, active: boolean) => {
@@ -334,35 +315,31 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     const updateContainerOffset = () => {
         let containerCurrent = container.current;
-        if(/* !network ||  */!containerCurrent) return;
-        setContainerOffset({left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop});
+        if (!containerCurrent) return;
+        setContainerOffset({ left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop });
     }
 
     const nodeId2Node = (nodeId: string) => {
-        if(!props.network) return null;
+        if (!props.network) return null;
         let id = nodeId.substring(5);
-        for(let layerNum = 1; layerNum < props.network.length; layerNum++) {
-            for(let nodeNum = 0; nodeNum < props.network[layerNum].length; nodeNum++) {
+        for (let layerNum = 1; layerNum < props.network.length; layerNum++) {
+            for (let nodeNum = 0; nodeNum < props.network[layerNum].length; nodeNum++) {
                 let node = props.network[layerNum][nodeNum];
-                if(node.id === id) return node;
+                if (node.id === id) return node;
             }
         }
     }
 
     const linkId2Link = (linkId: string) => {
-        console.log(props.network)
-        if(!props.network) return null;
+        if (!props.network) return null;
         let splitId = linkId.split("-");
-        console.log(linkId);
-        console.log(splitId);
         let fromNodeId = splitId[1];
         let toNodeId = splitId[2];
-        let fromNode = nodeId2Node("node-"+ fromNodeId);
-        console.log(fromNode);
-        if(!fromNode) return null;
-        for(let i = 0; i < fromNode.linksOut.length; i++) {
+        let fromNode = nodeId2Node("node-" + fromNodeId);
+        if (!fromNode) return null;
+        for (let i = 0; i < fromNode.linksOut.length; i++) {
             let link = fromNode.linksOut[i];
-            if(link.dest.id === toNodeId) return link;
+            if (link.dest.id === toNodeId) return link;
         }
         return null;
     }
@@ -373,7 +350,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 visible={showHoverCard}
                 offsetX={-1 * containerOffset.left}
                 offsetY={-1 * containerOffset.top}
-                style={{position: "relative"}}>
+                style={{ position: "relative" }}>
                 <HoverCard>
                     {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
                     {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
@@ -383,29 +360,29 @@ function NeuralNetworkVis(props: NetworkProps) {
                 ref={svgContainer}
                 width={props.networkWidth}
                 height={props.networkHeight}
-                style={{ position: "absolute", pointerEvents: "none"}}
+                style={{ position: "absolute", pointerEvents: "none" }}
                 id={'lines-container'}
                 className={"testg"}
             />
             {!network || !linksUpdated && <FadeCanvas visible={true} width={props.networkWidth} height={props.networkHeight} />}
 
-            <Container style={{width:props.networkWidth, height:props.networkHeight }}>
+            <Container style={{ width: props.networkWidth, height: props.networkHeight }}>
 
                 <Layer>
-                    {network && Object.keys(INPUTS).map(nodeId => 
+                    {network && Object.keys(INPUTS).map(nodeId =>
                         <NNNode
-                        id={`node-${nodeId}`}
-                        nodeId={nodeId}
-                        active={props.inputs.includes(nodeId)}
-                        nodeWidth={nodeWidth}
-                        numCells={20}
-                        decisionBoundary={props.decisionBoundaries[nodeId]}
-                        discreetBoundary={props.discreetBoundary}
-                        handleOnClick={props.handleOnClick}
+                            id={`node-${nodeId}`}
+                            nodeId={nodeId}
+                            active={props.inputs.includes(nodeId)}
+                            nodeWidth={nodeWidth}
+                            numCells={20}
+                            decisionBoundary={props.decisionBoundaries[nodeId]}
+                            discreetBoundary={props.discreetBoundary}
+                            handleOnClick={props.handleOnClick}
                         />
                     )}
                 </Layer>
-                
+
                 {network && network.slice(1).map(layer => <Layer>
                     {layer.map(node => <NNNode
                         id={`node-${node.id}`}
