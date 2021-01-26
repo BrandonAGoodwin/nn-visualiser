@@ -59,8 +59,7 @@ const PlusMinusButtonsContainer = styled("div")`
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 0px;
-    justify-self: flex-start;
+    align-self: flex-start;
 `
 
 const Container = styled("div")`
@@ -118,14 +117,8 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         window.addEventListener('resize', updateContainerOffset);
 
-        document.addEventListener('mouseenter', updateHovercard, true);
-        document.addEventListener('mouseleave', hideHoverCard, true);
-
         return () => {
             window.removeEventListener('resize', updateContainerOffset);
-
-            document.removeEventListener('mouseenter', updateHovercard);
-            document.removeEventListener('mouseleave', hideHoverCard);
         }
     }, [])
 
@@ -141,6 +134,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         } else {
             // If a link
             let link = linkId2Link(targetId);
+            // console.log(link)
             if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
         }
 
@@ -156,6 +150,14 @@ function NeuralNetworkVis(props: NetworkProps) {
     useEffect(() => {
         setLinksUpdated(false);
         setNetwork(props.network);
+
+        document.addEventListener('mouseenter', updateHovercard, true);
+        document.addEventListener('mouseleave', hideHoverCard, true);
+
+        return () => {
+            document.removeEventListener('mouseenter', updateHovercard);
+            document.removeEventListener('mouseleave', hideHoverCard);
+        }
     }, [props.network])
 
 
@@ -344,11 +346,14 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     const linkId2Link = (linkId: string) => {
+        // console.log(props.network)
         if (!props.network) return null;
         let splitId = linkId.split("-");
+        // console.log(splitId)
         let fromNodeId = splitId[1];
         let toNodeId = splitId[2];
         let fromNode = nodeId2Node("node-" + fromNodeId);
+        // console.log(fromNode)
         if (!fromNode) return null;
         for (let i = 0; i < fromNode.linksOut.length; i++) {
             let link = fromNode.linksOut[i];
@@ -397,8 +402,8 @@ function NeuralNetworkVis(props: NetworkProps) {
                 </Layer>
 
                 {network && network.slice(1).map((layer, layerNum) =>
-                    // <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
-                        <Layer>
+                    <div style={{ display: "flex", flexDirection: "column"}}>
+                        <Layer style={{ flexGrow: 1 }}>
                             {layer.map(node => <NNNode
                                 id={`node-${node.id}`}
                                 nodeWidth={nodeWidth}
@@ -408,7 +413,8 @@ function NeuralNetworkVis(props: NetworkProps) {
                                 discreetBoundary={props.discreetBoundary}
                                 handleOnHover={handleHover}
                             />)}
-                            {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer>
+                        </Layer>
+                        {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
                             <IconButton onClick={() => props.removeNode(layerNum + 1)}>
                                 <RemoveCircleIcon />
                             </IconButton>
@@ -416,9 +422,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                                 <AddCircleIcon />
                             </IconButton>
                         </PlusMinusButtonsContainer>}
-                        </Layer>
-                        
-                    /* </div> */)}
+                    </div>)}
             </Container>
         </div>
     );
