@@ -116,9 +116,10 @@ function NeuralNetworkVis(props: NetworkProps) {
         updateContainerOffset();
 
         window.addEventListener('resize', updateContainerOffset);
-
+        window.addEventListener('scroll', updateContainerOffset);
         return () => {
             window.removeEventListener('resize', updateContainerOffset);
+            window.removeEventListener('scroll', updateContainerOffset);
         }
     }, [])
 
@@ -339,7 +340,8 @@ function NeuralNetworkVis(props: NetworkProps) {
     const updateContainerOffset = () => {
         let containerCurrent = container.current;
         if (!containerCurrent) return;
-        setContainerOffset({ left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop });
+        let viewportOffset = containerCurrent.getBoundingClientRect();
+        setContainerOffset({ left: viewportOffset.left, top: viewportOffset.top });
     }
 
     const nodeId2Node = (nodeId: string) => {
