@@ -7,7 +7,6 @@ import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import { InputSharp } from "@material-ui/icons";
 import MouseToolTip from "react-sticky-mouse-tooltip";
-import { EAGAIN } from "constants";
 
 interface Offset {
     top: number;
@@ -41,12 +40,12 @@ const HoverCard = styled("div")`
     box-sizing: border-box; 
     background-color: white;
     margin: auto auto;
-    padding: 10px;
-    border-radius: 30px;
+    /* padding: 10px; */
+    border-radius: 10px;
     border: 2px solid #bdbdbd;
     //border: 2px solid #353a3c;
-    width: 200px;
-    height:180px;
+    width: 120px;
+    height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -161,7 +160,9 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     useEffect(() => {
         setLinksUpdated(false);
-        setNetwork(props.network)
+        console.log("Setting network")
+        console.log(props.network)
+        setNetwork(props.network);
     }, [props.network])
 
 
@@ -188,7 +189,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 for (let j = 0; j < node.linksOut.length; j++) {
                     let link: nn.Link = node.linksOut[j];
                     
-                    drawLink(link, node2Coord, j, node.linksOut.length)
+                    drawLink(link, node2Coord, j, node.linksOut.length);
 
                     iter++;
                 }
@@ -338,19 +339,19 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     const nodeId2Node = (nodeId: string) => {
-        if(!network) return null;
+        if(!props.network) return null;
         let id = nodeId.substring(5);
-        for(let layerNum = 1; layerNum < network.length; layerNum++) {
-            for(let nodeNum = 0; nodeNum < network[layerNum].length; nodeNum++) {
-                let node = network[layerNum][nodeNum];
+        for(let layerNum = 1; layerNum < props.network.length; layerNum++) {
+            for(let nodeNum = 0; nodeNum < props.network[layerNum].length; nodeNum++) {
+                let node = props.network[layerNum][nodeNum];
                 if(node.id === id) return node;
             }
         }
     }
 
     const linkId2Link = (linkId: string) => {
-        console.log(network)
-        if(!network) return null;
+        console.log(props.network)
+        if(!props.network) return null;
         let splitId = linkId.split("-");
         console.log(linkId);
         console.log(splitId);
@@ -374,7 +375,8 @@ function NeuralNetworkVis(props: NetworkProps) {
                 offsetY={-1 * containerOffset.top}
                 style={{position: "relative"}}>
                 <HoverCard>
-                    {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value}</p>}
+                    {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
+                    {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
                 </HoverCard>
             </MouseToolTip>
             <svg
