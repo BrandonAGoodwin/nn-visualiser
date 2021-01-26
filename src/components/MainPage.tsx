@@ -376,7 +376,7 @@ function MainPage(props: PageProps) {
                 <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
-                        <Typography variant="body2">The activation defines the output of a neuron (node).<br/>Given the inputs should the given neuron output.</Typography><br/>
+                        <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br/>
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
                 </StyledInfoButton>

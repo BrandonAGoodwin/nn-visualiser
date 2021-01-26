@@ -322,7 +322,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const nodeId2Node = (nodeId: string) => {
         if (!props.network) return null;
         let id = nodeId.substring(5);
-        for (let layerNum = 1; layerNum < props.network.length; layerNum++) {
+        for (let layerNum = 0; layerNum < props.network.length; layerNum++) {
             for (let nodeNum = 0; nodeNum < props.network[layerNum].length; nodeNum++) {
                 let node = props.network[layerNum][nodeNum];
                 if (node.id === id) return node;
