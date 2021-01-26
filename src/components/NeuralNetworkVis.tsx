@@ -130,12 +130,20 @@ function NeuralNetworkVis(props: NetworkProps) {
         if (targetId.indexOf("link") === -1) {
             // If a node
             let node = nodeId2Node(targetId);
-            if (node) setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+            if (node && !(props.inputs.includes(targetId.substring(5)))) {
+                setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+            } else {
+                return;
+            }
         } else {
             // If a link
             let link = linkId2Link(targetId);
             // console.log(link)
-            if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            if (link) { 
+                setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            } else {
+                return;
+            }
         }
 
         setShowHoverCard(true);
@@ -155,10 +163,10 @@ function NeuralNetworkVis(props: NetworkProps) {
         document.addEventListener('mouseleave', hideHoverCard, true);
 
         return () => {
-            document.removeEventListener('mouseenter', updateHovercard);
-            document.removeEventListener('mouseleave', hideHoverCard);
+            document.removeEventListener('mouseenter', updateHovercard, true);
+            document.removeEventListener('mouseleave', hideHoverCard, true);
         }
-    }, [props.network])
+    }, [props.network, props.inputs])
 
 
     useEffect(() => {
