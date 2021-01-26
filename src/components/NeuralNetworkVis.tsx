@@ -5,6 +5,9 @@ import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import MouseToolTip from "react-sticky-mouse-tooltip";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { IconButton } from "@material-ui/core";
 
 interface Offset {
     top: number;
@@ -19,6 +22,8 @@ interface NetworkProps {
     networkHeight: number;
     handleOnClick: any;
     inputs: string[];
+    addNode: (layer: number) => void;
+    removeNode: (layer: number) => void;
 }
 
 enum HoverCardType {
@@ -48,6 +53,14 @@ const HoverCard = styled("div")`
     justify-content: center;
     z-index: 10000;
     position: absolute;
+`
+
+const PlusMinusButtonsContainer = styled("div")`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0px;
+    justify-self: flex-start;
 `
 
 const Container = styled("div")`
@@ -383,18 +396,29 @@ function NeuralNetworkVis(props: NetworkProps) {
                     )}
                 </Layer>
 
-                {network && network.slice(1).map(layer => <Layer>
-                    {layer.map(node => <NNNode
-                        id={`node-${node.id}`}
-                        nodeWidth={nodeWidth}
-                        numCells={20}
-                        active={true}
-                        decisionBoundary={props.decisionBoundaries[node.id]}
-                        discreetBoundary={props.discreetBoundary}
-                        handleOnHover={handleHover}
-                    />)}
-                </Layer>)}
-
+                {network && network.slice(1).map((layer, layerNum) =>
+                    // <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+                        <Layer>
+                            {layer.map(node => <NNNode
+                                id={`node-${node.id}`}
+                                nodeWidth={nodeWidth}
+                                numCells={20}
+                                active={true}
+                                decisionBoundary={props.decisionBoundaries[node.id]}
+                                discreetBoundary={props.discreetBoundary}
+                                handleOnHover={handleHover}
+                            />)}
+                            {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer>
+                            <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                <RemoveCircleIcon />
+                            </IconButton>
+                            <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                <AddCircleIcon />
+                            </IconButton>
+                        </PlusMinusButtonsContainer>}
+                        </Layer>
+                        
+                    /* </div> */)}
             </Container>
         </div>
     );

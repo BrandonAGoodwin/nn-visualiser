@@ -349,6 +349,24 @@ function MainPage(props: PageProps) {
         }
     }
 
+    const removeNode = (layerNum: number) => {
+        console.log("Running removeNode");
+        if(config.networkShape[layerNum] > 1) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape[layerNum] = config.networkShape[layerNum] - 1;
+            setConfig({ ...config, networkShape: newNetworkShape});
+        }
+    }
+
+    const addNode = (layerNum: number) => {
+        console.log("Running addNode");
+        if(config.networkShape[layerNum] < 5) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape[layerNum] = config.networkShape[layerNum] + 1;
+            setConfig({ ...config, networkShape: newNetworkShape});
+        }
+    }
+
     const toggleAutoTrain = () => {
         if(training) {
             clearInterval(trainingInterval);
@@ -455,6 +473,8 @@ function MainPage(props: PageProps) {
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={handleInputNodeClick}
+                    addNode={addNode}
+                    removeNode={removeNode}
                     // handleOnHover={handleHover}
                 />}
             </NetworkPanel>
