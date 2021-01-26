@@ -2,7 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import { Dataset2D } from '../datasets';
 import BackgroundCanvas from './BackgroundCanvas';
+import styled from '@emotion/styled';
 
+const StyledBackgroundCanvas = styled(BackgroundCanvas)`
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: -1;
+`
 
 type GraphProps = {
     dataset: Dataset2D[],
@@ -115,12 +122,12 @@ function NNGraph(props: GraphProps): JSX.Element {
 
     return (
         <>
-            <div>
+            <div style={{ position: "relative"}}>
                 <svg
                     ref={d3Container}
                     width={props.canvasWidth + props.margin * 2}
                     height={props.canvasWidth + props.margin * 2}
-                    style={{ position: "absolute" }}
+                    style={{ position: "absolute"}}
                 />
                 <BackgroundCanvas
                     width={props.canvasWidth}
