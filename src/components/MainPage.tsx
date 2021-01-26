@@ -171,7 +171,7 @@ function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2,4, 4,1],
+            networkShape: [2, 4, 4, 1],
             activationFunction: "ReLU",
             learningRate: 0.03,
             inputs: ["x", "y"],
@@ -192,6 +192,7 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         console.log("Config change useEffect");
+        if(training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
     }, [config])
@@ -205,15 +206,20 @@ function MainPage(props: PageProps) {
         updateDecisionBoundaries();
     }, [network])
 
-   
+
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        generateDataset();
+        // if(training) toggleAutoTrain();
+        // setEpochs(0);
+        // setLossData([]);
+        // generateDataset();
+        reset();
+
     }, [datasetType, noise])
 
     useEffect(() => {
-        if(epochs === 0 || !network) return;
-            setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
+        if (epochs === 0 || !network) return;
+        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
     }, [epochs])
 
 
@@ -246,7 +252,7 @@ function MainPage(props: PageProps) {
 
     const reset = () => {
         console.log("Reset");
-        if(training) toggleAutoTrain();
+        if (training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
         updateDecisionBoundaries();
@@ -264,7 +270,7 @@ function MainPage(props: PageProps) {
             setEpochs(epochs => epochs + 1);
         }
 
-        
+
         // setLossData(() => lossData.concat(newLossData));
         let delta = Date.now() - start;
         console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
@@ -275,7 +281,7 @@ function MainPage(props: PageProps) {
         updateDecisionBoundaries();
         delta = Date.now() - start;
         console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
-        console.log(lossData);
+        // console.log(lossData);
     };
 
     const toggleDiscreetOutput = () => {
@@ -296,7 +302,7 @@ function MainPage(props: PageProps) {
 
     const handleRegenerateDataset = () => {
         generateDataset();
-        if(training) toggleAutoTrain();
+        if (training) toggleAutoTrain();
     };
 
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
@@ -307,18 +313,24 @@ function MainPage(props: PageProps) {
         // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
         // console.log(config.inputs) 
         // Change this implemntation input is highly coupled with visControl
-         let newInputs: string[];
+        let newInputs: string[];
 
-         if (!active) {
-             config.inputs.push(nodeId);
-             newInputs = config.inputs;
-         } else {
-             newInputs = removeItemOnce(config.inputs, nodeId);
-         }
- 
-         let newNetworkShape = config.networkShape;
-         newNetworkShape[0] = newInputs.length;
-         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
+        if (active) {
+            if (config.inputs.length > 1) {
+                newInputs = removeItemOnce(config.inputs, nodeId);
+            } else {
+                return;
+            }
+        } else {
+            config.inputs.push(nodeId);
+            newInputs = config.inputs;
+        }
+
+        // if(training) toggleAutoTrain();
+
+        let newNetworkShape = config.networkShape;
+        newNetworkShape[0] = newInputs.length;
+        setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
 
     // const handleHover = (nodeId: string, active: boolean) => {
@@ -327,30 +339,48 @@ function MainPage(props: PageProps) {
 
     const removeLayer = () => {
         console.log("Running removeLayer");
-        if(config.networkShape.length > 2) {
+        if (config.networkShape.length > 2) {
             let newNetworkShape = config.networkShape;
             newNetworkShape.pop();
             newNetworkShape.pop();
             newNetworkShape.push(1);
             console.log(newNetworkShape);
-            setConfig({ ...config, networkShape: newNetworkShape});
+            setConfig({ ...config, networkShape: newNetworkShape });
         }
     }
 
     const addLayer = () => {
         console.log("Running addLayer");
-        if(config.networkShape.length < 6) {
+        if (config.networkShape.length < 6) {
             let newNetworkShape = config.networkShape;
             newNetworkShape.pop();
-            newNetworkShape.push(newNetworkShape[newNetworkShape.length-1]);
+            newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
             newNetworkShape.push(1);
             console.log(newNetworkShape);
-            setConfig({ ...config, networkShape: newNetworkShape});
+            setConfig({ ...config, networkShape: newNetworkShape });
+        }
+    }
+
+    const removeNode = (layerNum: number) => {
+        console.log("Running removeNode");
+        if (config.networkShape[layerNum] > 1) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape[layerNum] = config.networkShape[layerNum] - 1;
+            setConfig({ ...config, networkShape: newNetworkShape });
+        }
+    }
+
+    const addNode = (layerNum: number) => {
+        console.log("Running addNode");
+        if (config.networkShape[layerNum] < 5) {
+            let newNetworkShape = config.networkShape;
+            newNetworkShape[layerNum] = config.networkShape[layerNum] + 1;
+            setConfig({ ...config, networkShape: newNetworkShape });
         }
     }
 
     const toggleAutoTrain = () => {
-        if(training) {
+        if (training) {
             clearInterval(trainingInterval);
         } else {
             setTrainingInterval(setInterval(() => {
@@ -376,7 +406,7 @@ function MainPage(props: PageProps) {
                 <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
-                        <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br/>
+                        <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
                 </StyledInfoButton>
@@ -394,7 +424,7 @@ function MainPage(props: PageProps) {
                 <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
-                        <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br/>
+                        <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
                 </StyledInfoButton>
@@ -412,7 +442,7 @@ function MainPage(props: PageProps) {
                 <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanel} infoPanel={<DatasetInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Datasets</Typography>
-                        <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br/>
+                        <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br />
                         <u>Click the icon to get more information</u>
                     </React.Fragment>
                 </StyledInfoButton>
@@ -433,7 +463,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
                 {/* <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton> */}
-                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training? "On" : "Off"}</b></StyledButton>
+                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
@@ -441,10 +471,10 @@ function MainPage(props: PageProps) {
             <NetworkPanel>
                 <NeuralNetworkControls>
                     <IconButton onClick={removeLayer}>
-                        <RemoveCircleIcon/>
+                        <RemoveCircleIcon />
                     </IconButton>
                     <IconButton onClick={addLayer}>
-                        <AddCircleIcon/>
+                        <AddCircleIcon />
                     </IconButton>
                 </NeuralNetworkControls>
                 {dataset && network && <NeuralNetworkVis
@@ -455,7 +485,9 @@ function MainPage(props: PageProps) {
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={handleInputNodeClick}
-                    // handleOnHover={handleHover}
+                    addNode={addNode}
+                    removeNode={removeNode}
+                // handleOnHover={handleHover}
                 />}
             </NetworkPanel>
             <GraphPanel>
@@ -472,12 +504,12 @@ function MainPage(props: PageProps) {
                 />}
                 {/* {(!dataset || !network) && <CircularProgress />} */}
                 <h3> Epochs: {epochs} </h3>
-                <div style={{display: "flex", justifyContent: "flex-start"}}>
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
                     <h3> Loss: {loss.toFixed(3)} </h3>
                     <StyledInfoButton title="Loss Tooltip" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
                         <React.Fragment>
                             <Typography color="inherit">Loss</Typography>
-                            <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br/>
+                            <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
                             <u>Click the icon to get more information</u>
                         </React.Fragment>
                     </StyledInfoButton>
@@ -486,7 +518,7 @@ function MainPage(props: PageProps) {
                     height={60}
                     width={170}
                     margin={5}
-                    dataset={lossData}/>
+                    dataset={lossData} />
             </GraphPanel>
             <StatsBar>
                 {/* <h2> Epochs: {epochs} </h2>

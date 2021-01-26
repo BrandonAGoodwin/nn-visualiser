@@ -5,6 +5,9 @@ import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import MouseToolTip from "react-sticky-mouse-tooltip";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { IconButton } from "@material-ui/core";
 
 interface Offset {
     top: number;
@@ -19,6 +22,8 @@ interface NetworkProps {
     networkHeight: number;
     handleOnClick: any;
     inputs: string[];
+    addNode: (layer: number) => void;
+    removeNode: (layer: number) => void;
 }
 
 enum HoverCardType {
@@ -48,6 +53,13 @@ const HoverCard = styled("div")`
     justify-content: center;
     z-index: 10000;
     position: absolute;
+`
+
+const PlusMinusButtonsContainer = styled("div")`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-start;
 `
 
 const Container = styled("div")`
@@ -105,14 +117,8 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         window.addEventListener('resize', updateContainerOffset);
 
-        document.addEventListener('mouseenter', updateHovercard, true);
-        document.addEventListener('mouseleave', hideHoverCard, true);
-
         return () => {
             window.removeEventListener('resize', updateContainerOffset);
-
-            document.removeEventListener('mouseenter', updateHovercard);
-            document.removeEventListener('mouseleave', hideHoverCard);
         }
     }, [])
 
@@ -124,11 +130,20 @@ function NeuralNetworkVis(props: NetworkProps) {
         if (targetId.indexOf("link") === -1) {
             // If a node
             let node = nodeId2Node(targetId);
-            if (node) setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+            if (node && !(props.inputs.includes(targetId.substring(5)))) {
+                setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+            } else {
+                return;
+            }
         } else {
             // If a link
             let link = linkId2Link(targetId);
-            if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            // console.log(link)
+            if (link) { 
+                setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            } else {
+                return;
+            }
         }
 
         setShowHoverCard(true);
@@ -143,7 +158,15 @@ function NeuralNetworkVis(props: NetworkProps) {
     useEffect(() => {
         setLinksUpdated(false);
         setNetwork(props.network);
-    }, [props.network])
+
+        document.addEventListener('mouseenter', updateHovercard, true);
+        document.addEventListener('mouseleave', hideHoverCard, true);
+
+        return () => {
+            document.removeEventListener('mouseenter', updateHovercard, true);
+            document.removeEventListener('mouseleave', hideHoverCard, true);
+        }
+    }, [props.network, props.inputs])
 
 
     useEffect(() => {
@@ -331,11 +354,14 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     const linkId2Link = (linkId: string) => {
+        // console.log(props.network)
         if (!props.network) return null;
         let splitId = linkId.split("-");
+        // console.log(splitId)
         let fromNodeId = splitId[1];
         let toNodeId = splitId[2];
         let fromNode = nodeId2Node("node-" + fromNodeId);
+        // console.log(fromNode)
         if (!fromNode) return null;
         for (let i = 0; i < fromNode.linksOut.length; i++) {
             let link = fromNode.linksOut[i];
@@ -383,18 +409,28 @@ function NeuralNetworkVis(props: NetworkProps) {
                     )}
                 </Layer>
 
-                {network && network.slice(1).map(layer => <Layer>
-                    {layer.map(node => <NNNode
-                        id={`node-${node.id}`}
-                        nodeWidth={nodeWidth}
-                        numCells={20}
-                        active={true}
-                        decisionBoundary={props.decisionBoundaries[node.id]}
-                        discreetBoundary={props.discreetBoundary}
-                        handleOnHover={handleHover}
-                    />)}
-                </Layer>)}
-
+                {network && network.slice(1).map((layer, layerNum) =>
+                    <div style={{ display: "flex", flexDirection: "column"}}>
+                        <Layer style={{ flexGrow: 1 }}>
+                            {layer.map(node => <NNNode
+                                id={`node-${node.id}`}
+                                nodeWidth={nodeWidth}
+                                numCells={20}
+                                active={true}
+                                decisionBoundary={props.decisionBoundaries[node.id]}
+                                discreetBoundary={props.discreetBoundary}
+                                handleOnHover={handleHover}
+                            />)}
+                        </Layer>
+                        {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
+                            <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                <RemoveCircleIcon />
+                            </IconButton>
+                            <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                <AddCircleIcon />
+                            </IconButton>
+                        </PlusMinusButtonsContainer>}
+                    </div>)}
             </Container>
         </div>
     );

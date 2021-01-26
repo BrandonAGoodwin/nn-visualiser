@@ -42,7 +42,7 @@ export function start(config: NNConfig): nn.Node[][] {
 export function getDataset(datasetType: string, numSamples: number, noise: number) {
     let datasetGenerator = GENERATORS[datasetType];
     let dataset = datasetGenerator(numSamples, noise);
-    console.log(dataset);
+    // console.log(dataset);
     return dataset;
 }
 
