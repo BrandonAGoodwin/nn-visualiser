@@ -21,7 +21,7 @@ interface NetworkProps {
     networkWidth: number;
     networkHeight: number;
     handleOnClick: any;
-    inputs: string[];
+    inputs: {[inputId: string]: boolean };
     addNode: (layer: number) => void;
     removeNode: (layer: number) => void;
 }
@@ -131,7 +131,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         if (targetId.indexOf("link") === -1) {
             // If a node
             let node = nodeId2Node(targetId);
-            if (node && !(props.inputs.includes(targetId.substring(5)))) {
+            if (node && !(props.inputs[targetId.substring(5)])) {
                 setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
             } else {
                 return;
@@ -243,7 +243,10 @@ function NeuralNetworkVis(props: NetworkProps) {
     // or
     // Set a max width
     const generateLineConfig = (link: nn.Link) => {
-        let weightToSize = d3.scaleLinear().domain([-1, 0, 1]).range([4, 1, 4]);
+        let weightToSize = d3.scaleLinear()
+            .domain([-1, 0, 1])
+            .range([6, 1.5, 6])
+            .clamp(true);
         return {
             color: (link.weight > 0 ? "#223781" : "#ff7661"),
             size: weightToSize(link.weight),
@@ -401,7 +404,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                         <NNNode
                             id={`node-${nodeId}`}
                             nodeId={nodeId}
-                            active={props.inputs.includes(nodeId)}
+                            active={props.inputs[nodeId]}
                             nodeWidth={nodeWidth}
                             numCells={20}
                             decisionBoundary={props.decisionBoundaries[nodeId]}
