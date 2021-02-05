@@ -139,13 +139,18 @@ export function generateNetwork(
     networkShape: number[],
     activationFunction: ActivationFunction,
     outputActivationFunction: ActivationFunction,
-    inputIds: string[],
+    inputs: {[id: string] : boolean},
 ): Node[][] {
     let numlayers = networkShape.length;
     let network: Node[][] = [];
 
-    let id = 1;
+    let inputIds: string[] = [];
+    Object.keys(inputs).forEach((inputId) => {
+        if(inputs[inputId]) inputIds.push(inputId);
+    });
 
+    let id = 1;
+    // console.log(inputIds)
     for (let layerNum = 0; layerNum < numlayers; layerNum++) {
         let currentLayer: Node[] = [];
 

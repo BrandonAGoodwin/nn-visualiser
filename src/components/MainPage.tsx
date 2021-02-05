@@ -16,14 +16,14 @@ import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import LossGraph, { LossData } from './LossGraph';
+import LossGraph from './LossGraph';
 import LossInfoPanel from './InfoPanels/LossInfoPanel';
 
 export interface NNConfig {
     networkShape: number[];
     activationFunction: string;
     learningRate: number;
-    inputs: string[];
+    inputs: {[key: string]: boolean};
     batchSize: number;
 }
 
@@ -54,8 +54,7 @@ const Container = styled("div")`
     max-width: 1400px;
     min-height: 600px;
     padding: 20px;
-    padding-right: 100px;
-    padding-left: 100px;
+
     grid-template-columns: 230px 1fr auto;
     grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
@@ -81,16 +80,13 @@ const ContainerSection = styled("div")`
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
     grid-area: ${(props: { gridArea: string }) => (props.gridArea)};
-    //background-color: #131516;
     background-color: white;
     margin: auto auto;
     width: 100%;
     height: 100%;
-    padding: 10px;
-    //padding: 30px; 
+    padding: 5px;
     border-radius: 30px;
     border: 2px solid #bdbdbd;
-    //border: 2px solid #353a3c;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -171,10 +167,18 @@ function MainPage(props: PageProps) {
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
-            networkShape: [2, 4, 4, 1],
+            networkShape: [2, 2, 2, 1],
             activationFunction: "ReLU",
             learningRate: 0.03,
-            inputs: ["x", "y"],
+            inputs: {
+                "x": true,
+                "y": true,
+                "xSquared": false,
+                "ySquared": false,
+                "xTimesY": false,
+                "sinX": false,
+                "sinY": false
+            },
             batchSize: 10,
         }
     );
@@ -313,23 +317,30 @@ function MainPage(props: PageProps) {
         // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
         // console.log(config.inputs) 
         // Change this implemntation input is highly coupled with visControl
-        let newInputs: string[];
+        // let newInputs: string[];
+        let newInputs: {[inputId: string] : boolean} = {...config.inputs};
+        let newNetworkShape = config.networkShape;
 
         if (active) {
-            if (config.inputs.length > 1) {
-                newInputs = removeItemOnce(config.inputs, nodeId);
+            let noActiveNodes = 0;
+            Object.keys(config.inputs).forEach((inputId) => { if(config.inputs[inputId]) noActiveNodes++; });
+            if(noActiveNodes > 1) {
+                // newInputs = removeItemOnce(config.inputs, nodeId);
+                newInputs[nodeId] = false;
+                newNetworkShape[0] = newNetworkShape[0] - 1;
             } else {
                 return;
             }
         } else {
-            config.inputs.push(nodeId);
-            newInputs = config.inputs;
+            // config.inputs.push(nodeId);
+            newInputs[nodeId] = true;
+            newNetworkShape[0] = newNetworkShape[0] + 1;
         }
 
         // if(training) toggleAutoTrain();
 
-        let newNetworkShape = config.networkShape;
-        newNetworkShape[0] = newInputs.length;
+        
+        // newNetworkShape[0] = newInputs.length;
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
 

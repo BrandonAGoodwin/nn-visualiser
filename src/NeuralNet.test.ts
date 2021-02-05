@@ -5,7 +5,15 @@ import { Dataset2D } from "./datasets";
 
 describe("Forward Propagation", () => {
     let network: nn.Node[][];
-    let inputIds = ["x"];
+    let inputIds = {
+        "x": true,
+        "y": false,
+        "xSquared": false,
+        "ySquared": false,
+        "xTimesY": false,
+        "sinX": false,
+        "sinY": false
+    };
 
     beforeEach(() => {
         network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputIds);
@@ -27,11 +35,19 @@ describe("Back Propagation", () => {
         {x1: 4, x2: 0, y: 1}
     ];
     let learningRate = 0.03;
-    let inputIds = ["x"];
+    let inputs = {
+        "x": true,
+        "y": false,
+        "xSquared": false,
+        "ySquared": false,
+        "xTimesY": false,
+        "sinX": false,
+        "sinY": false
+    };
     let batchSize = 1;
 
     beforeEach(() => {
-        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputIds);
+        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputs);
     })
 
     it("Check accumulators change", () => {
@@ -43,7 +59,7 @@ describe("Back Propagation", () => {
 
         let sample = trainingData[0]
 
-        vis.step(network, trainingData, learningRate, inputIds, batchSize);
+        vis.step(network, trainingData, learningRate, inputs, batchSize);
         nn.forwardPropagate(network, [sample.x1]);
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y)
 
@@ -73,7 +89,15 @@ describe("SGD", () => {
     ];
     let learningRate = 0.03;
     let batchSize = 1;
-    let inputs = ["x"];
+    let inputs = {
+        "x": true,
+        "y": false,
+        "xSquared": false,
+        "ySquared": false,
+        "xTimesY": false,
+        "sinX": false,
+        "sinY": false
+    };
 
     beforeEach(() => {
         network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputs);
@@ -101,10 +125,18 @@ describe("Network Building", () => {
         {x1: 4, x2: 0, y: 1}
     ];
     let learningRate = 0.03;
-    let inputIds = ["x"]
+    let inputs = {
+        "x": true,
+        "y": false,
+        "xSquared": false,
+        "ySquared": false,
+        "xTimesY": false,
+        "sinX": false,
+        "sinY": false
+    };
 
     beforeEach(() => {
-        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputIds);
+        network = nn.generateNetwork([1,1], nn.Activations.SIGMOID, nn.Activations.TANH, inputs);
     })
 
     it("Correct Input Nodes", () => {

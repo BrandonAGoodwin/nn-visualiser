@@ -21,7 +21,7 @@ interface NetworkProps {
     networkWidth: number;
     networkHeight: number;
     handleOnClick: any;
-    inputs: string[];
+    inputs: {[inputId: string]: boolean };
     addNode: (layer: number) => void;
     removeNode: (layer: number) => void;
 }
@@ -109,6 +109,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const [containerOffset, setContainerOffset] = useState<Offset>({ top: 0, left: 0 });
     const [showHoverCard, setShowHoverCard] = useState<boolean>(false);
     const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({ type: HoverCardType.WEIGHT, value: 0 });
+    const [hoverTarget, setHoverTarget] = useState<string>("");
 
 
     useEffect(() => {
@@ -125,27 +126,9 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     const updateHovercard = (event: any) => {
         let targetId = event.target.id;
+        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1) || (targetId.substring(5) in props.inputs)) return;
 
-        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
-
-        if (targetId.indexOf("link") === -1) {
-            // If a node
-            let node = nodeId2Node(targetId);
-            if (node && !(props.inputs.includes(targetId.substring(5)))) {
-                setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
-            } else {
-                return;
-            }
-        } else {
-            // If a link
-            let link = linkId2Link(targetId);
-            // console.log(link)
-            if (link) { 
-                setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
-            } else {
-                return;
-            }
-        }
+        setHoverTarget(targetId);
 
         setShowHoverCard(true);
     }
@@ -153,6 +136,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const hideHoverCard = (event: any) => {
         let targetId = event.target.id;
         if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+        setHoverTarget("");
         setShowHoverCard(false);
     }
 
@@ -173,6 +157,22 @@ function NeuralNetworkVis(props: NetworkProps) {
     useEffect(() => {
         drawAllLinks(props.network);
     }, [props.decisionBoundaries])
+
+    useEffect(() => {
+        if(hoverTarget !== "") {
+            if (hoverTarget.indexOf("link") === -1) {
+                // If a node
+                let node = nodeId2Node(hoverTarget);
+                if (node) setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+
+            } else {
+                // If a link
+                let link = linkId2Link(hoverTarget);
+                // console.log(link)
+                if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            }
+    }
+    }, [hoverTarget, props.decisionBoundaries]);
 
 
     const drawAllLinks = (network: nn.Node[][]) => {
@@ -243,7 +243,10 @@ function NeuralNetworkVis(props: NetworkProps) {
     // or
     // Set a max width
     const generateLineConfig = (link: nn.Link) => {
-        let weightToSize = d3.scaleLinear().domain([-1, 0, 1]).range([4, 1, 4]);
+        let weightToSize = d3.scaleLinear()
+            .domain([-1, 0, 1])
+            .range([6, 1.5, 6])
+            .clamp(true);
         return {
             color: (link.weight > 0 ? "#223781" : "#ff7661"),
             size: weightToSize(link.weight),
@@ -274,6 +277,16 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         let linkConfig = generateLineConfig(input);
 
+        const transitionLoop: any = (line: any, offset: number) => {
+            // console.log("Run transition loop. (id: " + line + ", offset: " + offset + ")");
+            d3.select(line).transition().duration(100000)
+                .attr("stroke-dashoffset", offset)
+                // .on("mouseout", function ())
+                // .on("end", () => { 
+                //     transitionLoop(line, offset + 1); 
+                // })
+        }
+
         d && line.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
@@ -282,6 +295,26 @@ function NeuralNetworkVis(props: NetworkProps) {
             .attr("pointer-events", "all")
             .attr("stroke", linkConfig.color)
             .attr("stroke-width", linkConfig.size || 0)
+            .attr("stroke-dasharray", "10,2")
+            .on("mouseover", function (d, i) {
+                d3.select(this).transition()
+                .duration(100000)
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 8000) 
+            })
+            .on("mouseout", function (d, i) {
+                d3.select(this)
+                    .transition();
+            })
+            //.attr("stroke-dashoffset", "0")
+            // .attr("style", )
+            //.transition(transitionPath)
+            // .on("mouseover", function (d, i) { transitionLoop(`link-${input.source.id}-${input.dest.id}`, 10); })
+            // .on("mouseout", function (d, i) {
+            //     d3.select(this)
+            //         .transition()
+            //         .attr("stroke-dashoffset", "0");
+            // })
 
         return line;
     }
@@ -341,7 +374,9 @@ function NeuralNetworkVis(props: NetworkProps) {
         let containerCurrent = container.current;
         if (!containerCurrent) return;
         let viewportOffset = containerCurrent.getBoundingClientRect();
-        setContainerOffset({ left: viewportOffset.left, top: viewportOffset.top });
+        setContainerOffset({ left: viewportOffset.x - containerCurrent.offsetLeft, top: viewportOffset.y - containerCurrent.offsetTop});
+        // setContainerOffset({ left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop });
+        // console.log(viewportOffset);
     }
 
     const nodeId2Node = (nodeId: string) => {
@@ -373,12 +408,12 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     return (
-        <div ref={container}>
+        <div style={{ overflow: "hidden" }} ref={container}>
             <MouseToolTip
                 visible={showHoverCard}
                 offsetX={-1 * containerOffset.left}
                 offsetY={-1 * containerOffset.top}
-                style={{ position: "relative" }}>
+                style={{ position: "absolute" }}>
                 <HoverCard>
                     {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
                     {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
@@ -401,7 +436,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                         <NNNode
                             id={`node-${nodeId}`}
                             nodeId={nodeId}
-                            active={props.inputs.includes(nodeId)}
+                            active={props.inputs[nodeId]}
                             nodeWidth={nodeWidth}
                             numCells={20}
                             decisionBoundary={props.decisionBoundaries[nodeId]}
@@ -412,7 +447,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 </Layer>
 
                 {network && network.slice(1).map((layer, layerNum) =>
-                    <div style={{ display: "flex", flexDirection: "column"}}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
                         <Layer style={{ flexGrow: 1 }}>
                             {layer.map(node => <NNNode
                                 id={`node-${node.id}`}
