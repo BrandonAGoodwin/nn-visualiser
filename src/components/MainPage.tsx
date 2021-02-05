@@ -54,8 +54,9 @@ const Container = styled("div")`
     max-width: 1400px;
     min-height: 600px;
     padding: 20px;
-    padding-right: 100px;
-    padding-left: 100px;
+
+    /* padding-right: 100px;
+    padding-left: 100px; */
     grid-template-columns: 230px 1fr auto;
     grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
@@ -94,6 +95,7 @@ const ContainerSection = styled("div")`
     display: flex;
     flex-direction: row;
     justify-content: center;
+    /* overflow-x: auto; */
 `;
 
 // Fix so that this doesn't use hard coded paddings
