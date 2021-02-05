@@ -126,8 +126,7 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     const updateHovercard = (event: any) => {
         let targetId = event.target.id;
-
-        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1) || (props.inputs[targetId.substring(5)])) return;
+        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1) || (targetId.substring(5) in props.inputs)) return;
 
         setHoverTarget(targetId);
 
@@ -278,6 +277,16 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         let linkConfig = generateLineConfig(input);
 
+        const transitionLoop: any = (line: any, offset: number) => {
+            // console.log("Run transition loop. (id: " + line + ", offset: " + offset + ")");
+            d3.select(line).transition().duration(100000)
+                .attr("stroke-dashoffset", offset)
+                // .on("mouseout", function ())
+                // .on("end", () => { 
+                //     transitionLoop(line, offset + 1); 
+                // })
+        }
+
         d && line.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
@@ -286,6 +295,26 @@ function NeuralNetworkVis(props: NetworkProps) {
             .attr("pointer-events", "all")
             .attr("stroke", linkConfig.color)
             .attr("stroke-width", linkConfig.size || 0)
+            .attr("stroke-dasharray", "10,2")
+            .on("mouseover", function (d, i) {
+                d3.select(this).transition()
+                .duration(100000)
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 8000) 
+            })
+            .on("mouseout", function (d, i) {
+                d3.select(this)
+                    .transition();
+            })
+            //.attr("stroke-dashoffset", "0")
+            // .attr("style", )
+            //.transition(transitionPath)
+            // .on("mouseover", function (d, i) { transitionLoop(`link-${input.source.id}-${input.dest.id}`, 10); })
+            // .on("mouseout", function (d, i) {
+            //     d3.select(this)
+            //         .transition()
+            //         .attr("stroke-dashoffset", "0");
+            // })
 
         return line;
     }
