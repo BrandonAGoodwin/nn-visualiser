@@ -344,7 +344,9 @@ function NeuralNetworkVis(props: NetworkProps) {
         let containerCurrent = container.current;
         if (!containerCurrent) return;
         let viewportOffset = containerCurrent.getBoundingClientRect();
-        setContainerOffset({ left: viewportOffset.left, top: viewportOffset.top });
+        setContainerOffset({ left: viewportOffset.x - containerCurrent.offsetLeft, top: viewportOffset.y - containerCurrent.offsetTop});
+        // setContainerOffset({ left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop });
+        // console.log(viewportOffset);
     }
 
     const nodeId2Node = (nodeId: string) => {
@@ -376,12 +378,12 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     return (
-        <div ref={container}>
+        <div style={{ overflow: "hidden" }} ref={container}>
             <MouseToolTip
                 visible={showHoverCard}
                 offsetX={-1 * containerOffset.left}
                 offsetY={-1 * containerOffset.top}
-                style={{ position: "relative" }}>
+                style={{ position: "absolute" }}>
                 <HoverCard>
                     {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
                     {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
@@ -415,7 +417,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 </Layer>
 
                 {network && network.slice(1).map((layer, layerNum) =>
-                    <div style={{ display: "flex", flexDirection: "column"}}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
                         <Layer style={{ flexGrow: 1 }}>
                             {layer.map(node => <NNNode
                                 id={`node-${node.id}`}

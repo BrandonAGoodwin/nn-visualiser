@@ -55,8 +55,6 @@ const Container = styled("div")`
     min-height: 600px;
     padding: 20px;
 
-    /* padding-right: 100px;
-    padding-left: 100px; */
     grid-template-columns: 230px 1fr auto;
     grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
@@ -82,20 +80,16 @@ const ContainerSection = styled("div")`
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
     grid-area: ${(props: { gridArea: string }) => (props.gridArea)};
-    //background-color: #131516;
     background-color: white;
     margin: auto auto;
     width: 100%;
     height: 100%;
-    padding: 10px;
-    //padding: 30px; 
+    padding: 5px;
     border-radius: 30px;
     border: 2px solid #bdbdbd;
-    //border: 2px solid #353a3c;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    /* overflow-x: auto; */
 `;
 
 // Fix so that this doesn't use hard coded paddings
