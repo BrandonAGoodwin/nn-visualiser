@@ -3,13 +3,6 @@ import React from 'react';
 import './App.css';
 import MainPage from './components/MainPage';
 
-// const Background = styled("div")`
-//   background: rgb(255,118,97);
-//   background: linear-gradient(207deg, rgba(255,118,97,1) 0%, rgba(34,55,129,1) 100%);
-//   min-height: 100vh;
-//   min-width: 100vw;
-//   overflow: hidden;
-// `;
 
 const Container = styled("div")`
   /* background: rgb(255,118,97);
@@ -28,13 +21,12 @@ const Container = styled("div")`
   align-items: center;
   min-height: 100vh;
   /* min-width: calc(100vw - 10px); */
-  min-width: inherit;
-  overflow-x: ;
+  min-width: fit-content;
+  /* overflow-x: ; */
 `
 
 function App() {
   return (
-    // <Background>
     <Container>
       <MainPage
         xDomain={[-8, 8]}
@@ -42,7 +34,6 @@ function App() {
         numCells={100}
       />
     </Container>
-    // </Background>
   );
 }
 
