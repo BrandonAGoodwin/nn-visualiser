@@ -109,6 +109,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const [containerOffset, setContainerOffset] = useState<Offset>({ top: 0, left: 0 });
     const [showHoverCard, setShowHoverCard] = useState<boolean>(false);
     const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({ type: HoverCardType.WEIGHT, value: 0 });
+    const [hoverTarget, setHoverTarget] = useState<string>("");
 
 
     useEffect(() => {
@@ -126,26 +127,9 @@ function NeuralNetworkVis(props: NetworkProps) {
     const updateHovercard = (event: any) => {
         let targetId = event.target.id;
 
-        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+        if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1) || (props.inputs[targetId.substring(5)])) return;
 
-        if (targetId.indexOf("link") === -1) {
-            // If a node
-            let node = nodeId2Node(targetId);
-            if (node && !(props.inputs[targetId.substring(5)])) {
-                setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
-            } else {
-                return;
-            }
-        } else {
-            // If a link
-            let link = linkId2Link(targetId);
-            // console.log(link)
-            if (link) { 
-                setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
-            } else {
-                return;
-            }
-        }
+        setHoverTarget(targetId);
 
         setShowHoverCard(true);
     }
@@ -153,6 +137,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     const hideHoverCard = (event: any) => {
         let targetId = event.target.id;
         if (!targetId || (targetId.indexOf("link") === -1 && targetId.indexOf("node") === -1)) return;
+        setHoverTarget("");
         setShowHoverCard(false);
     }
 
@@ -173,6 +158,22 @@ function NeuralNetworkVis(props: NetworkProps) {
     useEffect(() => {
         drawAllLinks(props.network);
     }, [props.decisionBoundaries])
+
+    useEffect(() => {
+        if(hoverTarget !== "") {
+            if (hoverTarget.indexOf("link") === -1) {
+                // If a node
+                let node = nodeId2Node(hoverTarget);
+                if (node) setHoverCardConfig({ type: HoverCardType.BIAS, value: node.bias });
+
+            } else {
+                // If a link
+                let link = linkId2Link(hoverTarget);
+                // console.log(link)
+                if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
+            }
+    }
+    }, [hoverTarget, props.decisionBoundaries]);
 
 
     const drawAllLinks = (network: nn.Node[][]) => {
