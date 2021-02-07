@@ -116,8 +116,6 @@ const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network"
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: auto;
-    height: auto;
 `
 
 const GraphPanel = styled((props: any) => <ContainerSection gridArea="nn-graph" {...props} />)`
@@ -481,26 +479,19 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
             </ControlPanel>
             <NetworkPanel>
-                <NeuralNetworkControls>
-                    <IconButton onClick={removeLayer}>
-                        <RemoveCircleIcon />
-                    </IconButton>
-                    <Typography> Hidden Layers: {config.networkShape.length - 2}</Typography>
-                    <IconButton onClick={addLayer}>
-                        <AddCircleIcon />
-                    </IconButton>
-                </NeuralNetworkControls>
                 {dataset && network && <NeuralNetworkVis
                     network={network}
                     decisionBoundaries={decisionBoundaries}
                     discreetBoundary={discreetBoundary}
                     inputs={config.inputs}
+                    config={config}
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={handleInputNodeClick}
                     addNode={addNode}
                     removeNode={removeNode}
-                // handleOnHover={handleHover}
+                    addLayer={addLayer}
+                    removeLayer={removeLayer}
                 />}
             </NetworkPanel>
             <GraphPanel>

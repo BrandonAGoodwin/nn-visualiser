@@ -7,11 +7,16 @@ import { INPUTS } from "../visControl"
 import MouseToolTip from "react-sticky-mouse-tooltip";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { IconButton } from "@material-ui/core";
+import { IconButton, Typography } from "@material-ui/core";
+import { NNConfig } from "./MainPage";
 
-interface Offset {
+interface ContainerBox {
     top: number;
     left: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 interface NetworkProps {
@@ -21,9 +26,12 @@ interface NetworkProps {
     networkWidth: number;
     networkHeight: number;
     handleOnClick: any;
-    inputs: {[inputId: string]: boolean };
+    inputs: { [inputId: string]: boolean };
+    config: NNConfig;
     addNode: (layer: number) => void;
     removeNode: (layer: number) => void;
+    addLayer: () => void;
+    removeLayer: () => void;
 }
 
 enum HoverCardType {
@@ -42,7 +50,6 @@ const HoverCard = styled("div")`
     box-sizing: border-box; 
     background-color: white;
     margin: auto auto;
-    /* padding: 10px; */
     border-radius: 10px;
     border: 2px solid #bdbdbd;
     //border: 2px solid #353a3c;
@@ -62,6 +69,21 @@ const PlusMinusButtonsContainer = styled("div")`
     align-self: flex-start;
 `
 
+const GridContainer = styled("div")`
+    display: grid;
+    height: 100%;
+    width: 30vw;
+    min-width: 550px;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto 1fr 48px;
+    grid-gap: 0px;
+    grid-template-areas: 
+        "inputs-label layer-controls ."
+        "inputs-layer hidden-layers output"
+        ". hidden-layers ."
+        ;
+`
+
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -71,7 +93,7 @@ const Container = styled("div")`
     justify-content: space-between;
     padding-left: 50px;
     padding-right: 0px;
-    width: inherit;
+    width: 100%;
     height: inherit;
 `;
 
@@ -81,6 +103,17 @@ const Layer = styled("div")`
     justify-content: space-around;
     align-items: center;
 `;
+
+const ContainerSection = styled("div")`
+    grid-area: ${(props: { gridArea: string }) => (props.gridArea)};
+`
+
+const LayerControls = styled((props: any) => <ContainerSection gridArea="layer-controls" {...props} />)`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+`
 
 interface CanvasProps {
     visible: boolean;
@@ -101,12 +134,11 @@ const FadeCanvas = styled("canvas") <CanvasProps>`
 function NeuralNetworkVis(props: NetworkProps) {
     const svgContainer: any = useRef<any>(null);
     const container: any = useRef<any>(null);
-    const nodeWidth = 40;
-    const RECT_SIZE = 40;
+    const nodeWidth = 30;
     const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [labelsDrawn, setLabelsDrawn] = useState<boolean>(false);
-    const [containerOffset, setContainerOffset] = useState<Offset>({ top: 0, left: 0 });
+    const [containerBox, setContainerBox] = useState<ContainerBox>({ top: 0, left: 0, x: 0, y: 0, width: 0, height: 0 });
     const [showHoverCard, setShowHoverCard] = useState<boolean>(false);
     const [hoverCardConfig, setHoverCardConfig] = useState<HoverCardConfig>({ type: HoverCardType.WEIGHT, value: 0 });
     const [hoverTarget, setHoverTarget] = useState<string>("");
@@ -114,13 +146,13 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     useEffect(() => {
 
-        updateContainerOffset();
+        updateContainerBox();
 
-        window.addEventListener('resize', updateContainerOffset);
-        window.addEventListener('scroll', updateContainerOffset);
+        window.addEventListener('resize', updateContainerBox);
+        window.addEventListener('scroll', updateContainerBox);
         return () => {
-            window.removeEventListener('resize', updateContainerOffset);
-            window.removeEventListener('scroll', updateContainerOffset);
+            window.removeEventListener('resize', updateContainerBox);
+            window.removeEventListener('scroll', updateContainerBox);
         }
     }, [])
 
@@ -156,10 +188,16 @@ function NeuralNetworkVis(props: NetworkProps) {
 
     useEffect(() => {
         drawAllLinks(props.network);
+        updateContainerBox();
     }, [props.decisionBoundaries])
 
     useEffect(() => {
-        if(hoverTarget !== "") {
+        // At this point this means links are always drawn twice
+        drawAllLinks(props.network);
+    }, [containerBox])
+
+    useEffect(() => {
+        if (hoverTarget !== "") {
             if (hoverTarget.indexOf("link") === -1) {
                 // If a node
                 let node = nodeId2Node(hoverTarget);
@@ -171,7 +209,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 // console.log(link)
                 if (link) setHoverCardConfig({ type: HoverCardType.WEIGHT, value: link.weight });
             }
-    }
+        }
     }, [hoverTarget, props.decisionBoundaries]);
 
 
@@ -264,9 +302,9 @@ function NeuralNetworkVis(props: NetworkProps) {
         // Check X and Ys are reversed properlly
         let datum: any = {
             source:
-                [source.cx + RECT_SIZE / 2 + 2, source.cy]
+                [source.cx + nodeWidth / 2 + 2, source.cy]
             ,
-            target: [dest.cx - RECT_SIZE / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
+            target: [dest.cx - nodeWidth / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
         };
 
         let diagonal = d3.linkHorizontal()
@@ -276,16 +314,6 @@ function NeuralNetworkVis(props: NetworkProps) {
         let d = diagonal(datum);
 
         let linkConfig = generateLineConfig(input);
-
-        const transitionLoop: any = (line: any, offset: number) => {
-            // console.log("Run transition loop. (id: " + line + ", offset: " + offset + ")");
-            d3.select(line).transition().duration(100000)
-                .attr("stroke-dashoffset", offset)
-                // .on("mouseout", function ())
-                // .on("end", () => { 
-                //     transitionLoop(line, offset + 1); 
-                // })
-        }
 
         d && line.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
@@ -298,24 +326,14 @@ function NeuralNetworkVis(props: NetworkProps) {
             .attr("stroke-dasharray", "10,2")
             .on("mouseover", function (d, i) {
                 d3.select(this).transition()
-                .duration(100000)
-                .ease(d3.easeLinear)
-                .attr("stroke-dashoffset", 8000) 
+                    .duration(100000)
+                    .ease(d3.easeLinear)
+                    .attr("stroke-dashoffset", 8000)
             })
             .on("mouseout", function (d, i) {
                 d3.select(this)
                     .transition();
             })
-            //.attr("stroke-dashoffset", "0")
-            // .attr("style", )
-            //.transition(transitionPath)
-            // .on("mouseover", function (d, i) { transitionLoop(`link-${input.source.id}-${input.dest.id}`, 10); })
-            // .on("mouseout", function (d, i) {
-            //     d3.select(this)
-            //         .transition()
-            //         .attr("stroke-dashoffset", "0");
-            // })
-
         return line;
     }
 
@@ -324,6 +342,8 @@ function NeuralNetworkVis(props: NetworkProps) {
         let nodeIds = Object.keys(INPUTS);
         let nodeNotDrawnYet = false;
         let svg = d3.select(svgContainer.current);
+        
+        svg.selectAll(".input-label").remove();
 
         nodeIds.forEach((nodeId) => {
             let source = node2coord[nodeId];
@@ -335,9 +355,11 @@ function NeuralNetworkVis(props: NetworkProps) {
             let label = INPUTS[nodeId].label != null ? INPUTS[nodeId].label : nodeId;
 
             let text = svg.append("text")
-                .attr("x", source.cx - (RECT_SIZE / 2 + 2))
-                .attr("y", source.cy)
+                .attr("class", "input-label")
+                .attr("x", source.cx - (nodeWidth / 2 + 2))
+                .attr("y", source.cy + (nodeWidth / 4))
                 .attr("text-anchor", "end")
+                .attr("alignment-baseline", "middle")
             if (/[_^]/.test(label)) {
                 let myRe = /(.*?)([_^])(.)/g;
                 let myArray;
@@ -366,17 +388,20 @@ function NeuralNetworkVis(props: NetworkProps) {
         if (!nodeNotDrawnYet) setLabelsDrawn(true);
     }
 
-    const handleHover = (nodeId: string, active: boolean) => {
-
-    }
-
-    const updateContainerOffset = () => {
+    const updateContainerBox = () => {
         let containerCurrent = container.current;
         if (!containerCurrent) return;
+        console.log("updating container box");
         let viewportOffset = containerCurrent.getBoundingClientRect();
-        setContainerOffset({ left: viewportOffset.x - containerCurrent.offsetLeft, top: viewportOffset.y - containerCurrent.offsetTop});
-        // setContainerOffset({ left: containerCurrent.offsetLeft, top: containerCurrent.offsetTop });
-        // console.log(viewportOffset);
+        setContainerBox({
+            left: viewportOffset.x - containerCurrent.offsetLeft,
+            top: viewportOffset.y - containerCurrent.offsetTop,
+            x: viewportOffset.x,
+            y: viewportOffset.y,
+            width: viewportOffset.width,
+            height: viewportOffset.height
+        });
+
     }
 
     const nodeId2Node = (nodeId: string) => {
@@ -408,11 +433,11 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     return (
-        <div style={{ overflow: "hidden" }} ref={container}>
+        <GridContainer style={{ overflow: "hidden" }} ref={container}>
             <MouseToolTip
                 visible={showHoverCard}
-                offsetX={-1 * containerOffset.left}
-                offsetY={-1 * containerOffset.top}
+                offsetX={-1 * containerBox.left}
+                offsetY={-1 * containerBox.top}
                 style={{ position: "absolute" }}>
                 <HoverCard>
                     {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
@@ -421,16 +446,24 @@ function NeuralNetworkVis(props: NetworkProps) {
             </MouseToolTip>
             <svg
                 ref={svgContainer}
-                width={props.networkWidth}
-                height={props.networkHeight}
+                width={containerBox.width}
+                height={containerBox.height}
                 style={{ position: "absolute", pointerEvents: "none" }}
                 id={'lines-container'}
                 className={"testg"}
             />
-            {!network || !linksUpdated && <FadeCanvas visible={true} width={props.networkWidth} height={props.networkHeight} />}
+            {!network || !linksUpdated && <FadeCanvas visible={true} width={containerBox.width} height={containerBox.height} />}
+            <LayerControls>
+                <IconButton onClick={props.removeLayer}>
+                    <RemoveCircleIcon />
+                </IconButton>
+                <Typography> Hidden Layers: {props.config.networkShape.length - 2}</Typography>
+                <IconButton onClick={props.addLayer}>
+                    <AddCircleIcon />
+                </IconButton>
+            </LayerControls>
 
-            <Container style={{ width: props.networkWidth, height: props.networkHeight }}>
-
+            <Container style={{ gridArea: "inputs-layer" }}>
                 <Layer>
                     {network && Object.keys(INPUTS).map(nodeId =>
                         <NNNode
@@ -445,31 +478,56 @@ function NeuralNetworkVis(props: NetworkProps) {
                         />
                     )}
                 </Layer>
-
-                {network && network.slice(1).map((layer, layerNum) =>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                        <Layer style={{ flexGrow: 1 }}>
-                            {layer.map(node => <NNNode
-                                id={`node-${node.id}`}
-                                nodeWidth={nodeWidth}
-                                numCells={20}
-                                active={true}
-                                decisionBoundary={props.decisionBoundaries[node.id]}
-                                discreetBoundary={props.discreetBoundary}
-                                handleOnHover={handleHover}
-                            />)}
-                        </Layer>
-                        {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
-                            <IconButton onClick={() => props.removeNode(layerNum + 1)}>
-                                <RemoveCircleIcon />
-                            </IconButton>
-                            <IconButton onClick={() => props.addNode(layerNum + 1)}>
-                                <AddCircleIcon />
-                            </IconButton>
-                        </PlusMinusButtonsContainer>}
-                    </div>)}
             </Container>
-        </div>
+
+                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", justifyContent: "space-around", gridArea: "hidden-layers"}}>
+                    {network && network.slice(1, network.length - 1).map((layer, layerNum) =>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <Layer style={{ flexGrow: 1 }}>
+                                {layer.map(node => <NNNode
+                                    id={`node-${node.id}`}
+                                    nodeWidth={nodeWidth}
+                                    numCells={20}
+                                    active={true}
+                                    decisionBoundary={props.decisionBoundaries[node.id]}
+                                    discreetBoundary={props.discreetBoundary}
+                                />)}
+                            </Layer>
+                            {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
+                                <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                    <RemoveCircleIcon />
+                                </IconButton>
+                                <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                    <AddCircleIcon />
+                                </IconButton>
+                            </PlusMinusButtonsContainer>}
+                        </div>)}
+                </Container>
+                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", gridArea: "output"  }}>
+                    {network && network.slice(network.length - 1).map((layer, layerNum) =>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <Layer style={{ flexGrow: 1 }}>
+                                {layer.map(node => <NNNode
+                                    id={`node-${node.id}`}
+                                    nodeWidth={nodeWidth}
+                                    numCells={20}
+                                    active={true}
+                                    decisionBoundary={props.decisionBoundaries[node.id]}
+                                    discreetBoundary={props.discreetBoundary}
+                                />)}
+                            </Layer>
+                        </div>)}
+                </Container>
+
+            <svg
+                ref={svgContainer}
+                width={containerBox.width}
+                height={containerBox.height}
+                style={{ position: "absolute", pointerEvents: "none" }}
+                id={'lines-container'}
+                className={"testg"}
+            />
+        </GridContainer>
     );
 }
 
