@@ -50,4 +50,19 @@ describe("Gradient Decent", () => {
         }
 
     })
+
+    it("Long ReLU", () => {
+        let longNetworkShape = [2, 1, 1, 1];
+        network = nn.generateNetwork(longNetworkShape, nn.Activations.RELU, defaultOutputActivation, defaultInputs);
+        for (let i = 0; i < noSteps; i++) {
+            vis.step(network, trainingData, learningRate, defaultInputs, defaultBatchSize);
+        }
+
+        for (let i = 0; i < trainingData.length; i++) {
+            let datapoint = trainingData[i];
+            let prediction = nn.forwardPropagate(network, vis.constructInputs(datapoint.x1, datapoint.x2, defaultInputs)) > 0 ? 1 : -1;
+            expect(prediction).toEqual(datapoint.y);
+        }
+
+    })
 })
