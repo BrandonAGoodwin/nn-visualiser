@@ -145,6 +145,7 @@ const NeuralNetworkControls = styled("div")`
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    align-items: center;
 `;
 
 const StyledInfoButton = styled(InfoButton)`
@@ -484,6 +485,7 @@ function MainPage(props: PageProps) {
                     <IconButton onClick={removeLayer}>
                         <RemoveCircleIcon />
                     </IconButton>
+                    <Typography> Hidden Layers: {config.networkShape.length - 2}</Typography>
                     <IconButton onClick={addLayer}>
                         <AddCircleIcon />
                     </IconButton>
