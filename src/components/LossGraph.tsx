@@ -27,7 +27,7 @@ function LossGraph(props: GraphProps) {
 
 
     const init = () => {
-        console.log("LossGraph init")
+        // console.log("LossGraph init")
 
         createGraph();
         setInitialised(true);
@@ -49,7 +49,7 @@ function LossGraph(props: GraphProps) {
 
 
     const createGraph = () => {
-        console.log("Creating loss graph")
+        // console.log("Creating loss graph")
 
         let svg = d3.select(d3Container.currnet)
 
@@ -59,8 +59,8 @@ function LossGraph(props: GraphProps) {
     }
 
     const updateGraph = () => {
-        console.log("Updating loss graph")
-
+        // console.log("Updating loss graph")
+        // console.log(props.dataset)
         const svg = d3.select(d3Container.current)
 
         svg.selectAll(`.loss-graph`).remove();

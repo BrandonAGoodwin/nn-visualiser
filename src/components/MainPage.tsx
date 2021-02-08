@@ -160,7 +160,7 @@ function removeItemOnce(arr: string[], value: string) {
 
 
 function MainPage(props: PageProps) {
-    const [numSamples, setNumSamples] = useState<number>(100);
+    const [numSamples, setNumSamples] = useState<number>(2);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
@@ -178,7 +178,7 @@ function MainPage(props: PageProps) {
                 "sinX": false,
                 "sinY": false
             },
-            batchSize: 10,
+            batchSize: 1, // CHange this back to 10
         }
     );
     const [network, setNetwork] = useState<nn.Node[][]>();
@@ -239,7 +239,7 @@ function MainPage(props: PageProps) {
     }
 
     const updateDecisionBoundaries = () => {
-        console.log("Updating decision boundaries");
+        // console.log("Updating decision boundaries");
         if (network) {
             // Don't like numcells having to be the same
             setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, config.inputs));
@@ -248,7 +248,7 @@ function MainPage(props: PageProps) {
     }
 
     const updateDecisionBoundary = () => {
-        console.log("Updating decision boundary");
+        // console.log("Updating decision boundary");
         //network && setDecisionBoundary(decisionBoundaries[nn.getOutputNode(network).id]);
         network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
     }
@@ -276,14 +276,14 @@ function MainPage(props: PageProps) {
 
         // setLossData(() => lossData.concat(newLossData));
         let delta = Date.now() - start;
-        console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
+        // console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
 
-        console.log(network);
+        // console.log(network);
 
         start = Date.now();
         updateDecisionBoundaries();
         delta = Date.now() - start;
-        console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
+        // console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
         // console.log(lossData);
     };
 
@@ -395,7 +395,7 @@ function MainPage(props: PageProps) {
         } else {
             setTrainingInterval(setInterval(() => {
                 step(1);
-            }, 500));
+            }, 10/* 500 */));
         }
         setTraining(!training);
     }

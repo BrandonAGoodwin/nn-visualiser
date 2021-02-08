@@ -54,7 +54,7 @@ describe("Gradient Decent", () => {
     it("Long ReLU", () => {
         let longNetworkShape = [2, 1, 1, 1];
         network = nn.generateNetwork(longNetworkShape, nn.Activations.RELU, defaultOutputActivation, defaultInputs);
-        for (let i = 0; i < noSteps; i++) {
+        for (let i = 0; i < 50; i++) {
             vis.step(network, trainingData, learningRate, defaultInputs, defaultBatchSize);
         }
 
