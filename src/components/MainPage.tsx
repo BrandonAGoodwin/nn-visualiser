@@ -160,14 +160,14 @@ function removeItemOnce(arr: string[], value: string) {
 
 
 function MainPage(props: PageProps) {
-    const [numSamples, setNumSamples] = useState<number>(2);
+    const [numSamples, setNumSamples] = useState<number>(500);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
             networkShape: [2, 2, 2, 1],
-            activationFunction: "ReLU",
+            activationFunction: "Tanh",
             learningRate: 0.03,
             inputs: {
                 "x": true,
@@ -178,7 +178,7 @@ function MainPage(props: PageProps) {
                 "sinX": false,
                 "sinY": false
             },
-            batchSize: 1, // CHange this back to 10
+            batchSize: 10, // CHange this back to 10
         }
     );
     const [network, setNetwork] = useState<nn.Node[][]>();
@@ -395,7 +395,7 @@ function MainPage(props: PageProps) {
         } else {
             setTrainingInterval(setInterval(() => {
                 step(1);
-            }, 10/* 500 */));
+            }, 500));
         }
         setTraining(!training);
     }
@@ -409,6 +409,7 @@ function MainPage(props: PageProps) {
                         value={config.activationFunction}
                         onChange={handleActivationChange}
                     >
+                        <MenuItem value="Tanh">Tanh</MenuItem>
                         <MenuItem value="ReLU">ReLU</MenuItem>
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>

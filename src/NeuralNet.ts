@@ -17,7 +17,7 @@ export class Node {
     totalInput: number = 0.0;
 
     /** AKA b */
-    bias: number = 0.0;
+    bias: number = 0.1;
     /** AKA a */
     output: number = 0.0;
 
@@ -68,6 +68,19 @@ export interface CostFunction {
     derivative: (output: number, y: number) => number;
 }
 
+/** Polyfill for TANH */
+(Math as any).tanh = (Math as any).tanh || function (x: number) {
+    if (x === Infinity) {
+        return 1;
+    } else if (x === -Infinity) {
+        return -1;
+    } else {
+        let e2x = Math.exp(2 * x);
+        return (e2x - 1) / (e2x + 1);
+    }
+};
+
+
 /** Built in activation functions */
 export class Activations {
     public static SIGMOID: ActivationFunction = {
@@ -78,12 +91,13 @@ export class Activations {
         }
     };
     public static RELU: ActivationFunction = {
-        output: (x: number) => x > 0 ? x : 0,
+        output: (x: number) => Math.max(0, x),
         derivative: (x: number) => x > 0 ? 1 : 0
     };
     // Might need to polyfill not TANH implementation for +/- inf values if Math.tah doesn't exist
     public static TANH: ActivationFunction = {
-        output: (x: number) => Math.tanh(x),
+        // output: (x: number) => Math.tanh(x),
+        output: (x: number) => (Math as any).tanh(x),
         derivative: (x: number) => {
             let output = Activations.TANH.output(x);
             return 1 - output * output;
@@ -113,17 +127,20 @@ export class Link {
      *  AKA w
      */
     weight: number;
+    /** current cost derivative */
+    costDer: number;
     /** Accumulated derivatives */
     derAcc: number;
     /** Number of accumulated derivatives */
-    noAccDer: number;
+    noAccDers: number;
 
     constructor(source: Node, dest: Node) {
         this.source = source;
         this.dest = dest;
         this.weight = Math.random() - 0.5;
+        this.costDer = 0.0;
         this.derAcc = 0.0;
-        this.noAccDer = 0.0;
+        this.noAccDers = 0.0;
     }
 }
 
@@ -139,14 +156,14 @@ export function generateNetwork(
     networkShape: number[],
     activationFunction: ActivationFunction,
     outputActivationFunction: ActivationFunction,
-    inputs: {[id: string] : boolean},
+    inputs: { [id: string]: boolean },
 ): Node[][] {
     let numlayers = networkShape.length;
     let network: Node[][] = [];
 
     let inputIds: string[] = [];
     Object.keys(inputs).forEach((inputId) => {
-        if(inputs[inputId]) inputIds.push(inputId);
+        if (inputs[inputId]) inputIds.push(inputId);
     });
 
     let id = 1;
@@ -186,11 +203,12 @@ export function forwardPropagate(network: Node[][], inputs: number[]): number {
     let inputLayer = network[0];
     let outputlayer = network[numLayers - 1];
 
+    if (inputLayer.length !== inputs.length) {
+        // Check the number of inputs is equal to the number of nodes in the first layer
+        throw new Error("Then number of inputs should equal the number of input neurons");
+    }
+
     for (let i = 0; i < inputLayer.length; i++) {
-        if (inputLayer.length !== inputs.length) {
-            // Check the number of inputs is equal to the number of nodes in the first layer
-            throw new Error("Then number of inputs should equal the number of input neurons");
-        }
         let node = inputLayer[i];
         node.output = inputs[i];
     }
@@ -227,12 +245,12 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
         let currentLayer = network[layerNum];
 
         // Parse through nodes and calculate input derivatives
-        for (let i = 0; i < network[layerNum].length; i++) {
+        for (let i = 0; i < currentLayer.length; i++) {
             let node = currentLayer[i];
 
             // Calculate input derivative for current node
             // inputDerivative = dc/dz = dc/da . phi_d(z)
-            node.inputDerivative = node.outputDerivative * node.activationFunction.derivative(outputNode.totalInput);
+            node.inputDerivative = node.outputDerivative * node.activationFunction.derivative(node.totalInput);
 
             // For average in gradient decent
             // dc/db for the bias on the current node
@@ -242,13 +260,15 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
         }
 
         // Parse through nodes again to calculate weight derivative for link
-        for (let i = 0; i < network[layerNum].length; i++) {
+        for (let i = 0; i < currentLayer.length; i++) {
             let node = currentLayer[i];
             // dc/dw for each weight comming in
             for (let j = 0; j < node.linksIn.length; j++) {
                 let link = node.linksIn[j];
-                link.derAcc += link.source.output * node.inputDerivative;
-                link.noAccDer++;
+
+                link.costDer = link.source.output * node.inputDerivative;
+                link.derAcc += link.costDer;
+                link.noAccDers++;
             }
         }
 
@@ -289,19 +309,22 @@ export function train(network: Node[][], learningRate: number) {
             for (let j = 0; j < node.linksIn.length; j++) {
                 let link = node.linksIn[j];
 
-                let averageWeightGradient = link.derAcc / link.noAccDer;
-                link.weight = link.weight - (learningRate * averageWeightGradient);
+                if (link.noAccDers > 0) {
+                    let averageWeightGradient = link.derAcc / link.noAccDers;
+                    link.weight = link.weight - (learningRate * averageWeightGradient);
 
-                link.derAcc = 0;
-                link.noAccDer = 0;
+                    link.derAcc = 0;
+                    link.noAccDers = 0;
+                }
             }
+            if (node.numInputDerivatives > 0) {
+                let averageBiasGradient = node.accInputDererivatives / node.numInputDerivatives;
 
-            let averageBiasGradient = node.accInputDererivatives / node.numInputDerivatives;
+                node.bias = node.bias - (learningRate * averageBiasGradient);
 
-            node.bias = node.bias - (learningRate * averageBiasGradient);
-
-            node.accInputDererivatives = 0;
-            node.numInputDerivatives = 0;
+                node.accInputDererivatives = 0;
+                node.numInputDerivatives = 0;
+            }
 
         }
     }

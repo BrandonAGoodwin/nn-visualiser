@@ -10,6 +10,7 @@ interface InputFunc {
 }
 
 let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
+    "Tanh": nn.Activations.TANH,
     "ReLU": nn.Activations.RELU,
     "Sigmoid": nn.Activations.SIGMOID,
 }
