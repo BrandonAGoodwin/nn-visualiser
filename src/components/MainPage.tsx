@@ -146,7 +146,7 @@ const NeuralNetworkControls = styled("div")`
     align-items: center;
 `;
 
-const StyledInfoButton = styled(InfoButton)`
+export const StyledInfoButton = styled(InfoButton)`
     font-size: 14px;
 `
 
@@ -162,7 +162,7 @@ function removeItemOnce(arr: string[], value: string) {
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(500);
     const [noise, setNoise] = useState<number>(0.2);
-    const [datasetType, setDatasetType] = useState<string>("Gaussian");
+    const [datasetType, setDatasetType] = useState<string>("Gaussian2");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
     const [config, setConfig] = useState<NNConfig>(
         {
@@ -446,7 +446,8 @@ function MainPage(props: PageProps) {
                         value={datasetType}
                         onChange={handleDatasetChange}
                     >
-                        <MenuItem value="Gaussian">Gaussian</MenuItem>
+                        <MenuItem value="Gaussian2">2 Gaussian</MenuItem>
+                        <MenuItem value="Gaussian3">3 Gaussian</MenuItem>
                         <MenuItem value="XOR">XOR</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
@@ -493,6 +494,7 @@ function MainPage(props: PageProps) {
                     removeNode={removeNode}
                     addLayer={addLayer}
                     removeLayer={removeLayer}
+                    setInfoPanel={setInfoPanel}
                 />}
             </NetworkPanel>
             <GraphPanel>

@@ -16,7 +16,8 @@ let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
 }
 
 let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
-    "Gaussian": Dataset.GAUSSIAN,
+    "Gaussian2": Dataset.GAUSSIAN_2,
+    "Gaussian3": Dataset.GAUSSIAN_3,
     "XOR": Dataset.XOR,
 }
 

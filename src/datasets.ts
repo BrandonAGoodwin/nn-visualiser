@@ -13,7 +13,7 @@ export type DatasetGenerator = (numSamples: number, noise: number) => Dataset2D[
 export class Dataset {
 
     // Could create 3 gauss data quite easily
-    public static GAUSSIAN: DatasetGenerator = (numSamples, noise) => {
+    public static GAUSSIAN_2: DatasetGenerator = (numSamples, noise) => {
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
         let samples: Dataset2D[] = [];
@@ -29,13 +29,41 @@ export class Dataset {
             for (let i = 0; i < numSamples / 2; i++) {
                 let x1 = normalDistribution(cx1, variance);
                 let x2 = normalDistribution(cx2, variance);
-                samples.push({ x1: x1, x2: x2, y: y })
+                samples.push({ x1: x1, x2: x2, y: y });
             }
         }
 
         // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
         generateGaussianData(-3, -3, -1);
-        generateGaussianData(3, 3, 1)
+        generateGaussianData(3, 3, 1);
+
+        return samples;
+    }
+
+    public static GAUSSIAN_3: DatasetGenerator = (numSamples, noise) => {
+        let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
+        let variance = varianceScale(noise) || 0;
+        let samples: Dataset2D[] = [];
+
+        /**
+         * Generate a gaussian dataset with centre point (/mean) at cx, cy
+         * @param cx Mean of distribution along x
+         * @param cy Mean of distribution along y
+         * @param variance Variance of distribution
+         */
+        function generateGaussianData(cx1: number, cx2: number, y: number) {
+            // Workiung with an -8, 8 grid non-variable for the forseeable future
+            for (let i = 0; i < numSamples / 3; i++) {
+                let x1 = normalDistribution(cx1, variance);
+                let x2 = normalDistribution(cx2, variance);
+                samples.push({ x1: x1, x2: x2, y: y });
+            }
+        }
+
+        // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
+        generateGaussianData(-4, -4, -1);
+        generateGaussianData(0, 0, 1);
+        generateGaussianData(4, 4, -1);
 
         return samples;
     }
@@ -49,14 +77,14 @@ export class Dataset {
             for (let i = 0; i < numSamples / 4; i++) {
                 let x1 = x1Scale(Math.random()) || 0;
                 let x2 = x2Scale(Math.random()) || 0;
-                samples.push({ x1: x1, x2: x2, y: y })
+                samples.push({ x1: x1, x2: x2, y: y });
             }
         }
 
-        generateUniformData(-8 / 2, 8 / 2, 8, 8, 1)     // Top left +1
-        generateUniformData(8 / 2, 8 / 2, 8, 8, -1)     // Top right -1
-        generateUniformData(-8 / 2, -8 / 2, 8, 8, -1)   // Bottom left -1
-        generateUniformData(8 / 2, -8 / 2, 8, 8, 1)     // Bottom right +1
+        generateUniformData(-8 / 2, 8 / 2, 8, 8, 1);     // Top left +1
+        generateUniformData(8 / 2, 8 / 2, 8, 8, -1);     // Top right -1
+        generateUniformData(-8 / 2, -8 / 2, 8, 8, -1);   // Bottom left -1
+        generateUniformData(8 / 2, -8 / 2, 8, 8, 1);     // Bottom right +1
 
         return samples;
     }
