@@ -7,7 +7,8 @@ import MainPage from './components/MainPage';
 const Container = styled("div")`
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
+  margin-top: auto;
   min-height: 100vh;
   min-width: fit-content;
 `

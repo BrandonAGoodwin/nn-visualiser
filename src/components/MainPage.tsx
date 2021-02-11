@@ -48,10 +48,10 @@ const StyledSelect = styled(Select)`
 `;
 
 const Container = styled("div")`
-    margin: auto auto;
+    margin: 0px auto auto auto;
     display: grid;
     width: inherit;
-    max-width: 1400px;
+    min-width: 1400px;
     min-height: 600px;
     padding: 20px;
 
