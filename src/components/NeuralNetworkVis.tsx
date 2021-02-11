@@ -8,7 +8,8 @@ import MouseToolTip from "react-sticky-mouse-tooltip";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { IconButton, Typography } from "@material-ui/core";
-import { NNConfig } from "./MainPage";
+import { NNConfig, StyledInfoButton } from "./MainPage";
+import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
 
 interface ContainerBox {
     top: number;
@@ -32,6 +33,7 @@ interface NetworkProps {
     removeNode: (layer: number) => void;
     addLayer: () => void;
     removeLayer: () => void;
+    setInfoPanel: any;
 }
 
 enum HoverCardType {
@@ -72,7 +74,7 @@ const PlusMinusButtonsContainer = styled("div")`
 const GridContainer = styled("div")`
     display: grid;
     height: 100%;
-    width: 30vw;
+    width: 40vw;
     min-width: 550px;
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto 1fr 48px;
@@ -342,7 +344,7 @@ function NeuralNetworkVis(props: NetworkProps) {
         let nodeIds = Object.keys(INPUTS);
         let nodeNotDrawnYet = false;
         let svg = d3.select(svgContainer.current);
-        
+
         svg.selectAll(".input-label").remove();
 
         nodeIds.forEach((nodeId) => {
@@ -453,6 +455,19 @@ function NeuralNetworkVis(props: NetworkProps) {
                 className={"testg"}
             />
             {!network || !linksUpdated && <FadeCanvas visible={true} width={containerBox.width} height={containerBox.height} />}
+            <div style={{ paddingTop: "10px", paddingLeft: "30px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gridArea: "inputs-label" }}>
+                <Typography>Inputs</Typography>
+                <StyledInfoButton title="Inputs Tooltip" fontSize="small" marginRight={0} marginLeft={5}>
+                    <React.Fragment>
+                        <Typography color="inherit">Inputs</Typography>
+                        <Typography variant="body2">
+                            The inputs determine the data that is input into the neural network from the data set.
+                            Each input is a function of <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and/or <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm>
+                        </Typography>
+                        {/* <br /><u>Click the icon to get more information</u> */}
+                    </React.Fragment>
+                </StyledInfoButton>
+            </div>
             <LayerControls>
                 <IconButton onClick={props.removeLayer}>
                     <RemoveCircleIcon />
@@ -463,7 +478,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 </IconButton>
             </LayerControls>
 
-            <Container style={{ gridArea: "inputs-layer" }}>
+            <Container style={{ gridArea: "inputs-layer", paddingLeft: "60px" }}>
                 <Layer>
                     {network && Object.keys(INPUTS).map(nodeId =>
                         <NNNode
@@ -480,44 +495,44 @@ function NeuralNetworkVis(props: NetworkProps) {
                 </Layer>
             </Container>
 
-                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", justifyContent: "space-around", gridArea: "hidden-layers"}}>
-                    {network && network.slice(1, network.length - 1).map((layer, layerNum) =>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                            <Layer style={{ flexGrow: 1 }}>
-                                {layer.map(node => <NNNode
-                                    id={`node-${node.id}`}
-                                    nodeWidth={nodeWidth}
-                                    numCells={20}
-                                    active={true}
-                                    decisionBoundary={props.decisionBoundaries[node.id]}
-                                    discreetBoundary={props.discreetBoundary}
-                                />)}
-                            </Layer>
-                            {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
-                                <IconButton onClick={() => props.removeNode(layerNum + 1)}>
-                                    <RemoveCircleIcon />
-                                </IconButton>
-                                <IconButton onClick={() => props.addNode(layerNum + 1)}>
-                                    <AddCircleIcon />
-                                </IconButton>
-                            </PlusMinusButtonsContainer>}
-                        </div>)}
-                </Container>
-                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", gridArea: "output"  }}>
-                    {network && network.slice(network.length - 1).map((layer, layerNum) =>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                            <Layer style={{ flexGrow: 1 }}>
-                                {layer.map(node => <NNNode
-                                    id={`node-${node.id}`}
-                                    nodeWidth={nodeWidth}
-                                    numCells={20}
-                                    active={true}
-                                    decisionBoundary={props.decisionBoundaries[node.id]}
-                                    discreetBoundary={props.discreetBoundary}
-                                />)}
-                            </Layer>
-                        </div>)}
-                </Container>
+            <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", justifyContent: "space-around", gridArea: "hidden-layers" }}>
+                {network && network.slice(1, network.length - 1).map((layer, layerNum) =>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                        <Layer style={{ flexGrow: 1 }}>
+                            {layer.map(node => <NNNode
+                                id={`node-${node.id}`}
+                                nodeWidth={nodeWidth}
+                                numCells={20}
+                                active={true}
+                                decisionBoundary={props.decisionBoundaries[node.id]}
+                                discreetBoundary={props.discreetBoundary}
+                            />)}
+                        </Layer>
+                        {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
+                            <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                <RemoveCircleIcon />
+                            </IconButton>
+                            <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                <AddCircleIcon />
+                            </IconButton>
+                        </PlusMinusButtonsContainer>}
+                    </div>)}
+            </Container>
+            <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", gridArea: "output", paddingRight: "10px" }}>
+                {network && network.slice(network.length - 1).map((layer, layerNum) =>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                        <Layer style={{ flexGrow: 1 }}>
+                            {layer.map(node => <NNNode
+                                id={`node-${node.id}`}
+                                nodeWidth={nodeWidth}
+                                numCells={20}
+                                active={true}
+                                decisionBoundary={props.decisionBoundaries[node.id]}
+                                discreetBoundary={props.discreetBoundary}
+                            />)}
+                        </Layer>
+                    </div>)}
+            </Container>
 
             <svg
                 ref={svgContainer}

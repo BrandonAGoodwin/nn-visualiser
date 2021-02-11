@@ -1,27 +1,7 @@
 import styled from "@emotion/styled";
-import { createStyles, IconButton, makeStyles, Theme, Tooltip, Typography } from "@material-ui/core";
+import { IconButton, Tooltip } from "@material-ui/core";
 import { Info } from "@material-ui/icons";
 import React from "react";
-
-interface InfoButtonProps {
-    title: string;
-    children?: React.ReactElement;
-    onClick?: (panel: JSX.Element) => void;
-    infoPanel?: JSX.Element;
-}
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            '& > *': {
-                margin: theme.spacing(1),
-            },
-        },
-        input: {
-            display: 'none',
-        },
-    }),
-);
 
 const StyledIconButton = styled(IconButton)`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -37,38 +17,45 @@ const StyledIconButton = styled(IconButton)`
     &:hover {
         background-color: inherit;
     }
-    /* &:active {
-        background-color: inherit;
-    } */
+
 `
 
 const HtmlTooltip = styled(Tooltip)`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
-    //background-color: #f5f5f9;
-    //color: rgba(0, 0, 0, 0.87);
-    //max-width: 220;
-    && {
-        font-size: 20px;
-    }
-    margin-right: 10px;
-    margin-left: 10px;
-    //border: 1px solid #dadde9;
-    & p {
-        font-size: 200px;
-    }
+
+    margin-right: ${(props: { marginLeft: number, marginRight: number }) => `${props.marginRight}px`};
+    margin-left: ${(props: { marginLeft: number, marginRight: number }) => `${props.marginLeft}px`};
+
 `
 
-function InfoButton(props: InfoButtonProps) {
-    //const classes = useStyles();
+interface InfoButtonProps {
+    title: string;
+    children?: React.ReactElement;
+    onClick?: (panel: JSX.Element) => void;
+    infoPanel?: JSX.Element;
+    icon?: React.ReactElement;
+    fontSize?: "small" | "inherit" | "default" | "large" | undefined;
+    marginLeft?: number;
+    marginRight?: number;
+}
+
+const InfoButton: React.FC<InfoButtonProps> = ({
+    marginLeft = 10,
+    marginRight = 10,
+    ...props
+}) => {
+
     return (
         <HtmlTooltip interactive arrow
             title={props.children || props.title}
             onClick={() => props.onClick && props.infoPanel && props.onClick(props.infoPanel)}
+            marginLeft={marginLeft}
+            marginRight={marginRight}
         >
             <StyledIconButton>
-                <Info/>
+                {props.icon || <Info fontSize={props.fontSize} />}
             </StyledIconButton>
         </HtmlTooltip>
     );
