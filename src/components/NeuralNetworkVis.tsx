@@ -330,7 +330,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 d3.select(this).transition()
                     .duration(100000)
                     .ease(d3.easeLinear)
-                    .attr("stroke-dashoffset", 8000)
+                    .attr("stroke-dashoffset", -8000)
             })
             .on("mouseout", function (d, i) {
                 d3.select(this)
