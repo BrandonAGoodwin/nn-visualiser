@@ -12,6 +12,10 @@ interface CanvasProps {
     decisionBoundary?: number[];
     discreetBoundary: boolean;
     disabled: boolean;
+    paddingLeft?: number;
+    paddingRight?: number;
+    paddingTop?: number;
+    paddingBottom?: number;
 }
 
 
@@ -79,7 +83,10 @@ function BackgroundCanvas(props: CanvasProps) {
             style={{
                 width: `${props.width}px`,
                 height: `${props.height}px`,
-                padding: `${props.padding ? "20" : "0"}px`
+                paddingLeft: `${props.padding && props.paddingLeft ? props.paddingLeft : "0"}px`,
+                paddingRight: `${props.padding && props.paddingRight ? props.paddingRight : "0"}px`,
+                paddingTop: `${props.padding && props.paddingTop ? props.paddingTop: "0"}px`,
+                paddingBottom: `${props.padding && props.paddingBottom ? props.paddingBottom : "0"}px`,
             }}
         />);
 }

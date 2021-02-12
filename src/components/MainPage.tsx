@@ -51,7 +51,7 @@ const Container = styled("div")`
     margin: 0px auto auto auto;
     display: grid;
     width: inherit;
-    min-width: 1400px;
+    /* min-width: 1400px; */
     min-height: 600px;
     padding: 20px;
 
@@ -498,11 +498,15 @@ function MainPage(props: PageProps) {
                 />}
             </NetworkPanel>
             <GraphPanel>
+                <div style={{ marginLeft: "25px"}}><Typography variant="h6">Output</Typography></div>
                 {dataset && network && <NNGraph
                     dataset={dataset}
                     density={25}
-                    canvasWidth={275}
-                    margin={20}
+                    canvasWidth={250}
+                    marginLeft={35}
+                    marginRight={20}
+                    marginTop={20}
+                    marginBottom={40}
                     numCells={props.numCells}
                     xDomain={props.xDomain}
                     yDomain={props.yDomain}
@@ -513,7 +517,7 @@ function MainPage(props: PageProps) {
                 <h3> Epochs: {epochs} </h3>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                     <h3> Loss: {loss.toFixed(3)} </h3>
-                    <StyledInfoButton title="Loss Tooltip" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                    <StyledInfoButton title="Loss Tooltip" marginLeft={5} onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
                         <React.Fragment>
                             <Typography color="inherit">Loss</Typography>
                             <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />

@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import * as d3 from 'd3';
-import { Dataset2D } from '../datasets';
-import BackgroundCanvas from './BackgroundCanvas';
-import styled from '@emotion/styled';
+import React, { useEffect, useState, useRef } from "react";
+import * as d3 from "d3";
+import { Dataset2D } from "../datasets";
+import BackgroundCanvas from "./BackgroundCanvas";
+import styled from "@emotion/styled";
 
 const StyledBackgroundCanvas = styled(BackgroundCanvas)`
     position: relative;
@@ -11,12 +11,15 @@ const StyledBackgroundCanvas = styled(BackgroundCanvas)`
     z-index: -1;
 `
 
-type GraphProps = {
-    dataset: Dataset2D[],
-    density: number,
+interface GraphProps  {
+    dataset: Dataset2D[];
+    density: number;
     canvasWidth: number;
 
-    margin: number,
+    marginLeft: number;
+    marginRight: number;
+    marginTop: number;
+    marginBottom: number;
     numCells: number;
     xDomain: number[];
     yDomain: number[];
@@ -58,25 +61,50 @@ function NNGraph(props: GraphProps): JSX.Element {
 
 
     const createGraph = () => {
-        console.log("Creating graph")
+        console.log("Creating graph");
 
         let svg = d3.select(d3Container.currnet)
-
-        svg.attr('width', props.canvasWidth + props.margin * 2)
-            .attr('height', props.canvasWidth + props.margin * 2)
+            .attr("width", props.canvasWidth + props.marginLeft + props.marginRight)
+            .attr("height", props.canvasWidth + props.marginTop + props.marginBottom);
 
     }
 
-    const updateGraph = () => {
-        console.log("Updating graph")
+    const addFormattedText = (label: string, text: d3.Selection<SVGTextElement, unknown, null, undefined>) => {
+        if (/[_^]/.test(label)) {
+            let myRe = /(.*?)([_^])(.)/g;
+            let myArray;
+            let lastIndex;
+            while ((myArray = myRe.exec(label)) != null) {
+                lastIndex = myRe.lastIndex;
+                let prefix = myArray[1];
+                let sep = myArray[2];
+                let suffix = myArray[3];
+                if (prefix) {
+                    text.append("tspan").text(prefix);
+                }
+                text.append("tspan")
+                    .attr("baseline-shift", sep === "_" ? "sub" : "super")
+                    .style("font-size", "9px")
+                    .text(suffix);
+            }
+            if (lastIndex && label.substring(lastIndex)) {
+                text.append("tspan").text(label.substring(lastIndex));
+            }
+        } else {
+            text.append("tspan").text(label);
+        }
+    }
 
-        const svg = d3.select(d3Container.current)
+    const updateGraph = () => {
+        console.log("Updating graph");
+
+        const svg = d3.select(d3Container.current);
 
         svg.selectAll(`.graph`).remove();
 
-        const graph = svg.append('g')
+        const graph = svg.append("g")
             .attr("class", "graph")
-            .attr('transform', `translate(${props.margin}, ${props.margin})`);
+            .attr("transform", `translate(${props.marginLeft}, ${props.marginTop})`);
 
         const x = d3.scaleLinear().range([0, props.canvasWidth]);
         const y = d3.scaleLinear().range([props.canvasWidth, 0]);
@@ -84,28 +112,53 @@ function NNGraph(props: GraphProps): JSX.Element {
         x.domain([-8, 8]);
         y.domain([-8, 8]);
 
-        graph.append('g')
+        graph.append("g")
             .attr("class", `axis`)
-            .attr('transform', `translate(0,${props.canvasWidth})`)
+            .attr("transform", `translate(0,${props.canvasWidth})`)
             .call(d3.axisBottom(x).tickValues([0].concat(x.ticks())));
 
-        graph.append('g')
+        graph.append("g")
             .attr("class", `axis`)
             .call(d3.axisLeft(y).tickValues([0].concat(y.ticks())));
 
-        graph.append('g')
+        graph.append("g")
             .attr("class", `axis`)
-            .attr('transform', `translate(${props.canvasWidth},0)`)
+            .attr("transform", `translate(${props.canvasWidth},0)`)
             .call(d3.axisRight(y).tickValues([0].concat(y.ticks())));
 
-        graph.append('g')
+        graph.append("g")
             .attr("class", `axis`)
             .call(d3.axisTop(x).tickValues([0].concat(x.ticks())));
 
+        let xAxisLabel = "X_1";
+        let yAxisLabel = "X_2";
+
+        let xAxisText = graph.append("text")
+            .attr("class", `axis`)
+            .attr("x", props.canvasWidth / 2)
+            .attr("y", props.canvasWidth + props.marginBottom - 7)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "bottom");
+
+        addFormattedText(xAxisLabel, xAxisText);
+
+        let yAxisText = graph.append("text")
+            .attr("class", `axis`)
+            // .attr("transform", "rotate(-90)")
+            // .attr("transform", `translate(${props.canvasWidth / 2}, ${- props.margin /2})`)
+            .attr("y", props.canvasWidth / 2)
+            .attr("x", -props.marginLeft)
+            // .attr("dy", "1em")
+            .attr("text-anchor", "left")
+            .attr("alignment-baseline", "middle")     
+        
+
+        addFormattedText(yAxisLabel, yAxisText);
+
         graph.selectAll(`.circle`)
             .data(props.dataset)
-            .enter().append('circle')
-            .attr('class', `circle`)
+            .enter().append("circle")
+            .attr("class", `circle`)
             .attr("r", scale / 7)
             .attr("fill", function (datapoint: Dataset2D): string {
                 let colour = "black";
@@ -125,14 +178,18 @@ function NNGraph(props: GraphProps): JSX.Element {
             <div style={{ position: "relative"}}>
                 <svg
                     ref={d3Container}
-                    width={props.canvasWidth + props.margin * 2}
-                    height={props.canvasWidth + props.margin * 2}
+                    width={props.canvasWidth + props.marginLeft + props.marginRight}
+                    height={props.canvasWidth + props.marginTop + props.marginBottom}
                     style={{ position: "absolute"}}
                 />
                 <BackgroundCanvas
                     width={props.canvasWidth}
                     height={props.canvasWidth}
                     numCells={props.numCells}
+                    paddingLeft={props.marginLeft}
+                    paddingRight={props.marginRight}
+                    paddingTop={props.marginTop}
+                    paddingBottom={props.marginBottom}
                     disabled={false}
                     padding={true}
                     decisionBoundary={props.decisionBoundary}
