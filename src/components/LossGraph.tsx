@@ -86,14 +86,14 @@ function LossGraph(props: GraphProps) {
             .range([props.height, 0])
             .domain([minY, maxY]);
 
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .attr('transform', `translate(0,${props.height})`)
-        //     .call(d3.axisBottom(x));
+        graph.append('g')
+            .attr("class", `axis`)
+            .attr('transform', `translate(0,${props.height})`)
+            .call(d3.axisBottom(x));
 
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .call(d3.axisLeft(y));
+        graph.append('g')
+            .attr("class", `axis`)
+            .call(d3.axisLeft(y));
 
         
         let index = 1;
