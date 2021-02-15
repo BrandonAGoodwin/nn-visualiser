@@ -462,7 +462,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                         <Typography color="inherit">Inputs</Typography>
                         <Typography variant="body2">
                             The inputs determine the data that is input into the neural network from the data set.
-                            Each input is a function of <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and/or <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm>
+                            Each input is a function of <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and/or <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm>.
                         </Typography>
                         {/* <br /><u>Click the icon to get more information</u> */}
                     </React.Fragment>

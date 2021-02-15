@@ -18,12 +18,13 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import LossGraph from './LossGraph';
 import LossInfoPanel from './InfoPanels/LossInfoPanel';
+import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 
 export interface NNConfig {
     networkShape: number[];
     activationFunction: string;
     learningRate: number;
-    inputs: {[key: string]: boolean};
+    inputs: { [key: string]: boolean };
     batchSize: number;
 }
 
@@ -158,6 +159,16 @@ function removeItemOnce(arr: string[], value: string) {
     return arr;
 }
 
+const ColouredBox = styled("div")`
+    float: left;
+    height: 1em;
+    width: 1em;
+    border: 1px solid black;
+    background-color: ${((props: { colour: string }) => props.colour)};
+    clear: both;
+    margin-right: 5px;
+`
+
 
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(500);
@@ -195,7 +206,7 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         console.log("Config change useEffect");
-        if(training) toggleAutoTrain();
+        if (training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
     }, [config])
@@ -317,13 +328,13 @@ function MainPage(props: PageProps) {
         // console.log(config.inputs) 
         // Change this implemntation input is highly coupled with visControl
         // let newInputs: string[];
-        let newInputs: {[inputId: string] : boolean} = {...config.inputs};
+        let newInputs: { [inputId: string]: boolean } = { ...config.inputs };
         let newNetworkShape = config.networkShape;
 
         if (active) {
             let noActiveNodes = 0;
-            Object.keys(config.inputs).forEach((inputId) => { if(config.inputs[inputId]) noActiveNodes++; });
-            if(noActiveNodes > 1) {
+            Object.keys(config.inputs).forEach((inputId) => { if (config.inputs[inputId]) noActiveNodes++; });
+            if (noActiveNodes > 1) {
                 // newInputs = removeItemOnce(config.inputs, nodeId);
                 newInputs[nodeId] = false;
                 newNetworkShape[0] = newNetworkShape[0] - 1;
@@ -338,7 +349,7 @@ function MainPage(props: PageProps) {
 
         // if(training) toggleAutoTrain();
 
-        
+
         // newNetworkShape[0] = newInputs.length;
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
@@ -498,7 +509,15 @@ function MainPage(props: PageProps) {
                 />}
             </NetworkPanel>
             <GraphPanel>
-                <div style={{ marginLeft: "25px"}}><Typography variant="h6">Output</Typography></div>
+                <div style={{ display: "flex", marginLeft: "25px" }}>
+                    <Typography variant="h6">Output</Typography>
+                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                        <React.Fragment>
+                            <Typography color="inherit">Output</Typography>
+                            <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> orange <ColouredBox colour={"#ff7661"} /> sections of the graph are classified as class -1 and points that are in <br /> blue <ColouredBox colour={"#223781"} /> sections of the graph are classified as class +1.</Typography><br />
+                        </React.Fragment>
+                    </StyledInfoButton>
+                </div>
                 {dataset && network && <NNGraph
                     dataset={dataset}
                     density={25}
@@ -514,22 +533,24 @@ function MainPage(props: PageProps) {
                     discreetBoundary={discreetBoundary}
                 />}
                 {/* {(!dataset || !network) && <CircularProgress />} */}
-                <h3> Epochs: {epochs} </h3>
-                <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                    <h3> Loss: {loss.toFixed(3)} </h3>
-                    <StyledInfoButton title="Loss Tooltip" marginLeft={5} onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
-                        <React.Fragment>
-                            <Typography color="inherit">Loss</Typography>
-                            <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
-                            <u>Click the icon to get more information</u>
-                        </React.Fragment>
-                    </StyledInfoButton>
+                <div style={{ marginLeft: "10px" }}>
+                    <h3 style={{ marginTop: "0px"}}> Epochs: {epochs} </h3>
+                    <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                        <h3 style={{ marginTop: "0px", marginBottom: "0px"}}> Loss: {loss.toFixed(3)} </h3>
+                        <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                            <React.Fragment>
+                                <Typography color="inherit">Loss</Typography>
+                                <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
+                                <u>Click the icon to get more information</u>
+                            </React.Fragment>
+                        </StyledInfoButton>
+                    </div>
+                    <LossGraph
+                        height={60}
+                        width={170}
+                        margin={5}
+                        dataset={lossData} />
                 </div>
-                <LossGraph
-                    height={60}
-                    width={170}
-                    margin={5}
-                    dataset={lossData} />
             </GraphPanel>
             <StatsBar>
                 {/* <h2> Epochs: {epochs} </h2>
