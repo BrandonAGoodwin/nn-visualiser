@@ -10,6 +10,7 @@ export type LossData = {
 
 interface GraphProps {
     dataset: [number, number][];
+    comparisionData?: [number, number][];
     width: number;
     height: number;
     margin: number;
@@ -71,16 +72,24 @@ function LossGraph(props: GraphProps) {
 
         const x = d3.scaleLinear()
             .range([0, props.width])
-            .domain([1, props.dataset.length]);
+            .domain([1, Math.max(props.dataset.length, props.comparisionData?.length || 0)]);
 
         let minY = Number.MAX_VALUE;
         let maxY = Number.MIN_VALUE;
-        
+
         props.dataset.forEach((d: [number, number]) => {
             let y = d[1];
             minY = Math.min(minY, y);
             maxY = Math.max(maxY, y);
-        })
+        });
+
+        if (props.comparisionData) {
+            props.comparisionData.forEach((d: [number, number]) => {
+                let y = d[1];
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            });
+        }
 
         const y = d3.scaleLinear()
             .range([props.height, 0])
@@ -95,7 +104,7 @@ function LossGraph(props: GraphProps) {
             .attr("class", `axis`)
             .call(d3.axisLeft(y));
 
-        
+
         let index = 1;
         graph.append("path")
             .datum(props.dataset)
@@ -105,6 +114,17 @@ function LossGraph(props: GraphProps) {
             .attr("d", d3.line()
                 .x((d: [number, number]) => x(d[0]) || 0)
                 .y((d: [number, number]) => y(d[1]) || 0))
+
+        if (props.comparisionData) {
+            graph.append("path")
+                .datum(props.comparisionData)
+                .attr("fill", "none")
+                .attr("stroke", "red")
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x((d: [number, number]) => x(d[0]) || 0)
+                    .y((d: [number, number]) => y(d[1]) || 0))
+        }
 
         // graph.selectAll(`.circle`)
         //     .data(props.dataset)
@@ -125,12 +145,12 @@ function LossGraph(props: GraphProps) {
     }
 
     return (
-                <svg
-                    ref={d3Container}
-                    width={props.width + props.margin * 2}
-                    height={props.height + props.margin * 2}
-                    //style={{ position: "absolute" }}
-                />
+        <svg
+            ref={d3Container}
+            width={props.width + props.margin * 2}
+            height={props.height + props.margin * 2}
+        //style={{ position: "absolute" }}
+        />
     );
 }
 

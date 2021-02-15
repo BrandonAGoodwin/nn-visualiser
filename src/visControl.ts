@@ -2,6 +2,7 @@ import * as nn from "./NeuralNet";
 import { Dataset2D, DatasetGenerator, Dataset } from "./datasets";
 import { NNConfig } from "./components/MainPage";
 import * as d3 from "d3";
+import seedrandom from "seedrandom";
 
 
 interface InputFunc {
@@ -34,7 +35,11 @@ export let INPUTS: { [name: string]: InputFunc } = {
 
 
 export function start(config: NNConfig): nn.Node[][] {
-
+    // seedrandom(seed);
+    // const seedrandom = require('seedrandom');
+    // seedrandom(seed);
+    // console.log(seed);
+    // console.log(Math.random());
     let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, config.inputs);
     console.log(network);
 
@@ -77,6 +82,10 @@ export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: {[key: 
     }
 
     return totalCost / data.length;
+}
+
+export function copyNetwork(network: nn.Node[][]): nn.Node[][] {
+    return nn.copyNetwork(network);
 }
 
 export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: {[key: string] : boolean}): Dataset2D[] {
@@ -157,8 +166,3 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
 
 }
 
-function forEachInputNode() {
-    Object.keys(INPUTS).forEach((nodeId) => {
-
-    })
-}

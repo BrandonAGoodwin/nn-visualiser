@@ -134,10 +134,11 @@ export class Link {
     /** Number of accumulated derivatives */
     noAccDers: number;
 
-    constructor(source: Node, dest: Node) {
+    // Careful of copying a network while acc values aren't zero
+    constructor(source: Node, dest: Node, startWeight?: number) {
         this.source = source;
         this.dest = dest;
-        this.weight = Math.random() - 0.5;
+        this.weight = startWeight ? startWeight : Math.random() - 0.5;
         this.costDer = 0.0;
         this.derAcc = 0.0;
         this.noAccDers = 0.0;
@@ -341,4 +342,37 @@ export function forEachNode(network: Node[][], f: (node: Node) => void, ignoreIn
 
 export function getOutputNode(network: Node[][]): Node {
     return network[network.length - 1][0];
+}
+
+export function copyNetwork(network: Node[][]): Node[][] {
+    let networkCopy: Node[][] = [];
+    
+    for (let layerNum = 0; layerNum < network.length; layerNum++) {
+        let currentLayerCopy: Node[] = [];
+
+        networkCopy.push(currentLayerCopy);
+
+        let isInputLayer = layerNum === 0;
+
+        for (let i = 0; i < network[layerNum].length; i++) {
+            let nodeOriginal = network[layerNum][i];
+            let nodeCopy = new Node(nodeOriginal.id, nodeOriginal.activationFunction);
+            currentLayerCopy.push(nodeCopy);
+
+            if (!isInputLayer) {
+                let prevLayerCopy = networkCopy[layerNum - 1]
+                for (let j = 0; j < prevLayerCopy.length; j++) {
+                    let prevNodeCopy = prevLayerCopy[j];
+
+                    let linkOriginal = nodeOriginal.linksIn[j];
+
+                    let linkCopy = new Link(prevNodeCopy, nodeCopy, linkOriginal.weight);
+                    prevNodeCopy.linksOut.push(linkCopy);
+                    nodeCopy.linksIn.push(linkCopy);
+                }
+            }
+        }
+    }
+
+    return networkCopy;
 }

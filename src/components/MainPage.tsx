@@ -169,6 +169,18 @@ const ColouredBox = styled("div")`
     margin-right: 5px;
 `
 
+interface ComparisonData {
+    noise: number;
+    datasetType: string;
+    dataset: Dataset2D[];
+    config: NNConfig;
+    decisionBoundaries: {[nodeId: string]: number[]};
+    decisionBoundary: number[];
+    loss: number;
+    epochs: number;
+    lossData: [number, number][];
+}
+
 
 function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(500);
@@ -201,8 +213,13 @@ function MainPage(props: PageProps) {
     const [lossData, setLossData] = useState<[number, number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
-
+    const [networkSeed, setNetworkSeed] = useState<string>();
+    const [compareMode, setCompareMode] = useState<boolean>(false);
     const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
+    const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
+    const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
+
+    const [comparisonData, setComaparisonData] = useState<ComparisonData>();
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -244,7 +261,28 @@ function MainPage(props: PageProps) {
 
     const generateNetwork = () => {
         console.log("Generating network");
-        setNetwork(vis.start(config));
+        // let seed: string;
+        // if(compareMode && networkSeed) {
+        //     seed = networkSeed;
+        // } else {
+        //     seed = Math.random().toFixed(5);
+        //     setNetworkSeed(seed);
+        // }
+        // let newNetwork = vis.start(config);
+        // setNetwork(newNetwork);
+        if (!compareMode) {
+            let newNetwork = vis.start(config);
+            setNetwork(newNetwork);
+            let newNetworkCopy = vis.copyNetwork(newNetwork);
+            console.log(newNetworkCopy);
+            setNetworkOriginalState(newNetworkCopy);
+        } else {
+            console.log("Loading network original state");
+            if (networkOriginalState) {
+                console.log(networkOriginalState);
+                setNetwork(vis.copyNetwork(networkOriginalState));
+            }
+        }
         setEpochs(0);
         setLossData([]);
     }
@@ -268,8 +306,8 @@ function MainPage(props: PageProps) {
         console.log("Reset");
         if (training) toggleAutoTrain();
         generateNetwork();
-        generateDataset();
-        updateDecisionBoundaries();
+        if (!compareMode) generateDataset();
+        // updateDecisionBoundaries();
     };
 
     const step = (noSteps: number) => {
@@ -400,6 +438,22 @@ function MainPage(props: PageProps) {
         }
     }
 
+    const saveComparisionData = () => {
+        let newComparisionData: ComparisonData = {
+            config: config,
+            dataset: dataset,
+            datasetType: datasetType,
+            decisionBoundaries: decisionBoundaries,
+            decisionBoundary: decisionBoundary,
+            epochs: epochs,
+            loss: loss,
+            lossData: lossData,
+            noise: noise
+        }
+
+        setComaparisonData(newComparisionData);
+    }
+
     const toggleAutoTrain = () => {
         if (training) {
             clearInterval(trainingInterval);
@@ -409,6 +463,28 @@ function MainPage(props: PageProps) {
             }, 500));
         }
         setTraining(!training);
+    }
+
+    const saveNetworkState = () => {
+        setCompareMode(true);
+    }
+
+    const loadOriginalState = () => {
+
+    }
+
+    const saveCurrentState = () => {
+        saveComparisionData();
+        setCompareMode(true);
+    }
+
+    const loadSavedState = () => {
+        reset();
+    }
+
+    const clearNetworkState= () => {
+        setComaparisonData(undefined);
+        setCompareMode(false);
     }
 
     return (
@@ -484,12 +560,13 @@ function MainPage(props: PageProps) {
             </ConfigBar>
             <ControlPanel>
                 <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
-                {/* <StyledButton variant={"contained"} onClick={() => step(10)}> Step 10</StyledButton>
-                <StyledButton variant={"contained"} onClick={() => step(100)}> Step 100</StyledButton> */}
                 <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
+                <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton>
+                <StyledButton variant={"contained"} onClick={loadSavedState} disabled={compareMode}> Load Network State </StyledButton>
+                <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
             </ControlPanel>
             <NetworkPanel>
                 {dataset && network && <NeuralNetworkVis
@@ -534,9 +611,9 @@ function MainPage(props: PageProps) {
                 />}
                 {/* {(!dataset || !network) && <CircularProgress />} */}
                 <div style={{ marginLeft: "10px" }}>
-                    <h3 style={{ marginTop: "0px"}}> Epochs: {epochs} </h3>
+                    <h3 style={{ marginTop: "0px" }}> Epochs: {epochs} </h3>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                        <h3 style={{ marginTop: "0px", marginBottom: "0px"}}> Loss: {loss.toFixed(3)} </h3>
+                        <h3 style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </h3>
                         <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
                             <React.Fragment>
                                 <Typography color="inherit">Loss</Typography>
@@ -549,7 +626,8 @@ function MainPage(props: PageProps) {
                         height={60}
                         width={170}
                         margin={5}
-                        dataset={lossData} />
+                        dataset={lossData}
+                        comparisionData={comparisonData?.lossData} />
                 </div>
             </GraphPanel>
             <StatsBar>

@@ -2,8 +2,13 @@ Tasks:
     New Tasks:
         ✔ Add axis to line graph @done (15/02/2021, 13:01:17)
         ☐ Add noSamples slider
-        ☐ Labels for output graph
+        ✔ Labels for output graph @done (15/02/2021, 14:50:28)
         ☐ Update auto train button
         ☐ Add more learning rates
         ☐ Inputs info panel
         ✔ Fix main page grid container @done (11/02/2021, 20:04:18)
+        ☐ Put comparison line on loss graph
+        ☐ Create test set
+        ☐ Background colour usability study
+        ☐ Cypress Test Runner
+        ☐ Host project on webpage
