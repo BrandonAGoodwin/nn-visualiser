@@ -565,7 +565,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
                 <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
                 <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton>
-                <StyledButton variant={"contained"} onClick={loadSavedState} disabled={compareMode}> Load Network State </StyledButton>
+                <StyledButton variant={"contained"} onClick={loadSavedState} disabled={!compareMode}> Load Network State </StyledButton>
                 <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
             </ControlPanel>
             <NetworkPanel>
