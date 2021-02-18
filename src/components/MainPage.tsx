@@ -117,6 +117,7 @@ const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network"
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    /* max-width: fit-content; */
 `
 
 const GraphPanel = styled((props: any) => <ContainerSection gridArea="nn-graph" {...props} />)`
