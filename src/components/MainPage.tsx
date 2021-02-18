@@ -49,12 +49,16 @@ const StyledSelect = styled(Select)`
 `;
 
 const Container = styled("div")`
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box; 
     margin: 0px auto auto auto;
     display: grid;
-    width: inherit;
+    width: auto;
     /* min-width: 1400px; */
     min-height: 600px;
     padding: 20px;
+    /* max-width: 100%; */
 
     grid-template-columns: 230px 1fr auto;
     grid-template-rows: 90px 1fr 80px auto;
