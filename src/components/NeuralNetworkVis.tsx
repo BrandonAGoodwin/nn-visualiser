@@ -10,6 +10,7 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { IconButton, Typography } from "@material-ui/core";
 import { NNConfig, StyledInfoButton } from "./MainPage";
 import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
+import { cursorTo } from "readline";
 
 interface ContainerBox {
     top: number;
@@ -72,6 +73,7 @@ const PlusMinusButtonsContainer = styled("div")`
 `
 
 const GridContainer = styled("div")`
+    position: relative;
     display: grid;
     height: 100%;
     width: 40vw;
@@ -151,11 +153,17 @@ function NeuralNetworkVis(props: NetworkProps) {
 
         updateContainerBox();
 
-        window.addEventListener('resize', updateContainerBox);
-        window.addEventListener('scroll', updateContainerBox);
+        let container = document.getElementById("main-container");
+        if (container) {
+            console.log("here")
+        container.addEventListener('resize', updateContainerBox);
+        container.addEventListener('scroll', updateContainerBox);
+        }
         return () => {
-            window.removeEventListener('resize', updateContainerBox);
-            window.removeEventListener('scroll', updateContainerBox);
+            if (container) {
+            container.removeEventListener('resize', updateContainerBox);
+            container.removeEventListener('scroll', updateContainerBox);
+            }
         }
     }, [])
 
@@ -197,6 +205,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     useEffect(() => {
         // At this point this means links are always drawn twice
         drawAllLinks(props.network);
+        console.log(containerBox)
     }, [containerBox])
 
     useEffect(() => {
@@ -266,14 +275,14 @@ function NeuralNetworkVis(props: NetworkProps) {
 
                     let nodeElement = document.getElementById(`node-${nodeId}`);
                     // Right now they aren't actually the centre
-                    if (nodeElement) node2Coord[nodeId] = { cx: nodeElement.offsetLeft - containerLeft + nodeWidth / 2, cy: nodeElement.offsetTop - containerTop + nodeWidth / 2 }
+                    if (nodeElement) node2Coord[nodeId] = { cx: nodeElement.offsetLeft  + nodeWidth / 2, cy: nodeElement.offsetTop  + nodeWidth / 2 }
                 })
             } else {
                 for (let i = 0; i < currentLayer.length; i++) {
                     let node: nn.Node = currentLayer[i];
                     let nodeElement = document.getElementById(`node-${node.id}`);
                     // Right now they aren't actually the centre
-                    if (nodeElement) node2Coord[node.id] = { cx: nodeElement.offsetLeft - containerLeft + nodeWidth / 2, cy: nodeElement.offsetTop - containerTop + nodeWidth / 2 }
+                    if (nodeElement) node2Coord[node.id] = { cx: nodeElement.offsetLeft  + nodeWidth / 2, cy: nodeElement.offsetTop  + nodeWidth / 2 }
                 }
             }
         }
@@ -396,9 +405,11 @@ function NeuralNetworkVis(props: NetworkProps) {
         if (!containerCurrent) return;
         console.log("updating container box");
         let viewportOffset = containerCurrent.getBoundingClientRect();
+        console.log(containerCurrent.offsetTop);
+        console.log(viewportOffset)
         setContainerBox({
-            left: viewportOffset.x - containerCurrent.offsetLeft,
-            top: viewportOffset.y - containerCurrent.offsetTop,
+            left: -viewportOffset.x,
+            top: -viewportOffset.y,
             x: viewportOffset.x,
             y: viewportOffset.y,
             width: viewportOffset.width,
@@ -439,8 +450,8 @@ function NeuralNetworkVis(props: NetworkProps) {
         <GridContainer style={{ overflow: "hidden" }} ref={container}>
             <MouseToolTip
                 visible={showHoverCard}
-                offsetX={-1 * containerBox.left}
-                offsetY={-1 * containerBox.top}
+                offsetX={containerBox.left}
+                offsetY={containerBox.top}
                 style={{ position: "absolute" }}>
                 <HoverCard>
                     {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}

@@ -1,20 +1,16 @@
 import styled from '@emotion/styled';
-import React from 'react';
+import { IconButton } from '@material-ui/core';
+import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
 import MainPage from './components/MainPage';
 
 const StyledMainPage = styled(MainPage)`
-  /* position: absolute; */
-  /* left: 50%;
-  transform: translate(-50%, 0); */
-  /* max-width: min-content; */
-  /* margin: auto auto;   */
-  /* overflow-x: auto; */
+
 `
 
 const StyledComparePage = styled(ComparePage)`
-  /* position: absolute; */
 `
 
 const StyledMargin = styled("div")`
@@ -22,38 +18,80 @@ const StyledMargin = styled("div")`
 `
 
 const Container = styled("div")`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  /* align-items: center; */
-  margin-top: auto;
-  min-height: 100vh;
-  /* margin: 0 auto; */
-  width: 100vw;
-  max-width: 100vw;
-  /* min-width: fit-content; */
-  overflow-x: auto;
-  /* left: 50%;
-  top: 50%; */
-  /* float: left; */
+    position: absolute;
+    display: flex;
+    /* justify-content: center; */
+    margin-top: auto;
+    min-height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: auto;
   
-  /* tranform: translate(-50%, 0); */
+
+  &.main-page {
+    left: 0%;
+    transition: all 0.7s ease-in-out;
+    &.active {
+      left: -100%;
+    }
+  }
+
+  &.compare-page {
+    left: 100%;
+    transition: all 0.7s ease-in-out;
+    &.active {
+      left: 0%;
+    }
+  }
 `
+
+// const MainContainer = styled(Container)`
+
+// `
 
 const AuxContainer = styled("div")`
   position: relative;
-  /* width: 100vw; */
+  min-width: 100vw;
   height: 100vh;
-  min-width: 100%;
-  width: fit-content;
+  /* min-width: 100%; */
+  width: auto;
   display: flex;
   overflow-x: hidden;
+  left: 0%;
+`
+
+const TransitionButton = styled(IconButton)`
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  left: 95%;
+  z-index: 500;
+  transition: all 0.7s ease-in-out;
+  &.active {
+    left: 5%;
+  }
 `
 
 function App() {
+  const [pageState, setPageState] = useState<string>("main");
+
+  // useEffect(() => {
+  //   let containers = document.querySelectorAll(".animated");
+  //   containers.forEach((container: Element) => container.classList.toggle("active"));
+  // }, [pageState]);
+
+  const handleTransitionButton = () => {
+    setPageState(pageState === "main" ? "compare" : "main");
+    let containers = document.querySelectorAll(".animated");
+    containers.forEach((container: Element) => container.classList.toggle("active"));
+  }
+
   return (
     <AuxContainer>
-      <Container>
+      <Container id="main-container" className="animated main-page">
         {/* <StyledMargin/> */}
         <StyledMainPage
           xDomain={[-8, 8]}
@@ -62,7 +100,11 @@ function App() {
         />
         {/* <StyledMargin /> */}
       </Container>
-      <Container>
+      <TransitionButton className="animated" onClick={handleTransitionButton}>
+        {pageState === "main" && <ArrowForwardIos/> }
+        {pageState === "compare" && <ArrowBackIos/>}
+      </TransitionButton>
+      <Container className="animated compare-page">
       <StyledComparePage />
       </Container>
     </AuxContainer> 
