@@ -1,0 +1,38 @@
+import { useRef, useEffect, RefObject } from 'react';
+
+// From https://github.com/Junscuzzy/useHooks.ts
+
+function useEventListener<T extends HTMLElement = HTMLDivElement>(
+  eventName: string,
+  handler: (event: Event) => void,
+  element?: RefObject<T>,
+  useCapture?: boolean,
+) {
+  // Create a ref that stores handler
+  const savedHandler = useRef<(event: Event) => void>()
+  useEffect(() => {
+    // Define the listening target
+    const targetElement: T | Window = element?.current || window;
+    const capture = useCapture ? useCapture : false;
+    if (!(targetElement && targetElement.addEventListener)) {
+      return;
+    }
+    // Update saved handler if necessary
+    if (savedHandler.current !== handler) {
+      savedHandler.current = handler;
+    }
+    // Create event listener that calls handler function stored in ref
+    const eventListener = (event: Event) => {
+      // eslint-disable-next-line no-extra-boolean-cast
+      if (!!savedHandler?.current) {
+        savedHandler.current(event);
+      }
+    }
+    targetElement.addEventListener(eventName, eventListener, capture);
+    // Remove event listener on cleanup
+    return () => {
+      targetElement.removeEventListener(eventName, eventListener, capture);
+    }
+  }, [eventName, element, handler, useCapture]);
+}
+export default useEventListener;

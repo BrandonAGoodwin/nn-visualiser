@@ -493,7 +493,7 @@ function MainPage(props: PageProps) {
     }
 
     return (
-        <Container>
+        <Container id="main-page">
             <ConfigBar>
                 <StyledFormControl variant="filled">
                     <InputLabel>Activation</InputLabel>
@@ -573,23 +573,7 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={loadSavedState} disabled={!compareMode}> Load Network State </StyledButton>
                 <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
             </ControlPanel>
-            <NetworkPanel>
-                {dataset && network && <NeuralNetworkVis
-                    network={network}
-                    decisionBoundaries={decisionBoundaries}
-                    discreetBoundary={discreetBoundary}
-                    inputs={config.inputs}
-                    config={config}
-                    networkWidth={650}
-                    networkHeight={550}
-                    handleOnClick={handleInputNodeClick}
-                    addNode={addNode}
-                    removeNode={removeNode}
-                    addLayer={addLayer}
-                    removeLayer={removeLayer}
-                    setInfoPanel={setInfoPanel}
-                />}
-            </NetworkPanel>
+            
             <GraphPanel>
                 <div style={{ display: "flex", marginLeft: "25px" }}>
                     <Typography variant="h6">Output</Typography>
@@ -635,6 +619,23 @@ function MainPage(props: PageProps) {
                         comparisionData={comparisonData?.lossData} />
                 </div>
             </GraphPanel>
+            <NetworkPanel>
+                {dataset && network && <NeuralNetworkVis
+                    network={network}
+                    decisionBoundaries={decisionBoundaries}
+                    discreetBoundary={discreetBoundary}
+                    inputs={config.inputs}
+                    config={config}
+                    networkWidth={650}
+                    networkHeight={550}
+                    handleOnClick={handleInputNodeClick}
+                    addNode={addNode}
+                    removeNode={removeNode}
+                    addLayer={addLayer}
+                    removeLayer={removeLayer}
+                    setInfoPanel={setInfoPanel}
+                />}
+            </NetworkPanel>
             <StatsBar>
                 {/* <h2> Epochs: {epochs} </h2>
                 <h2 style={{minWidth: 200}}> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>

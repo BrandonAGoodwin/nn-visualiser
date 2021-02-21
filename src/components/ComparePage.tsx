@@ -7,10 +7,12 @@ const ContainerSection = styled("div")`
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
     background-color: white;
-    margin: auto auto;
-    width: 80vw;
+    margin: 30px auto;
+    min-width: 800px;
+    width: auto;
+    max-width: 80vw;
     height: 80vh;
-    padding: 5px;
+    padding: 30px;
     border-radius: 30px;
     border: 2px solid #bdbdbd;
     display: flex;
@@ -25,7 +27,7 @@ interface PageProps {
 function ComparePage(props: PageProps) {
 
     return(
-        <ContainerSection>
+        <ContainerSection id="compare-page">
 
             
         </ContainerSection>
