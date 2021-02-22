@@ -11,7 +11,7 @@ import InfoButton from './InfoButton';
 import DefaultInfoPanel from './InfoPanels/DefaultInfoPanel';
 import LearningInfoRatePanel from './InfoPanels/LearningRateInfoPanel';
 import ActivationInfoPanel from './InfoPanels/ActivationInfoPanel';
-import { GitHub } from '@material-ui/icons';
+import { ArrowBackIos, ArrowForwardIos, GitHub } from '@material-ui/icons';
 import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -57,10 +57,20 @@ const Container = styled("div")`
     width: auto;
     /* min-width: 1400px; */
     min-height: 600px;
+    transition: padding 0.4s ease-in-out;
     padding: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    
     /* max-width: 100%; */
 
-    grid-template-columns: 230px 1fr auto;
+    @media (min-width: 1367px) {
+        padding-left: 70px;
+        padding-right: 70px;
+    }
+
+    // Using values from NeuralNetworkVis for middle column
+    grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
     grid-template-rows: 90px 1fr 80px auto;
     grid-gap: 15px;
     grid-template-areas: 
@@ -143,6 +153,9 @@ const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...p
     justify-content: left;
     padding-left: 30px;
     padding-top: 10px;
+    /* position: relative; */
+    max-width: inherit;
+    /* max-width: fit-content; */
 `;
 
 const NeuralNetworkControls = styled("div")`
@@ -179,7 +192,7 @@ interface ComparisonData {
     datasetType: string;
     dataset: Dataset2D[];
     config: NNConfig;
-    decisionBoundaries: {[nodeId: string]: number[]};
+    decisionBoundaries: { [nodeId: string]: number[] };
     decisionBoundary: number[];
     loss: number;
     epochs: number;
@@ -223,6 +236,8 @@ function MainPage(props: PageProps) {
     const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
     const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
+    const [infoPanelHistory, setInfoPanelHistory] = useState<JSX.Element[]>([]);
+    const [infoPanelFuture, setInfoPanelFuture] = useState<JSX.Element[]>([]);
 
     const [comparisonData, setComaparisonData] = useState<ComparisonData>();
 
@@ -245,12 +260,7 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        // if(training) toggleAutoTrain();
-        // setEpochs(0);
-        // setLossData([]);
-        // generateDataset();
         reset();
-
     }, [datasetType, noise])
 
     useEffect(() => {
@@ -266,15 +276,7 @@ function MainPage(props: PageProps) {
 
     const generateNetwork = () => {
         console.log("Generating network");
-        // let seed: string;
-        // if(compareMode && networkSeed) {
-        //     seed = networkSeed;
-        // } else {
-        //     seed = Math.random().toFixed(5);
-        //     setNetworkSeed(seed);
-        // }
-        // let newNetwork = vis.start(config);
-        // setNetwork(newNetwork);
+
         if (!compareMode) {
             let newNetwork = vis.start(config);
             setNetwork(newNetwork);
@@ -303,7 +305,6 @@ function MainPage(props: PageProps) {
 
     const updateDecisionBoundary = () => {
         // console.log("Updating decision boundary");
-        //network && setDecisionBoundary(decisionBoundaries[nn.getOutputNode(network).id]);
         network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
     }
 
@@ -312,7 +313,6 @@ function MainPage(props: PageProps) {
         if (training) toggleAutoTrain();
         generateNetwork();
         if (!compareMode) generateDataset();
-        // updateDecisionBoundaries();
     };
 
     const step = (noSteps: number) => {
@@ -320,19 +320,14 @@ function MainPage(props: PageProps) {
         if (!network || !dataset) return;
 
         let start = Date.now();
-        let newLossData: [number, number][] = [];
         for (let i = 0; i < noSteps; i++) {
             vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
-            // newLossData.push([epochs + i + 1, vis.getCost(network, dataset, config.inputs)])
             setEpochs(epochs => epochs + 1);
         }
 
 
-        // setLossData(() => lossData.concat(newLossData));
         let delta = Date.now() - start;
         // console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
-
-        // console.log(network);
 
         start = Date.now();
         updateDecisionBoundaries();
@@ -368,9 +363,7 @@ function MainPage(props: PageProps) {
 
     const handleInputNodeClick = (nodeId: string, active: boolean) => {
         // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
-        // console.log(config.inputs) 
         // Change this implemntation input is highly coupled with visControl
-        // let newInputs: string[];
         let newInputs: { [inputId: string]: boolean } = { ...config.inputs };
         let newNetworkShape = config.networkShape;
 
@@ -378,28 +371,17 @@ function MainPage(props: PageProps) {
             let noActiveNodes = 0;
             Object.keys(config.inputs).forEach((inputId) => { if (config.inputs[inputId]) noActiveNodes++; });
             if (noActiveNodes > 1) {
-                // newInputs = removeItemOnce(config.inputs, nodeId);
                 newInputs[nodeId] = false;
                 newNetworkShape[0] = newNetworkShape[0] - 1;
             } else {
                 return;
             }
         } else {
-            // config.inputs.push(nodeId);
             newInputs[nodeId] = true;
             newNetworkShape[0] = newNetworkShape[0] + 1;
         }
-
-        // if(training) toggleAutoTrain();
-
-
-        // newNetworkShape[0] = newInputs.length;
         setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
-
-    // const handleHover = (nodeId: string, active: boolean) => {
-
-    // }
 
     const removeLayer = () => {
         console.log("Running removeLayer");
@@ -487,9 +469,46 @@ function MainPage(props: PageProps) {
         reset();
     }
 
-    const clearNetworkState= () => {
+    const clearNetworkState = () => {
         setComaparisonData(undefined);
         setCompareMode(false);
+    }
+
+    const setInfoPanelWrapper = (newInfoPanel: JSX.Element) => {
+        let newInfoPanelHistory = infoPanelHistory;
+        newInfoPanelHistory.push(infoPanel);
+
+        setInfoPanel(newInfoPanel);
+
+        setInfoPanelFuture([]);
+    }
+
+    const handleInfoPanelForward = () => {
+        if (infoPanelFuture.length !== 0) {
+            let newInfoPanelHistory = infoPanelHistory;
+            let newInfoPanelFuture = infoPanelFuture;
+            let newPanel = newInfoPanelFuture.shift;
+
+            newInfoPanelHistory.push(infoPanel);
+
+            setInfoPanelHistory(newInfoPanelHistory);
+            setInfoPanelFuture(newInfoPanelFuture);
+            setInfoPanel(newPanel() || <DefaultInfoPanel {...config} />);
+        }
+    }
+
+    const handleInfoPanelBackward = () => {
+        if (infoPanelHistory.length !== 0) {
+            let newInfoPanelHistory = infoPanelHistory;
+            let newInfoPanelFuture = infoPanelFuture;
+            let newPanel = newInfoPanelHistory.pop;
+
+            newInfoPanelFuture.unshift(infoPanel);
+
+            setInfoPanelHistory(newInfoPanelHistory);
+            setInfoPanelFuture(newInfoPanelFuture);
+            setInfoPanel(newPanel() || <DefaultInfoPanel {...config} />);
+        }
     }
 
     return (
@@ -506,7 +525,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanel} infoPanel={<ActivationInfoPanel {...config} />}>
+                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
                         <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
@@ -524,7 +543,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="0.005">0.005</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanel} infoPanel={<LearningInfoRatePanel {...config} />}>
+                <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningInfoRatePanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
                         <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
@@ -543,7 +562,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="XOR">XOR</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanel} infoPanel={<DatasetInfoPanel {...config} />}>
+                <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanelWrapper} infoPanel={<DatasetInfoPanel {...config} />}>
                     <React.Fragment>
                         <Typography color="inherit">Datasets</Typography>
                         <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br />
@@ -573,11 +592,11 @@ function MainPage(props: PageProps) {
                 <StyledButton variant={"contained"} onClick={loadSavedState} disabled={!compareMode}> Load Network State </StyledButton>
                 <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
             </ControlPanel>
-            
+
             <GraphPanel>
                 <div style={{ display: "flex", marginLeft: "25px" }}>
                     <Typography variant="h6">Output</Typography>
-                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
                         <React.Fragment>
                             <Typography color="inherit">Output</Typography>
                             <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> orange <ColouredBox colour={"#ff7661"} /> sections of the graph are classified as class -1 and points that are in <br /> blue <ColouredBox colour={"#223781"} /> sections of the graph are classified as class +1.</Typography><br />
@@ -603,7 +622,7 @@ function MainPage(props: PageProps) {
                     <h3 style={{ marginTop: "0px" }}> Epochs: {epochs} </h3>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
                         <h3 style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </h3>
-                        <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanel} infoPanel={<LossInfoPanel {...config} />}>
+                        <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
                             <React.Fragment>
                                 <Typography color="inherit">Loss</Typography>
                                 <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
@@ -633,20 +652,30 @@ function MainPage(props: PageProps) {
                     removeNode={removeNode}
                     addLayer={addLayer}
                     removeLayer={removeLayer}
-                    setInfoPanel={setInfoPanel}
+                    setInfoPanel={setInfoPanelWrapper}
                 />}
             </NetworkPanel>
             <StatsBar>
-                {/* <h2> Epochs: {epochs} </h2>
-                <h2 style={{minWidth: 200}}> Loss: {(new Intl.NumberFormat("en-UK", { maximumSignificantDigits: 3 }).format(loss))} </h2>
-                <LossGraph
-                    height={30}
-                    width={100}
-                    margin={5}
-                    dataset={lossData}/> */}
+
             </StatsBar>
             <InfoPanel>
+                {/* <div style={{ position: "relative", right: "-95%", top:"5%" }}>
+                    <IconButton>
+                        <ArrowBackIos aria-disabled={true}/>
+                    </IconButton>
+                    <IconButton>
+                        <ArrowForwardIos/>
+                    </IconButton>
+                </div> */}
                 {infoPanel}
+                <div style={{ position: "absolute", right: "3%", top: "10%" }}>
+                    <IconButton>
+                        <ArrowBackIos />
+                    </IconButton>
+                    <IconButton>
+                        <ArrowForwardIos />
+                    </IconButton>
+                </div>
             </InfoPanel>
             <LinksDiv>
                 <a href="https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/bxg796" target="_blank">

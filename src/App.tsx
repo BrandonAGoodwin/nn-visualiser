@@ -224,7 +224,7 @@ function App() {
 
             console.log("Margin width: " + marginWidth);
 
-            if ((container.offsetWidth - marginWidth) < (mainPage.offsetWidth + maxMarginSize * 2)) {
+            if ((container.offsetWidth - marginWidth) < (mainPage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((mainPage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
@@ -251,7 +251,7 @@ function App() {
 
             console.log("Margin width: " + marginWidth);
 
-            if ((container.offsetWidth - marginWidth) < (comparePage.offsetWidth + maxMarginSize * 2)) {
+            if ((container.offsetWidth - marginWidth) < (comparePage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((comparePage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
