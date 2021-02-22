@@ -19,6 +19,7 @@
     "@types/styled-components": "^5.1.4",
     "css-element-queries": "^1.2.3",
     "d3": "^6.2.0",
+    "express": "^4.17.1",
     "mathjax-full": "^3.1.2",
     "mathjax-react": "^1.0.6",
     "react": "^17.0.1",

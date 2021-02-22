@@ -64,11 +64,6 @@ const Container = styled("div")`
     
     /* max-width: 100%; */
 
-    /* @media (min-width: 1367px) {
-        padding-left: 70px;
-        padding-right: 70px;
-    } */
-
     // Using values from NeuralNetworkVis for middle column
     grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
     grid-template-rows: 90px 1fr 80px auto;
@@ -487,13 +482,13 @@ function MainPage(props: PageProps) {
         if (infoPanelFuture.length !== 0) {
             let newInfoPanelHistory = infoPanelHistory;
             let newInfoPanelFuture = infoPanelFuture;
-            let newPanel = newInfoPanelFuture.shift;
+            let newPanel = newInfoPanelFuture.shift();
 
             newInfoPanelHistory.push(infoPanel);
 
             setInfoPanelHistory(newInfoPanelHistory);
             setInfoPanelFuture(newInfoPanelFuture);
-            setInfoPanel(newPanel() || <DefaultInfoPanel {...config} />);
+            if (newPanel) setInfoPanel(newPanel);
         }
     }
 
@@ -501,13 +496,13 @@ function MainPage(props: PageProps) {
         if (infoPanelHistory.length !== 0) {
             let newInfoPanelHistory = infoPanelHistory;
             let newInfoPanelFuture = infoPanelFuture;
-            let newPanel = newInfoPanelHistory.pop;
+            let newPanel = newInfoPanelHistory.pop();
 
             newInfoPanelFuture.unshift(infoPanel);
 
             setInfoPanelHistory(newInfoPanelHistory);
             setInfoPanelFuture(newInfoPanelFuture);
-            setInfoPanel(newPanel() || <DefaultInfoPanel {...config} />);
+            if (newPanel) setInfoPanel(newPanel);
         }
     }
 
@@ -617,7 +612,6 @@ function MainPage(props: PageProps) {
                     decisionBoundary={decisionBoundary}
                     discreetBoundary={discreetBoundary}
                 />}
-                {/* {(!dataset || !network) && <CircularProgress />} */}
                 <div style={{ marginLeft: "10px" }}>
                     <h3 style={{ marginTop: "0px" }}> Epochs: {epochs} </h3>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
@@ -659,20 +653,12 @@ function MainPage(props: PageProps) {
 
             </StatsBar>
             <InfoPanel>
-                {/* <div style={{ position: "relative", right: "-95%", top:"5%" }}>
-                    <IconButton>
-                        <ArrowBackIos aria-disabled={true}/>
-                    </IconButton>
-                    <IconButton>
-                        <ArrowForwardIos/>
-                    </IconButton>
-                </div> */}
                 {infoPanel}
-                <div style={{ position: "absolute", right: "3%", top: "10%" }}>
-                    <IconButton>
+                <div style={{ position: "absolute", right: "40px", top: "30px" }}>
+                    <IconButton onClick={handleInfoPanelBackward}>
                         <ArrowBackIos />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={handleInfoPanelForward}>
                         <ArrowForwardIos />
                     </IconButton>
                 </div>
