@@ -49,3 +49,20 @@ export function DefX2() {
         </Typography>
     );
 }
+
+export function DefNode() {
+    return (
+        <Typography variant="body2">
+           Nodes are the individual functions that make up the neural network and are connected to nodes in adjacent layers by links.<br/>
+           <u>Click the icon to get more information</u>
+        </Typography>
+    );
+}
+
+export function DefLink() {
+    return (
+        <Typography variant="body2">
+
+        </Typography>
+    )
+}

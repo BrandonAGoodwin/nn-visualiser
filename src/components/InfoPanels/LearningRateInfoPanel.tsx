@@ -5,12 +5,12 @@ import { MathComponent } from "mathjax-react";
 function LearningInfoRatePanel(props: NNConfig) {
 
     return (
-        <div>
+        <div style={{ float: "left"}}>
             <h1>Learning Rate (&epsilon;)</h1>
             <p>The learning rate affects the rate at which the weights and biases change each epoch when training the neural network.</p>
             <h2>Usage</h2>
             <MathComponent tex={String.raw`w'=w-\epsilon\Delta J(x)`} />
-            <h2>Observations</h2>
+           <h2>Observations</h2>
             <p>
                 We observe that <b>smaller</b> learning rates lead to <b>slower learning</b> but <b>more precise decision boundaries </b>
                 and <b>less fluctuating</b> around the local optima and conversely <b>larger</b> learning rates lead to <b>faster learning </b>
