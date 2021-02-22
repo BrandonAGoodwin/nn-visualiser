@@ -64,10 +64,10 @@ const Container = styled("div")`
     
     /* max-width: 100%; */
 
-    @media (min-width: 1367px) {
+    /* @media (min-width: 1367px) {
         padding-left: 70px;
         padding-right: 70px;
-    }
+    } */
 
     // Using values from NeuralNetworkVis for middle column
     grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
@@ -153,7 +153,7 @@ const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...p
     justify-content: left;
     padding-left: 30px;
     padding-top: 10px;
-    /* position: relative; */
+    position: relative;
     max-width: inherit;
     /* max-width: fit-content; */
 `;
