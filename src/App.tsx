@@ -1,9 +1,7 @@
 import styled from '@emotion/styled';
 import { IconButton } from '@material-ui/core';
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
-import { ResizeSensor } from 'css-element-queries';
-import React, { createRef, useEffect, useRef, useState } from 'react';
-import { isConstructorDeclaration } from 'typescript';
+import React, { createRef, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
 import MainPage from './components/MainPage';

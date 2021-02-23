@@ -4,13 +4,11 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
-import MouseToolTip from "react-sticky-mouse-tooltip";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { IconButton, Typography } from "@material-ui/core";
 import { NNConfig, StyledInfoButton } from "./MainPage";
 import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
-import { cursorTo } from "readline";
 import MouseTooltip from "./MouseTooltip";
 import ResizeSensor from "css-element-queries";
 import useEventListener from "./UseEventListener";
