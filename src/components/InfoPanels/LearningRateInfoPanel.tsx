@@ -2,7 +2,7 @@ import React from "react";
 import { NNConfig } from "../MainPage";
 import { MathComponent } from "mathjax-react";
 
-function LearningInfoRatePanel(props: NNConfig) {
+function LearningRateInfoPanel(props: NNConfig) {
 
     return (
         <div style={{ float: "left"}}>
@@ -22,4 +22,4 @@ function LearningInfoRatePanel(props: NNConfig) {
     );
 }
 
-export default LearningInfoRatePanel;
+export default LearningRateInfoPanel;

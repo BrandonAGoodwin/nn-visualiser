@@ -470,11 +470,13 @@ function MainPage(props: PageProps) {
     }
 
     const setInfoPanelWrapper = (newInfoPanel: JSX.Element) => {
+        console.log(newInfoPanel);
         let newInfoPanelHistory = infoPanelHistory;
         newInfoPanelHistory.push(infoPanel);
-
+        console.log(newInfoPanelHistory);
+        console.log(infoPanel)
         setInfoPanel(newInfoPanel);
-
+        setInfoPanelHistory(newInfoPanelHistory);
         setInfoPanelFuture([]);
     }
 
@@ -520,7 +522,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel {...config} />}>
+                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper}/>}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
                         <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
