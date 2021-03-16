@@ -6,6 +6,7 @@ import './App.css';
 import ComparePage from './components/ComparePage';
 import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
+import { Controller } from './Controller';
 
 const StyledMainPage = styled(MainPage)`
 
@@ -86,7 +87,20 @@ interface ComparisonData {
     savedState: NetworkState;
 }
 
+export interface Model {
+
+}
+
+const defaultModel: Model = {
+
+}
+
 function App() {
+
+
+    let model: Model = defaultModel;
+    // let controller = new Controller(model);
+
 
     const mainContainer = createRef<HTMLDivElement>();
 
@@ -270,7 +284,7 @@ function App() {
                     xDomain={[-8, 8]}
                     yDomain={[-8, 8]}
                     numCells={100}
-                    updateComparisionData={updateComparisionData}
+                    model={model}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>

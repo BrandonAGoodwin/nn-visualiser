@@ -30,7 +30,7 @@ interface PageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
-    updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
+    model: Model;
 }
 
 const StyledButton = styled(Button)`
