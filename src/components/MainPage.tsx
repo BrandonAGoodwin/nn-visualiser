@@ -30,6 +30,7 @@ interface PageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
+    updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
 }
 
 const StyledButton = styled(Button)`
@@ -180,7 +181,7 @@ const ColouredBox = styled("div")`
     margin-right: 5px;
 `
 
-interface ComparisonData {
+export interface NetworkState {
     noise: number;
     datasetType: string;
     dataset: Dataset2D[];
@@ -232,7 +233,7 @@ function MainPage(props: PageProps) {
     const [infoPanelHistory, setInfoPanelHistory] = useState<JSX.Element[]>([]);
     const [infoPanelFuture, setInfoPanelFuture] = useState<JSX.Element[]>([]);
 
-    const [comparisonData, setComaparisonData] = useState<ComparisonData>();
+    const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -419,7 +420,7 @@ function MainPage(props: PageProps) {
     }
 
     const saveComparisionData = () => {
-        let newComparisionData: ComparisonData = {
+        let newComparisionData: NetworkState = {
             config: config,
             dataset: dataset,
             datasetType: datasetType,

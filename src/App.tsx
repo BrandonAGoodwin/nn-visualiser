@@ -4,7 +4,7 @@ import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
 import React, { createRef, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
-import MainPage from './components/MainPage';
+import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 
 const StyledMainPage = styled(MainPage)`
@@ -81,6 +81,11 @@ const TransitionButton = styled(IconButton)`
     }
 `
 
+interface ComparisonData {
+    currentState: NetworkState;
+    savedState: NetworkState;
+}
+
 function App() {
 
     const mainContainer = createRef<HTMLDivElement>();
@@ -90,84 +95,11 @@ function App() {
     const [marginWidth, setMarginWidth] = useState<number>(0);
     const [transitioning, setTransitioning] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     let mainPage = document.getElementById("main-page");
+    const [comparisonData, setComparisonData] = useState<ComparisonData>();
 
-    //     let resizeSensor: ResizeSensor;
-    //     if (mainPage) {
-    //         resizeSensor = new ResizeSensor(mainPage, () => {
-    //             updateContainerSize();
-    //             updateButtonPosition();
-    //         })
-    //     }
-
-    //     let container = document.getElementById("main-container");
-
-
-    //     window.addEventListener("resize", () => {
-    //         updateContainerSize();
-    //         updateButtonPosition();
-    //     });
-    //     if (container) container.addEventListener("scroll", updateButtonPosition);
-    //     return () => {
-    //         resizeSensor.detach();
-
-    //         window.removeEventListener("resize",  () => {
-    //             updateContainerSize();
-    //             updateButtonPosition();
-    //         });
-    //         if (container) container.removeEventListener("scroll", updateButtonPosition);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     let container = document.getElementById("main-container");
-
-    //     let mainPage = document.getElementById("main-page");
-
-    //     window.removeEventListener("resize",  () => {
-    //         updateContainerSize();
-    //         updateButtonPosition();
-    //     });
-    //     if (container) container.removeEventListener("scroll", updateButtonPosition);
-
-    //     // let resizeSensor: ResizeSensor;
-    //     // if (mainPage) {
-    //     //     resizeSensor = new ResizeSensor(mainPage, () => {
-    //     //         updateContainerSize();
-    //     //         updateButtonPosition();
-    //     //     })
-    //     // }
-
-    //     window.addEventListener("resize",  () => {
-    //         updateContainerSize();
-    //         updateButtonPosition();
-    //     });
-    //     if (container) container.addEventListener("scroll", updateButtonPosition);
-    //     return () => {
-    //         // resizeSensor.detach();
-
-    //         window.removeEventListener("resize",  () => {
-    //             updateContainerSize();
-    //             updateButtonPosition();
-    //         });
-    //         if (container) container.removeEventListener("scroll", updateButtonPosition);
-    //     }
-    // }, [pageState, marginAdded]);
-
-
-    // useEffect(() => {
-    //     // let mainPage = document.getElementById("main-page");
-    //     updateButtonPosition();
-    //     updateContainerSize();
-
-
-    // }, []);
-
-    // useEffect(() => {
-    //   let containers = document.querySelectorAll(".animated");
-    //   containers.forEach((container: Element) => container.classList.toggle("active"));
-    // }, [pageState]);
+    const updateComparisionData = (currentState: NetworkState, savedState: NetworkState) => {
+        setComparisonData({currentState: currentState, savedState: savedState});
+    }
 
     useEffect(() => {
         if(transitioning) {
@@ -193,12 +125,6 @@ function App() {
         setTransitioning(true);
         let containers = document.querySelectorAll(".animated");
         containers.forEach((container: Element) => container.classList.toggle("active"));
-        // setTimeout(function() {
-        //     console.log(pageState);
-        //     setTransitioning(false);
-        //     updateContainerSize();
-        //     updateButtonPosition();
-        // }, 401);
     }
 
     const updateContainerSize = () => {
@@ -212,10 +138,6 @@ function App() {
             let margin = document.getElementById("dynamic-margin-main");
 
             if (!container || !mainPage || !margin) return;
-
-            // let containerRect = container.getBoundingClientRect();
-            // let pageRect = mainPage.getBoundingClientRect();
-            // let marginRect = margin.getBoundingClientRect();
 
             console.log("Conatainer width: " + container.offsetWidth);
             console.log("Page width: " + mainPage.offsetWidth);
@@ -348,6 +270,7 @@ function App() {
                     xDomain={[-8, 8]}
                     yDomain={[-8, 8]}
                     numCells={100}
+                    updateComparisionData={updateComparisionData}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>
@@ -357,7 +280,7 @@ function App() {
             </TransitionButton>
             <Container id="compare-container" className="animated compare">
                 <StyledMargin id="dynamic-margin-compare" />
-                <StyledComparePage />
+                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
             </Container>
         </AuxContainer>
     );

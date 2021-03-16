@@ -35,11 +35,6 @@ export let INPUTS: { [name: string]: InputFunc } = {
 
 
 export function start(config: NNConfig): nn.Node[][] {
-    // seedrandom(seed);
-    // const seedrandom = require('seedrandom');
-    // seedrandom(seed);
-    // console.log(seed);
-    // console.log(Math.random());
     let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, config.inputs);
     console.log(network);
 
