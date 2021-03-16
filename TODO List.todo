@@ -7,7 +7,7 @@ Tasks:
         ☐ Add more learning rates
         ☐ Inputs info panel
         ✔ Fix main page grid container @done (11/02/2021, 20:04:18)
-        ☐ Put comparison line on loss graph
+        ✔ Put comparison line on loss graph @done (16/03/2021, 11:55:13)
         ☐ Create test set
         ☐ Background colour usability study
         ☐ Cypress Test Runner
