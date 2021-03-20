@@ -2,15 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
 import { Dataset2D } from "../datasets";
 import BackgroundCanvas from "./BackgroundCanvas";
-import styled from "@emotion/styled";
 import { ThemeContext } from "../contexts/ThemeContext";
-
-const StyledBackgroundCanvas = styled(BackgroundCanvas)`
-    position: relative;
-    top: 0;
-    left: 0;
-    z-index: -1;
-`
 
 interface GraphProps  {
     dataset: Dataset2D[];
@@ -66,7 +58,7 @@ function NNGraph(props: GraphProps): JSX.Element {
     const createGraph = () => {
         console.log("Creating graph");
 
-        let svg = d3.select(d3Container.currnet)
+        d3.select(d3Container.currnet)
             .attr("width", props.canvasWidth + props.marginLeft + props.marginRight)
             .attr("height", props.canvasWidth + props.marginTop + props.marginBottom);
 
@@ -147,19 +139,21 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         let yAxisText = graph.append("text")
             .attr("class", `axis`)
-            // .attr("transform", "rotate(-90)")
-            // .attr("transform", `translate(${props.canvasWidth / 2}, ${- props.margin /2})`)
             .attr("y", props.canvasWidth / 2)
             .attr("x", -props.marginLeft)
-            // .attr("dy", "1em")
             .attr("text-anchor", "left")
             .attr("alignment-baseline", "middle")     
         
 
         addFormattedText(yAxisLabel, yAxisText);
 
+        let filteredDataset = props.dataset.filter((p: Dataset2D) => {
+            return p.x1 >= x.domain()[0] && p.x1 <= x.domain()[1]
+              && p.x2 >= y.domain()[0] && p.x2 <= y.domain()[1];
+          });
+
         graph.selectAll(`.circle`)
-            .data(props.dataset)
+            .data(filteredDataset)
             .enter().append("circle")
             .attr("class", `circle`)
             .attr("r", scale / 7)
@@ -173,9 +167,6 @@ function NNGraph(props: GraphProps): JSX.Element {
             .style("stroke", "black")
             .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
             .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
-
-
-        
     }
 
     return (
