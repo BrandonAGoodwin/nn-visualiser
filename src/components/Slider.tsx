@@ -32,6 +32,9 @@ interface sliderProps {
     defaultValue: number;
     onChange: (e: React.ChangeEvent<{}>, value: number | number[]) => void;
     valueLabelDisplay?: "on" | "off" | "auto" | undefined;
+    step: number;
+    min: number;
+    max: number;
 }
 
 function LabeledSlider(props: sliderProps) {
@@ -43,10 +46,10 @@ function LabeledSlider(props: sliderProps) {
                 ValueLabelComponent={ValueLabelComponent}
                 //aria-label="custom thumb label"
                 defaultValue={props.defaultValue}
-                step={0.1}
-                min={0}
-                max={1}
-                onChange={props.onChange}
+                step={props.step}
+                min={props.min}
+                max={props.max}
+                onChangeCommitted={props.onChange}
                 valueLabelDisplay={props.valueLabelDisplay || "auto"}
             />
         </StyledDiv>

@@ -255,7 +255,7 @@ function MainPage(props: PageProps) {
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
         reset();
-    }, [datasetType, noise])
+    }, [datasetType, noise, numSamples])
 
     useEffect(() => {
         if (epochs === 0 || !network) return;
@@ -354,6 +354,10 @@ function MainPage(props: PageProps) {
     const handleNoiseChange = (e: any, newValue: number | number[]) => {
         setNoise(newValue as number);
     };
+
+    const handleNumSamplesChange = (e: any, newValue: number | number[]) => {
+        setNumSamples(newValue as number);
+    }
 
     const handleInputNodeClick = (nodeId: string, active: boolean) => {
         // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
@@ -568,6 +572,9 @@ function MainPage(props: PageProps) {
                 <Divider orientation="vertical" flexItem />
                 <LabeledSlider
                     label="Noise"
+                    min = {0}
+                    step = {0.1}
+                    max = {1}
                     defaultValue={noise}
                     onChange={handleNoiseChange}
                 />
@@ -575,6 +582,22 @@ function MainPage(props: PageProps) {
                     <React.Fragment>
                         <Typography color="inherit">Noise</Typography>
                         <Typography variant="body2">This sets the noise in the generated data set. The more noise the greater the variance in the generated data.</Typography>
+                    </React.Fragment>
+                </StyledInfoButton>
+                <Divider orientation="vertical" flexItem />
+                <LabeledSlider
+                    label="Dataset Size"
+                    min={10}
+                    step={10}
+                    max={500}
+                    defaultValue={numSamples}
+                    onChange={handleNumSamplesChange}
+
+                />
+                <StyledInfoButton title="Sample Size Tooltip">
+                    <React.Fragment>
+                        {/* <Typography color="inherit">Noise</Typography> */}
+                        <Typography variant="body2">Changes the number of samples in the dataset. <br/>(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
             </ConfigBar>
