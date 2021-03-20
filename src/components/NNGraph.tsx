@@ -167,7 +167,9 @@ function NNGraph(props: GraphProps): JSX.Element {
             .style("stroke", "black")
             .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
             .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
-    }
+    
+
+        }
 
     return (
         <>

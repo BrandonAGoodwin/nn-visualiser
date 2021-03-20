@@ -52,7 +52,7 @@ describe("Back Propagation", () => {
 
     it("Check accumulators change", () => {
         let startWeightAcc = network[1][0].linksIn[0].derAcc;
-        let startNoWeightAcc = network[1][0].linksIn[0].noAccDer;
+        let startNoWeightAcc = network[1][0].linksIn[0].noAccDers;
 
         let startBiasAcc = network[1][0].accInputDererivatives;
         let startNoBiasAcc = network[1][0].numInputDerivatives;
@@ -64,7 +64,7 @@ describe("Back Propagation", () => {
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y)
 
         let newWeightAcc = network[1][0].linksIn[0].derAcc;
-        let newNoWeightAcc = network[1][0].linksIn[0].noAccDer;
+        let newNoWeightAcc = network[1][0].linksIn[0].noAccDers;
 
         let newBiasAcc = network[1][0].accInputDererivatives;
         let newNoBiasAcc = network[1][0].numInputDerivatives;

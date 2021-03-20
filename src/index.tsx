@@ -9,14 +9,14 @@ import { ThemeProvider } from './contexts/ThemeContext';
 
 
 ReactDOM.render(
-  <React.StrictMode>
-    <StylesProvider injectFirst>
-      <ThemeProvider>
-      <App/>
-      </ThemeProvider>
-    </StylesProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <StylesProvider injectFirst>
+            <ThemeProvider>
+                <App />
+            </ThemeProvider>
+        </StylesProvider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

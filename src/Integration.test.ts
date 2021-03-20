@@ -6,7 +6,7 @@ import { Dataset } from "./datasets";
 describe("Gradient Decent", () => {
     let network: nn.Node[][];
 
-    let trainingData = Dataset.GAUSSIAN(30, 0);
+    let trainingData = Dataset.GAUSSIAN_2(30, 0);
     let learningRate = 0.03;
     let noSteps = 300;
     let defaultNetworkShape = [2, 1];

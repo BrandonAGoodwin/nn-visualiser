@@ -17,6 +17,7 @@ import LossGraph from './LossGraph';
 import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
+import ColourScale from './ColourScale';
 
 export interface NNConfig {
     networkShape: number[];
@@ -195,7 +196,7 @@ export interface NetworkState {
 
 
 function MainPage(props: PageProps) {
-    const {minColour, minColourName, maxColour, maxColourName} = useContext(ThemeContext);
+    const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
 
     const [numSamples, setNumSamples] = useState<number>(500);
     const [noise, setNoise] = useState<number>(0.2);
@@ -527,7 +528,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper}/>}>
+                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper} />}>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
                         <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
@@ -574,9 +575,9 @@ function MainPage(props: PageProps) {
                 <Divider orientation="vertical" flexItem />
                 <LabeledSlider
                     label="Noise"
-                    min = {0}
-                    step = {0.1}
-                    max = {1}
+                    min={0}
+                    step={0.1}
+                    max={1}
                     defaultValue={noise}
                     onChange={handleNoiseChange}
                 />
@@ -599,7 +600,7 @@ function MainPage(props: PageProps) {
                 <StyledInfoButton title="Sample Size Tooltip">
                     <React.Fragment>
                         {/* <Typography color="inherit">Noise</Typography> */}
-                        <Typography variant="body2">Changes the number of samples in the dataset. <br/>(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
+                        <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
             </ConfigBar>
@@ -623,6 +624,18 @@ function MainPage(props: PageProps) {
                             <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> {minColourName} <ColouredBox colour={minColour} /> sections of the graph are classified as class -1 and points that are in <br /> {maxColourName} <ColouredBox colour={maxColour} /> sections of the graph are classified as class +1.</Typography><br />
                         </React.Fragment>
                     </StyledInfoButton>
+                    <ColourScale
+                        width={150}
+                        height={15}
+                        maxColour={maxColour}
+                        minColour={minColour}
+                        midColour={midColour}
+                        maxValue={1}
+                        minValue={-1}
+                        midValue={0}
+                        numShades={100}
+                        horizontal={true}
+                    />
                 </div>
                 {dataset && network && <NNGraph
                     dataset={dataset}
