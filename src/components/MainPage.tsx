@@ -198,7 +198,7 @@ export interface NetworkState {
 function MainPage(props: PageProps) {
     const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
 
-    const [numSamples, setNumSamples] = useState<number>(500);
+    const [numSamples, setNumSamples] = useState<number>(100);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian2");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
