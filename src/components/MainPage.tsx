@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
 import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
@@ -17,6 +17,7 @@ import NeuralNetworkVis from './NeuralNetworkVis';
 import LossGraph from './LossGraph';
 import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 export interface NNConfig {
     networkShape: number[];
@@ -195,6 +196,8 @@ export interface NetworkState {
 
 
 function MainPage(props: PageProps) {
+    const {minColour, minColourName, maxColour, maxColourName} = useContext(ThemeContext);
+
     const [numSamples, setNumSamples] = useState<number>(500);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian2");
@@ -618,7 +621,7 @@ function MainPage(props: PageProps) {
                     <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
                         <React.Fragment>
                             <Typography color="inherit">Output</Typography>
-                            <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> orange <ColouredBox colour={"#ff7661"} /> sections of the graph are classified as class -1 and points that are in <br /> blue <ColouredBox colour={"#223781"} /> sections of the graph are classified as class +1.</Typography><br />
+                            <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> {minColourName} <ColouredBox colour={minColour} /> sections of the graph are classified as class -1 and points that are in <br /> {maxColourName} <ColouredBox colour={maxColour} /> sections of the graph are classified as class +1.</Typography><br />
                         </React.Fragment>
                     </StyledInfoButton>
                 </div>

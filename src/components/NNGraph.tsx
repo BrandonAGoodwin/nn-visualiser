@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
 import { Dataset2D } from "../datasets";
 import BackgroundCanvas from "./BackgroundCanvas";
 import styled from "@emotion/styled";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 const StyledBackgroundCanvas = styled(BackgroundCanvas)`
     position: relative;
@@ -29,6 +30,8 @@ interface GraphProps  {
 
 
 function NNGraph(props: GraphProps): JSX.Element {
+
+    const {minColour, maxColour} = useContext(ThemeContext);
 
     const d3Container: any = useRef<any>(null);
 
@@ -162,8 +165,8 @@ function NNGraph(props: GraphProps): JSX.Element {
             .attr("r", scale / 7)
             .attr("fill", function (datapoint: Dataset2D): string {
                 let colour = "black";
-                if (datapoint.y === 1) colour = "#223781";
-                if (datapoint.y === -1) colour = "#ff7661";
+                if (datapoint.y === 1) colour = maxColour;
+                if (datapoint.y === -1) colour = minColour;
 
                 return colour;
             })
@@ -171,6 +174,8 @@ function NNGraph(props: GraphProps): JSX.Element {
             .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
             .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
 
+
+        
     }
 
     return (

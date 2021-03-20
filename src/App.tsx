@@ -1,11 +1,16 @@
+import { ThemeContext } from "./contexts/ThemeContext";
 import styled from '@emotion/styled';
 import { IconButton } from '@material-ui/core';
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
-import React, { createRef, useEffect, useState } from 'react';
+import React, { createRef, useContext, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
 import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
+import { css, Global } from "@emotion/react";
+
+
+// export const ThemeContext = createContext<Partial<ThemeProps>>({});
 
 const StyledMainPage = styled(MainPage)`
 
@@ -87,6 +92,7 @@ interface ComparisonData {
 }
 
 function App() {
+    const {background} = useContext(ThemeContext);
 
     const mainContainer = createRef<HTMLDivElement>();
 
@@ -263,7 +269,13 @@ function App() {
     useEventListener("scroll",  updateButtonPosition, mainContainer);
 
     return (
+        // <ThemeContext.Consumer>
         <AuxContainer>
+        <Global
+          styles={css`
+            body {
+              background: ${background}
+            }`}/>
             <Container id="main-container" className="animated main" ref={mainContainer}>
                 {/* <StyledMargin/> */}
                 <StyledMainPage
@@ -283,6 +295,7 @@ function App() {
                 <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
             </Container>
         </AuxContainer>
+        // </ThemeContext.Consumer>
     );
 }
 
