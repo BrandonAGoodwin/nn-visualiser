@@ -125,23 +125,6 @@ function LossGraph(props: GraphProps) {
                     .x((d: [number, number]) => x(d[0]) || 0)
                     .y((d: [number, number]) => y(d[1]) || 0))
         }
-
-        // graph.selectAll(`.circle`)
-        //     .data(props.dataset)
-        //     .enter().append('circle')
-        //     .attr('class', `circle`)
-        //     .attr("r", scale / 7)
-        //     .attr("fill", function (datapoint: Dataset2D): string {
-        //         let colour = "black";
-        //         if (datapoint.y === 1) colour = "#223781";
-        //         if (datapoint.y === -1) colour = "#ff7661";
-
-        //         return colour;
-        //     })
-        //     .style("stroke", "black")
-        //     .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
-        //     .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
-
     }
 
     return (

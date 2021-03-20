@@ -1,6 +1,6 @@
 import * as nn from "../NeuralNet";
 import styled from "@emotion/styled";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
@@ -12,6 +12,7 @@ import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
 import MouseTooltip from "./MouseTooltip";
 import ResizeSensor from "css-element-queries";
 import useEventListener from "./UseEventListener";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 interface ContainerBox {
     top: number;
@@ -139,6 +140,8 @@ const FadeCanvas = styled("canvas") <CanvasProps>`
 
 // Could remove the output node and point straight to the graph
 function NeuralNetworkVis(props: NetworkProps) {
+    const {minColour, maxColour} = useContext(ThemeContext);
+
     const svgContainer: any = useRef<any>(null);
     const container: any = useRef<any>(null);
     const nodeWidth = 30;
@@ -305,7 +308,7 @@ function NeuralNetworkVis(props: NetworkProps) {
             .range([6, 1.5, 6])
             .clamp(true);
         return {
-            color: (link.weight > 0 ? "#223781" : "#ff7661"),
+            color: (link.weight > 0 ? maxColour : minColour),
             size: weightToSize(link.weight),
         }
     }

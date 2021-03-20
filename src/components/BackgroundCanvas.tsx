@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 
 interface CanvasProps {
@@ -20,6 +21,8 @@ interface CanvasProps {
 
 
 function BackgroundCanvas(props: CanvasProps) {
+    const {minColour, midColour, maxColour} = useContext(ThemeContext);
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -35,7 +38,7 @@ function BackgroundCanvas(props: CanvasProps) {
 
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
-            .range(props.disabled ? ["#606060", "#FFFFFF", "#202020" ] : ["#ff7661", "#FFFFFF", "#223781"])
+            .range(props.disabled ? ["#606060", "#FFFFFF", "#202020" ] : [minColour, midColour, maxColour])
             .clamp(true);
 
         let numShades = props.numShades || 100;
