@@ -15,7 +15,7 @@ const StyledDiv = styled("div")`
     padding-left: 10px;
     padding-right: 10px;
 `
-  
+
 function ValueLabelComponent(props: Props) {
     const { children, open, value } = props;
 

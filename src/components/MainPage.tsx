@@ -17,6 +17,7 @@ import LossGraph from './LossGraph';
 import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
+import ColourScale from './ColourScale';
 
 export interface NNConfig {
     networkShape: number[];
@@ -195,7 +196,7 @@ export interface NetworkState {
 
 
 function MainPage(props: PageProps) {
-    const {minColour, minColourName, maxColour, maxColourName} = useContext(ThemeContext);
+    const {minColour, minColourName, maxColour, maxColourName, midColour} = useContext(ThemeContext);
 
     const [numSamples, setNumSamples] = useState<number>(500);
     const [noise, setNoise] = useState<number>(0.2);
@@ -638,6 +639,17 @@ function MainPage(props: PageProps) {
                     decisionBoundary={decisionBoundary}
                     discreetBoundary={discreetBoundary}
                 />}
+                <ColourScale
+                    width={20}
+                    height={100}
+                    maxColour={maxColour}
+                    minColour={minColour}
+                    midColour={midColour}
+                    maxValue={1}
+                    minValue={-1}
+                    midValue={0}
+                    numShades={100}
+                />
                 <div style={{ marginLeft: "10px" }}>
                     <h3 style={{ marginTop: "0px" }}> Epochs: {epochs} </h3>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
