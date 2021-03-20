@@ -4,7 +4,6 @@ import { Dataset2D } from '../datasets';
 import NNGraph from './NNGraph';
 import { Button, InputLabel, MenuItem, Select, FormControl, Typography, Divider, IconButton } from '@material-ui/core';
 import * as nn from './../NeuralNet';
-import './../MainPage.css';
 import styled from '@emotion/styled';
 import LabeledSlider from './Slider';
 import InfoButton from './InfoButton';
