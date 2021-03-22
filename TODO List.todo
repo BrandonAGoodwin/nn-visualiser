@@ -1,7 +1,7 @@
 Tasks:
     New Tasks:
         ✔ Add axis to line graph @done (15/02/2021, 13:01:17)
-        ☐ Add noSamples slider
+        ✔ Add noSamples slider @done (20/03/2021, 17:37:09)
         ✔ Labels for output graph @done (15/02/2021, 14:50:28)
         ☐ Update auto train button
         ☐ Add more learning rates
@@ -13,13 +13,17 @@ Tasks:
         ☐ Cypress Test Runner
         ☐ Host project on webpage
         ☐ Create questionaire
-        ☐ Achim's Tutor Group#
-        ☐ Separate page for comparison data
+        ☐ Achim's Tutor Group
+        ✔ Separate page for comparison data @done (20/03/2021, 17:36:40)
         ☐ Load data should reset config
-        ☐ Fix hovercard not appearing outside of hidden overflow
+        ✔ Fix hovercard not appearing outside of hidden overflow @done (20/03/2021, 17:36:33)
         ☐ Neuron View
         ☐ Overlay
         ☐ Exercise buttons
         ☐ Custom input
         ☐ Comparison page
         ☐ Remove tooltip text from main code
+        ☐ Reorganise buttons
+        ☐ Refactor buttons
+        ☐ Explain what is seen on the nodes and output graph
+        ☐ Explain what nodes represent
