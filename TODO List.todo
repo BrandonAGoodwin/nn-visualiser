@@ -36,3 +36,4 @@ Tasks:
         ☐ Explain somewhere that mini-batch gradient decent is being used by default
     If I have time:
         ☐ Could create an info panel for Stochastic Gradient Decent
+        ☐ Make a hand crafted overfitting example dataset

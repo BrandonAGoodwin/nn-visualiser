@@ -558,23 +558,6 @@ function MainPage(props: PageProps) {
                     </React.Fragment>
                 </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
-                <LabeledSlider
-                    label={"Batch Size"}
-                    min={1}
-                    step={1}
-                    max={10}
-                    defaultValue={config.batchSize}
-                    onChange={handleBatchSizeChange}
-                    appendValueToLabel={true}
-                />
-                <StyledInfoButton title="Batch Size Tooltip">
-                    <React.Fragment>
-                        {/* <Typography color="inherit">Noise</Typography> */}
-                        {/* Could create an info panel for Stochastic Gradient Decent*/}
-                        <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Dataset</InputLabel>
                     <StyledSelect
@@ -595,6 +578,22 @@ function MainPage(props: PageProps) {
                 </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
                 <LabeledSlider
+                    label="Dataset Size"
+                    min={10}
+                    step={10}
+                    max={500}
+                    defaultValue={numSamples}
+                    onChange={handleNumSamplesChange}
+                    appendValueToLabel={true}
+                />
+                <StyledInfoButton title="Sample Size Tooltip">
+                    <React.Fragment>
+                        {/* <Typography color="inherit">Noise</Typography> */}
+                        <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
+                    </React.Fragment>
+                </StyledInfoButton>
+                <Divider orientation="vertical" flexItem />
+                <LabeledSlider
                     label="Noise"
                     min={0}
                     step={0.1}
@@ -611,18 +610,19 @@ function MainPage(props: PageProps) {
                 </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
                 <LabeledSlider
-                    label="Dataset Size"
-                    min={10}
-                    step={10}
-                    max={500}
-                    defaultValue={numSamples}
-                    onChange={handleNumSamplesChange}
+                    label={"Batch Size"}
+                    min={1}
+                    step={1}
+                    max={10}
+                    defaultValue={config.batchSize}
+                    onChange={handleBatchSizeChange}
                     appendValueToLabel={true}
                 />
-                <StyledInfoButton title="Sample Size Tooltip">
+                <StyledInfoButton title="Batch Size Tooltip">
                     <React.Fragment>
                         {/* <Typography color="inherit">Noise</Typography> */}
-                        <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
+                        {/* Could create an info panel for Stochastic Gradient Decent*/}
+                        <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
             </ConfigBar>
@@ -674,9 +674,9 @@ function MainPage(props: PageProps) {
                     discreetBoundary={discreetBoundary}
                 />}
                 <div style={{ marginLeft: "10px" }}>
-                    <h3 style={{ marginTop: "0px" }}> Epochs: {epochs} </h3>
+                    <p style={{ marginTop: "0px", marginBottom:"0px" }}> Epochs: {epochs} </p>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                        <h3 style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </h3>
+                        <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
                         <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
                             <React.Fragment>
                                 <Typography color="inherit">Loss</Typography>
