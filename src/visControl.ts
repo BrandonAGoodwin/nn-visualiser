@@ -48,7 +48,7 @@ export function getDataset(datasetType: string, numSamples: number, noise: numbe
     return dataset;
 }
 
-export function constructInputs(x: number, y: number, inputs: {[key: string] : boolean}): number[] {
+export function constructInputs(x: number, y: number, inputs: { [key: string]: boolean }): number[] {
     let constructedInputs: number[] = [];
     for (let inputName in INPUTS) {
         if (inputs[inputName]) constructedInputs.push(INPUTS[inputName].f(x, y))
@@ -59,7 +59,7 @@ export function constructInputs(x: number, y: number, inputs: {[key: string] : b
 
 }
 
-export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: {[key: string] : boolean}, batchSize: number): void {
+export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): void {
     for (let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
         nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2, inputs));
@@ -69,7 +69,7 @@ export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRa
 
 }
 
-export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: {[key: string] : boolean}/* , costFunction: nn.CostFunction */): number {
+export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: { [key: string]: boolean }/* , costFunction: nn.CostFunction */): number {
     let totalCost = 0;
     for (let i = 0; i < data.length; i++) {
         let dataPoint = data[i];
@@ -83,7 +83,7 @@ export function copyNetwork(network: nn.Node[][]): nn.Node[][] {
     return nn.copyNetwork(network);
 }
 
-export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: {[key: string] : boolean}): Dataset2D[] {
+export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: { [key: string]: boolean }): Dataset2D[] {
 
     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
@@ -106,7 +106,7 @@ export function getOutputDecisionBoundary(network: nn.Node[][], density: number,
     return boundary;
 }
 
-export function getOutputDecisionBoundary1D(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: {[key: string] : boolean}): number[] {
+export function getOutputDecisionBoundary1D(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: { [key: string]: boolean }): number[] {
 
     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
@@ -128,8 +128,8 @@ export function getOutputDecisionBoundary1D(network: nn.Node[][], density: numbe
     return boundary;
 }
 
-export function getAllDecisionBoundaries(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: {[key: string] : boolean}): { [nodeId: string]: number[] } {
-    let boundaries: {[nodeId:string]: number[]} = {};
+export function getAllDecisionBoundaries(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: { [key: string]: boolean }): { [nodeId: string]: number[] } {
+    let boundaries: { [nodeId: string]: number[] } = {};
 
     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);

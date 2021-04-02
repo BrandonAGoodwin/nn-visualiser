@@ -362,6 +362,10 @@ function MainPage(props: PageProps) {
         setNumSamples(newValue as number);
     }
 
+    const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
+        setConfig({ ...config, batchSize: newValue as number });
+    }
+
     const handleInputNodeClick = (nodeId: string, active: boolean) => {
         // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
         // Change this implemntation input is highly coupled with visControl
@@ -554,6 +558,23 @@ function MainPage(props: PageProps) {
                     </React.Fragment>
                 </StyledInfoButton>
                 <Divider orientation="vertical" flexItem />
+                <LabeledSlider
+                    label={"Batch Size"}
+                    min={1}
+                    step={1}
+                    max={10}
+                    defaultValue={config.batchSize}
+                    onChange={handleBatchSizeChange}
+                    appendValueToLabel={true}
+                />
+                <StyledInfoButton title="Batch Size Tooltip">
+                    <React.Fragment>
+                        {/* <Typography color="inherit">Noise</Typography> */}
+                        {/* Could create an info panel for Stochastic Gradient Decent*/}
+                        <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
+                    </React.Fragment>
+                </StyledInfoButton>
+                <Divider orientation="vertical" flexItem />
                 <StyledFormControl variant="filled">
                     <InputLabel>Dataset</InputLabel>
                     <StyledSelect
@@ -580,6 +601,7 @@ function MainPage(props: PageProps) {
                     max={1}
                     defaultValue={noise}
                     onChange={handleNoiseChange}
+                    appendValueToLabel={true}
                 />
                 <StyledInfoButton title="Noise Tooltip">
                     <React.Fragment>
@@ -595,7 +617,7 @@ function MainPage(props: PageProps) {
                     max={500}
                     defaultValue={numSamples}
                     onChange={handleNumSamplesChange}
-
+                    appendValueToLabel={true}
                 />
                 <StyledInfoButton title="Sample Size Tooltip">
                     <React.Fragment>

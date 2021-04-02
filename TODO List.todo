@@ -32,5 +32,7 @@ Tasks:
         ☐ Explain noise variance relation mathematically
             When noise = 0, variance = 0.5 and when noise = 1, variance = 8 (variance = sigma squared)
         ✔ Implement variance for XOR @done (02/04/2021, 15:56:53)
+        ☐ Fix Slider label font size
+        ☐ Explain somewhere that mini-batch gradient decent is being used by default
     If I have time:
         ☐ Could create an info panel for Stochastic Gradient Decent
