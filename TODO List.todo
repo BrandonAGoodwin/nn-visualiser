@@ -20,10 +20,11 @@ Tasks:
         ☐ Neuron View
         ☐ Overlay
         ☐ Exercise buttons
-        ☐ Custom input
+        ☐ Custom input (Customise weight values)
         ☐ Comparison page
         ☐ Remove tooltip text from main code
         ☐ Reorganise buttons
         ☐ Refactor buttons
         ☐ Explain what is seen on the nodes and output graph
         ☐ Explain what nodes represent
+        Batch size slider
