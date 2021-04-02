@@ -12,8 +12,8 @@ export type DatasetGenerator = (numSamples: number, noise: number) => Dataset2D[
 
 export class Dataset {
 
-    // Could create 3 gauss data quite easily
     public static GAUSSIAN_2: DatasetGenerator = (numSamples, noise) => {
+        // When noise = 0, variance = 0.5 and when noise = 1, variance = 8
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
         let samples: Dataset2D[] = [];
@@ -69,14 +69,14 @@ export class Dataset {
     }
 
     public static XOR: DatasetGenerator = (numSamples, noise) => {
+        let noiseScale = d3.scaleLinear().domain([0, 1]).range([-0.5, 0.5]);
         let samples: Dataset2D[] = [];
-        // Noise currently not implemented
         function generateUniformData(cx1: number, cx2: number, width: number, height: number, y: number) {
             let x1Scale = d3.scaleLinear().domain([0, 1]).range([cx1 - (width / 2), cx1 + (width / 2)]);
             let x2Scale = d3.scaleLinear().domain([0, 1]).range([cx2 - (height / 2), cx2 + (height / 2)]);
             for (let i = 0; i < numSamples / 4; i++) {
-                let x1 = x1Scale(Math.random()) || 0;
-                let x2 = x2Scale(Math.random()) || 0;
+                let x1 = x1Scale(Math.random() + (noiseScale(Math.random()) || 0) * noise) || 0;
+                let x2 = x2Scale(Math.random() + (noiseScale(Math.random()) || 0) * noise) || 0;
                 samples.push({ x1: x1, x2: x2, y: y });
             }
         }
