@@ -23,22 +23,6 @@ interface ContainerBox {
     height: number;
 }
 
-interface NetworkProps {
-    network: nn.Node[][];
-    decisionBoundaries: { [nodeId: string]: number[] };
-    discreetBoundary: boolean;
-    networkWidth: number;
-    networkHeight: number;
-    handleOnClick: any;
-    inputs: { [inputId: string]: boolean };
-    config: NNConfig;
-    addNode: (layer: number) => void;
-    removeNode: (layer: number) => void;
-    addLayer: () => void;
-    removeLayer: () => void;
-    setInfoPanel: any;
-}
-
 enum HoverCardType {
     BIAS,
     WEIGHT
@@ -138,9 +122,86 @@ const FadeCanvas = styled("canvas") <CanvasProps>`
     `}
 `;
 
+// export function generateLineConfig (link: nn.Link, minColour:string, maxColour: string) {
+//     let weightToSize = d3.scaleLinear()
+//         .domain([-1, 0, 1])
+//         .range([6, 1.5, 6])
+//         .clamp(true);
+//     return {
+//         color: (link.weight > 0 ? maxColour : minColour),
+//         size: weightToSize(link.weight),
+//     }
+// }
+
+// export function drawLink(
+//     input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } },
+//     index: number, length: number, nodeWidth: number, minColour: string, maxColour: string, container: any) {
+//     let line = d3.select(container.current).append("path");
+//     let source = node2coord[input.source.id];
+//     let dest = node2coord[input.dest.id];
+//     if (!(dest && source)) return;
+
+//     // Check X and Ys are reversed properlly
+//     let datum: any = {
+//         source:
+//             [source.cx + nodeWidth / 2 + 2, source.cy]
+//         ,
+//         target: [dest.cx - nodeWidth / 2, dest.cy]
+//     };
+
+//     let diagonal = d3.linkHorizontal()
+//         .x(function (d: any) {
+//             return d[0];
+//         }).y(function (d: any) { return d[1]; })
+//     let d = diagonal(datum);
+
+//     let linkConfig = generateLineConfig(input, minColour,  maxColour);
+
+//     d && line.attr("marker-start", "url(#markerArrow)")
+//         .attr("class", "link")
+//         .attr("id", `link-${input.source.id}-${input.dest.id}`)
+//         .attr("d", d)
+//         .attr("fill", "transparent")
+//         .attr("pointer-events", "all")
+//         .attr("stroke", linkConfig.color)
+//         .attr("stroke-width", linkConfig.size || 0)
+//         .attr("stroke-dasharray", "10,2")
+//         .on("mouseover", function (d, i) {
+//             d3.select(this).transition()
+//                 .duration(100000)
+//                 .ease(d3.easeLinear)
+//                 .attr("stroke-dashoffset", -8000)
+//         })
+//         .on("mouseout", function (d, i) {
+//             d3.select(this)
+//                 .transition();
+//         })
+//     return line;
+// }
+
+// function drawLink2() {
+
+// }
+
+interface NetworkProps {
+    network: nn.Node[][];
+    decisionBoundaries: { [nodeId: string]: number[] };
+    discreetBoundary: boolean;
+    networkWidth: number;
+    networkHeight: number;
+    handleOnClick: any;
+    inputs: { [inputId: string]: boolean };
+    config: NNConfig;
+    addNode: (layer: number) => void;
+    removeNode: (layer: number) => void;
+    addLayer: () => void;
+    removeLayer: () => void;
+    setInfoPanel: any;
+}
+
 // Could remove the output node and point straight to the graph
 function NeuralNetworkVis(props: NetworkProps) {
-    const {minColour, maxColour} = useContext(ThemeContext);
+    const { minColour, maxColour } = useContext(ThemeContext);
 
     const svgContainer: any = useRef<any>(null);
     const container: any = useRef<any>(null);
@@ -253,7 +314,7 @@ function NeuralNetworkVis(props: NetworkProps) {
                 for (let j = 0; j < node.linksOut.length; j++) {
                     let link: nn.Link = node.linksOut[j];
 
-                    drawLink(link, node2Coord, j, node.linksOut.length);
+                    drawLink(link, node2Coord);
 
                     iter++;
                 }
@@ -314,8 +375,7 @@ function NeuralNetworkVis(props: NetworkProps) {
     }
 
     function drawLink(
-        input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } },
-        index: number, length: number) {
+        input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } }) {
         let line = d3.select(svgContainer.current).append("path");
         let source = node2coord[input.source.id];
         let dest = node2coord[input.dest.id];
@@ -326,7 +386,7 @@ function NeuralNetworkVis(props: NetworkProps) {
             source:
                 [source.cx + nodeWidth / 2 + 2, source.cy]
             ,
-            target: [dest.cx - nodeWidth / 2, dest.cy + ((index - (length - 1) / 2) / length) * 12]
+            target: [dest.cx - nodeWidth / 2, dest.cy]
         };
 
         let diagonal = d3.linkHorizontal()
@@ -465,7 +525,6 @@ function NeuralNetworkVis(props: NetworkProps) {
                     height={containerBox.height}
                     style={{ position: "absolute", pointerEvents: "none" }}
                     id={'lines-container'}
-                    className={"testg"}
                 />
                 {!network || !linksUpdated && <FadeCanvas visible={true} width={containerBox.width} height={containerBox.height} />}
                 <div style={{ paddingTop: "10px", paddingLeft: "30px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gridArea: "inputs-label" }}>

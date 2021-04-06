@@ -10,7 +10,7 @@ import InfoButton from './InfoButton';
 import DefaultInfoPanel from './InfoPanels/DefaultInfoPanel';
 import LearningInfoRatePanel from './InfoPanels/LearningRateInfoPanel';
 import ActivationInfoPanel from './InfoPanels/ActivationInfoPanel';
-import { ArrowBackIos, ArrowForwardIos, GitHub } from '@material-ui/icons';
+import { ArrowBackIos, ArrowForwardIos, GitHub, Home } from '@material-ui/icons';
 import DatasetInfoPanel from './InfoPanels/DatasetInfoPanel';
 import NeuralNetworkVis from './NeuralNetworkVis';
 import LossGraph from './LossGraph';
@@ -518,6 +518,10 @@ function MainPage(props: PageProps) {
         }
     }
 
+    const handleInfoPanelHome = () => {
+        setInfoPanelWrapper(<DefaultInfoPanel{...config}/>);
+    }
+
     return (
         <Container id="main-page">
             <ConfigBar>
@@ -718,6 +722,9 @@ function MainPage(props: PageProps) {
                 <div style={{ position: "absolute", right: "40px", top: "30px" }}>
                     <IconButton onClick={handleInfoPanelBackward}>
                         <ArrowBackIos />
+                    </IconButton>
+                    <IconButton onClick={handleInfoPanelHome}>
+                        <Home fontSize={"large"}/>
                     </IconButton>
                     <IconButton onClick={handleInfoPanelForward}>
                         <ArrowForwardIos />
