@@ -1,6 +1,6 @@
 import React from "react";
 import { DefinedTerm, DefX1, DefX2 } from "../Definitions";
-import { NNConfig } from "../MainPage";
+import { NNConfig } from "../../Network";
 
 function DatasetInfoPanel(props: NNConfig) {
 

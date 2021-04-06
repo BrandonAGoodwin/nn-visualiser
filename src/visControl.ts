@@ -1,8 +1,7 @@
 import * as nn from "./NeuralNet";
 import { Dataset2D, DatasetGenerator, Dataset } from "./datasets";
-import { NNConfig } from "./components/MainPage";
 import * as d3 from "d3";
-import seedrandom from "seedrandom";
+import { NNConfig } from "./Network";
 
 
 interface InputFunc {

@@ -18,20 +18,26 @@ import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
 import ColourScale from './ColourScale';
+import { NNConfig } from '../Network';
+import { useDispatch, useSelector } from 'react-redux';
+import * as nr from "../NetworkReducer";
 
-export interface NNConfig {
-    networkShape: number[];
-    activationFunction: string;
-    learningRate: number;
-    inputs: { [key: string]: boolean };
-    batchSize: number;
-}
+// export interface NNConfig {
+//     networkShape: number[];
+//     activationFunction: string;
+//     learningRate: number;
+//     inputs: { [key: string]: boolean };
+//     batchSize: number;
+// }
 
 interface PageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
     updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
+    addLayer: () => void;
+    removeLayer: () => void;
+    // config: NNConfig;
 }
 
 const StyledButton = styled(Button)`
@@ -196,29 +202,34 @@ export interface NetworkState {
 
 
 function MainPage(props: PageProps) {
+    const config = useSelector<nr.NetworkState, nr.NetworkState["config"]>((state) => state.config)
+    const dispatch = useDispatch();
+    console.log(config)
+    const { addLayer, removeLayer } = props;
+
     const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
 
     const [numSamples, setNumSamples] = useState<number>(100);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian2");
     const [dataset, setDataset] = useState<Dataset2D[]>([]);
-    const [config, setConfig] = useState<NNConfig>(
-        {
-            networkShape: [2, 2, 2, 1],
-            activationFunction: "Tanh",
-            learningRate: 0.03,
-            inputs: {
-                "x": true,
-                "y": true,
-                "xSquared": false,
-                "ySquared": false,
-                "xTimesY": false,
-                "sinX": false,
-                "sinY": false
-            },
-            batchSize: 10, // CHange this back to 10
-        }
-    );
+    // const [config, setConfig] = useState<NNConfig>(
+    //     {
+    //         networkShape: [2, 2, 2, 1],
+    //         activationFunction: "Tanh",
+    //         learningRate: 0.03,
+    //         inputs: {
+    //             "x": true,
+    //             "y": true,
+    //             "xSquared": false,
+    //             "ySquared": false,
+    //             "xTimesY": false,
+    //             "sinX": false,
+    //             "sinY": false
+    //         },
+    //         batchSize: 10, // CHange this back to 10
+    //     }
+    // );
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
@@ -237,6 +248,8 @@ function MainPage(props: PageProps) {
     const [infoPanelFuture, setInfoPanelFuture] = useState<JSX.Element[]>([]);
 
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
+
+    
 
     useEffect(() => {
         console.log("Config change useEffect");
@@ -338,11 +351,11 @@ function MainPage(props: PageProps) {
     };
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({ ...config, activationFunction: e.target.value as string });
+        // setConfig({ ...config, activationFunction: e.target.value as string });
     };
 
     const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setConfig({ ...config, learningRate: e.target.value as number });
+        // setConfig({ ...config, learningRate: e.target.value as number });
     };
 
     const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
@@ -363,7 +376,7 @@ function MainPage(props: PageProps) {
     }
 
     const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
-        setConfig({ ...config, batchSize: newValue as number });
+        // setConfig({ ...config, batchSize: newValue as number });
     }
 
     const handleInputNodeClick = (nodeId: string, active: boolean) => {
@@ -385,39 +398,39 @@ function MainPage(props: PageProps) {
             newInputs[nodeId] = true;
             newNetworkShape[0] = newNetworkShape[0] + 1;
         }
-        setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
+        // setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     }
 
-    const removeLayer = () => {
-        console.log("Running removeLayer");
-        if (config.networkShape.length > 2) {
-            let newNetworkShape = config.networkShape;
-            newNetworkShape.pop();
-            newNetworkShape.pop();
-            newNetworkShape.push(1);
-            console.log(newNetworkShape);
-            setConfig({ ...config, networkShape: newNetworkShape });
-        }
-    }
+    // const removeLayer = () => {
+    //     console.log("Running removeLayer");
+    //     if (config.networkShape.length > 2) {
+    //         let newNetworkShape = config.networkShape;
+    //         newNetworkShape.pop();
+    //         newNetworkShape.pop();
+    //         newNetworkShape.push(1);
+    //         console.log(newNetworkShape);
+    //         setConfig({ ...config, networkShape: newNetworkShape });
+    //     }
+    // }
 
-    const addLayer = () => {
-        console.log("Running addLayer");
-        if (config.networkShape.length < 6) {
-            let newNetworkShape = config.networkShape;
-            newNetworkShape.pop();
-            newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
-            newNetworkShape.push(1);
-            console.log(newNetworkShape);
-            setConfig({ ...config, networkShape: newNetworkShape });
-        }
-    }
+    // const addLayer = () => {
+    //     console.log("Running addLayer");
+    //     if (config.networkShape.length < 6) {
+    //         let newNetworkShape = config.networkShape;
+    //         newNetworkShape.pop();
+    //         newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
+    //         newNetworkShape.push(1);
+    //         console.log(newNetworkShape);
+    //         setConfig({ ...config, networkShape: newNetworkShape });
+    //     }
+    // }
 
     const removeNode = (layerNum: number) => {
         console.log("Running removeNode");
         if (config.networkShape[layerNum] > 1) {
             let newNetworkShape = config.networkShape;
             newNetworkShape[layerNum] = config.networkShape[layerNum] - 1;
-            setConfig({ ...config, networkShape: newNetworkShape });
+            // setConfig({ ...config, networkShape: newNetworkShape });
         }
     }
 
@@ -426,7 +439,7 @@ function MainPage(props: PageProps) {
         if (config.networkShape[layerNum] < 5) {
             let newNetworkShape = config.networkShape;
             newNetworkShape[layerNum] = config.networkShape[layerNum] + 1;
-            setConfig({ ...config, networkShape: newNetworkShape });
+            // setConfig({ ...config, networkShape: newNetworkShape });
         }
     }
 

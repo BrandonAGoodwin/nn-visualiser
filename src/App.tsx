@@ -8,7 +8,25 @@ import ComparePage from './components/ComparePage';
 import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { AppState } from "./store/rootStore";
+import { addLayer, removeLayer } from "./store/network/NetworkActions"
+import { NNConfig } from "./Network";
 
+interface AppProps {
+    addLayer: () => void;
+    removeLayer: () => void;
+}
+
+const mapStateToProps = (state: AppState) => ({
+    config: state.networkReducer.config
+})
+
+const mapDispatchToProps = (dispatch: Dispatch): AppProps => ({
+    addLayer: () => dispatch(addLayer()),
+    removeLayer: () => dispatch(removeLayer())
+})
 
 // export const ThemeContext = createContext<Partial<ThemeProps>>({});
 
@@ -80,7 +98,7 @@ const TransitionButton = styled(IconButton)`
     top: 50%;
     left: 95%;
     z-index: 500;
-    transition: all ${(props: {transitioning: boolean}) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
+    transition: all ${(props: { transitioning: boolean }) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
     &.active {
         left: 5%;
     }
@@ -91,8 +109,8 @@ interface ComparisonData {
     savedState: NetworkState;
 }
 
-function App() {
-    const {background} = useContext(ThemeContext);
+function App(props: AppProps) {
+    const { background } = useContext(ThemeContext);
 
     const mainContainer = createRef<HTMLDivElement>();
 
@@ -104,17 +122,17 @@ function App() {
     const [comparisonData, setComparisonData] = useState<ComparisonData>();
 
     const updateComparisionData = (currentState: NetworkState, savedState: NetworkState) => {
-        setComparisonData({currentState: currentState, savedState: savedState});
+        setComparisonData({ currentState: currentState, savedState: savedState });
     }
 
     useEffect(() => {
-        if(transitioning) {
+        if (transitioning) {
             updateButtonPosition();
         }
     }, [transitioning])
 
     useEffect(() => {
-        setTimeout(function() {
+        setTimeout(function () {
             console.log(pageState);
             setTransitioning(false);
             updateContainerSize();
@@ -199,14 +217,14 @@ function App() {
 
         let button = document.getElementById("transition-button");
 
-        if(!button) return;
+        if (!button) return;
 
 
         console.log("Margin added: " + marginAdded);
         console.log("Transitioning: " + transitioning);
         console.log("Pagestate: " + pageState);
 
-        if(transitioning) {
+        if (transitioning) {
             button.style.left = pageState === "compare" ? "5%" : "95%";
             return;
         }
@@ -265,17 +283,17 @@ function App() {
         updateContainerSize();
         updateButtonPosition();
     });
-    
-    useEventListener("scroll",  updateButtonPosition, mainContainer);
+
+    useEventListener("scroll", updateButtonPosition, mainContainer);
 
     return (
         // <ThemeContext.Consumer>
         <AuxContainer>
-        <Global
-          styles={css`
+            <Global
+                styles={css`
             body {
               background: ${background}
-            }`}/>
+            }`} />
             <Container id="main-container" className="animated main" ref={mainContainer}>
                 {/* <StyledMargin/> */}
                 <StyledMainPage
@@ -283,6 +301,7 @@ function App() {
                     yDomain={[-8, 8]}
                     numCells={100}
                     updateComparisionData={updateComparisionData}
+                    {...props}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>
@@ -292,11 +311,12 @@ function App() {
             </TransitionButton>
             <Container id="compare-container" className="animated compare">
                 <StyledMargin id="dynamic-margin-compare" />
-                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
+                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState} />
             </Container>
         </AuxContainer>
         // </ThemeContext.Consumer>
     );
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+// export default App;

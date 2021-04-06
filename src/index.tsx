@@ -6,15 +6,18 @@ import { StylesProvider } from '@material-ui/core';
 import { ThemeProvider } from './contexts/ThemeContext';
 //import reportWebVitals from './reportWebVitals';
 
-
+import { Provider } from "react-redux";
+import { store } from "./store/rootStore";
 
 ReactDOM.render(
     <React.StrictMode>
-        <StylesProvider injectFirst>
-            <ThemeProvider>
-                <App />
-            </ThemeProvider>
-        </StylesProvider>
+        <Provider store={store}>
+            <StylesProvider injectFirst>
+                <ThemeProvider>
+                    <App />
+                </ThemeProvider>
+            </StylesProvider>
+        </Provider>
     </React.StrictMode>,
     document.getElementById('root')
 );

@@ -1,8 +1,8 @@
 import React, { useContext, useRef } from "react";
-import { NNConfig } from "../MainPage";
 import positiveLink from "../../PositiveLink.png";
 import negativeLink from "../../NegativeLink.png";
 import { ThemeContext } from "../../contexts/ThemeContext";
+import { NNConfig } from "../../Network";
 
 function DefaultInfoPanel(props: NNConfig) {
     // const linkSvgContainer: any = useRef<any>(null);
