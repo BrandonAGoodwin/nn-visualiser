@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/nn-visualiser/static/css/main.acb28296.chunk.css",
+    "main.js": "/nn-visualiser/static/js/main.5f206369.chunk.js",
+    "main.js.map": "/nn-visualiser/static/js/main.5f206369.chunk.js.map",
+    "runtime-main.js": "/nn-visualiser/static/js/runtime-main.c053de11.js",
+    "runtime-main.js.map": "/nn-visualiser/static/js/runtime-main.c053de11.js.map",
+    "static/js/2.ce5665de.chunk.js": "/nn-visualiser/static/js/2.ce5665de.chunk.js",
+    "static/js/2.ce5665de.chunk.js.map": "/nn-visualiser/static/js/2.ce5665de.chunk.js.map",
+    "index.html": "/nn-visualiser/index.html",
+    "static/css/main.acb28296.chunk.css.map": "/nn-visualiser/static/css/main.acb28296.chunk.css.map",
+    "static/js/2.ce5665de.chunk.js.LICENSE.txt": "/nn-visualiser/static/js/2.ce5665de.chunk.js.LICENSE.txt",
+    "static/media/Sigmoid-function-2.8e7151dc.svg": "/nn-visualiser/static/media/Sigmoid-function-2.8e7151dc.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.c053de11.js",
+    "static/js/2.ce5665de.chunk.js",
+    "static/css/main.acb28296.chunk.css",
+    "static/js/main.5f206369.chunk.js"
+  ]
+}
