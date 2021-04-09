@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-
+// Maybe refactor to Datapoint
 export type Dataset2D = {
     x1: number,
     x2: number,
@@ -37,7 +37,7 @@ export class Dataset {
         generateGaussianData(-3, -3, -1);
         generateGaussianData(3, 3, 1);
 
-        return samples;
+        return shuffle(samples);
     }
 
     public static GAUSSIAN_3: DatasetGenerator = (numSamples, noise) => {
@@ -65,7 +65,7 @@ export class Dataset {
         generateGaussianData(0, 0, 1);
         generateGaussianData(4, 4, -1);
 
-        return samples;
+        return shuffle(samples);
     }
 
     public static XOR: DatasetGenerator = (numSamples, noise) => {
@@ -86,7 +86,7 @@ export class Dataset {
         generateUniformData(-8 / 2, -8 / 2, 8, 8, -1);   // Bottom left -1
         generateUniformData(8 / 2, -8 / 2, 8, 8, 1);     // Bottom right +1
 
-        return samples;
+        return shuffle(samples);
     }
 }
 
@@ -113,3 +113,22 @@ function normalDistribution(mean: number, variance: number): number {
 
     return mean + Math.sqrt(variance) * y;
 }
+
+function shuffle(dataset: Dataset2D[]): Dataset2D[] {
+    var currentIndex = dataset.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = dataset[currentIndex];
+      dataset[currentIndex] = dataset[randomIndex];
+      dataset[randomIndex] = temporaryValue;
+    }
+  
+    return dataset;
+  }
