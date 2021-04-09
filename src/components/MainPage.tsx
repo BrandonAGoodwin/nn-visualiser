@@ -18,14 +18,15 @@ import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
 import ColourScale from './ColourScale';
+import { NetworkController, NNConfig } from '../NetworkController';
 
-export interface NNConfig {
-    networkShape: number[];
-    activationFunction: string;
-    learningRate: number;
-    inputs: { [key: string]: boolean };
-    batchSize: number;
-}
+// export interface NNConfig {
+//     networkShape: number[];
+//     activationFunction: string;
+//     learningRate: number;
+//     inputs: { [key: string]: boolean };
+//     batchSize: number;
+// }
 
 interface PageProps {
     xDomain: number[];
@@ -198,12 +199,7 @@ export interface NetworkState {
 function MainPage(props: PageProps) {
     const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
 
-    const [numSamples, setNumSamples] = useState<number>(100);
-    const [noise, setNoise] = useState<number>(0.2);
-    const [datasetType, setDatasetType] = useState<string>("Gaussian2");
-    const [dataset, setDataset] = useState<Dataset2D[]>([]);
-    const [config, setConfig] = useState<NNConfig>(
-        {
+    const defaultConfig: NNConfig = {
             networkShape: [2, 2, 2, 1],
             activationFunction: "Tanh",
             learningRate: 0.03,
@@ -216,54 +212,91 @@ function MainPage(props: PageProps) {
                 "sinX": false,
                 "sinY": false
             },
-            batchSize: 10, // CHange this back to 10
-        }
-    );
-    const [network, setNetwork] = useState<nn.Node[][]>();
-    const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
-    const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
-    const [loss, setLoss] = useState<number>(0);
-    const [epochs, setEpochs] = useState<number>(0);
+            batchSize: 10,
+            datasetType: "Gaussian2",
+            numSamples: 100,
+            noise: 0.2,
+            dataset: [], // Probably shouldn't be in here
+            decisionBoundaries: {}, // Probably shouldn't be in here
+            decisionBoundary: [], // Probably shouldn't in in here / should be refactored entirely
+            epochs: 0, // Probably shouldn't be in here
+            loss: 0, // Probably shouldn't be in here
+            lossData: [], // Probably shouldn't be in here
+
+    }
+
+    const [numSamples, setNumSamples] = useState<number>(100);
+    const [noise, setNoise] = useState<number>(0.2);
+    const [datasetType, setDatasetType] = useState<string>("Gaussian2");
+    const [dataset, setDataset] = useState<Dataset2D[]>([]);
+    // const [config, setConfig] = useState<NNConfig>(
+    //     {
+    //         networkShape: [2, 2, 2, 1],
+    //         activationFunction: "Tanh",
+    //         learningRate: 0.03,
+    //         inputs: {
+    //             "x": true,
+    //             "y": true,
+    //             "xSquared": false,
+    //             "ySquared": false,
+    //             "xTimesY": false,
+    //             "sinX": false,
+    //             "sinY": false
+    //         },
+    //         batchSize: 10, // CHange this back to 10
+    //     }
+    // );
+    // const [network, setNetwork] = useState<nn.Node[][]>();
+    // const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
+    // const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
+    // const [loss, setLoss] = useState<number>(0);
+    // const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
     const [lossData, setLossData] = useState<[number, number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
-    const [networkSeed, setNetworkSeed] = useState<string>();
-    const [compareMode, setCompareMode] = useState<boolean>(false);
+    // const [networkSeed, setNetworkSeed] = useState<string>();
+    // const [compareMode, setCompareMode] = useState<boolean>(false);
     const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config} />);
-    const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
-    const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
+    // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
+    // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
     const [infoPanelHistory, setInfoPanelHistory] = useState<JSX.Element[]>([]);
     const [infoPanelFuture, setInfoPanelFuture] = useState<JSX.Element[]>([]);
 
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
+
+    const [networkController, setNetworkController] = useState<NetworkController>();
+
+    useEffect(() => {
+        setNetworkController(new NetworkController(defaultConfig));
+    }, []);
 
     useEffect(() => {
         console.log("Config change useEffect");
         if (training) toggleAutoTrain();
         generateNetwork();
         generateDataset();
-    }, [config])
+    }, [config]);
 
     useEffect(() => {
         updateDecisionBoundary();
-    }, [decisionBoundaries])
+    }, [decisionBoundaries]);
 
     useEffect(() => {
         console.log("Config change useEffect");
         updateDecisionBoundaries();
-    }, [network])
+    }, [network]);
 
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
         reset();
-    }, [datasetType, noise, numSamples])
+    }, [datasetType, noise, numSamples]);
 
     useEffect(() => {
         if (epochs === 0 || !network) return;
         setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
-    }, [epochs])
+    }, [epochs]);
 
 
     const generateDataset = () => {
