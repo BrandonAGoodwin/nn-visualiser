@@ -9,6 +9,7 @@ import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
 import { useNetwork } from "./NetworkController";
+import { useDatasetGenerator } from "./DatasetGenerator";
 
 
 // export const ThemeContext = createContext<Partial<ThemeProps>>({});
@@ -94,7 +95,8 @@ interface ComparisonData {
 
 function App() {
     const {background} = useContext(ThemeContext);
-    const { config } = useNetwork();
+    const { nnConfig } = useNetwork();
+    const { dgConfig } = useDatasetGenerator();
     const mainContainer = createRef<HTMLDivElement>();
 
     const [pageState, setPageState] = useState<string>("main");
@@ -270,7 +272,6 @@ function App() {
     useEventListener("scroll",  updateButtonPosition, mainContainer);
 
     return (
-        // <ThemeContext.Consumer>
         <AuxContainer>
         <Global
           styles={css`
@@ -284,7 +285,8 @@ function App() {
                     yDomain={[-8, 8]}
                     numCells={100}
                     updateComparisionData={updateComparisionData}
-                    nnConfig={config}
+                    nnConfig={nnConfig}
+                    dgConfig={dgConfig}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>
@@ -297,7 +299,6 @@ function App() {
                 <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
             </Container>
         </AuxContainer>
-        // </ThemeContext.Consumer>
     );
 }
 

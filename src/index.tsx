@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { StylesProvider } from '@material-ui/core';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { InfoPanelProvider } from './contexts/InfoPanelContext';
 //import reportWebVitals from './reportWebVitals';
 
 
@@ -12,7 +13,9 @@ ReactDOM.render(
     <React.StrictMode>
         <StylesProvider injectFirst>
             <ThemeProvider>
-                <App />
+                <InfoPanelProvider>
+                    <App />
+                </InfoPanelProvider>
             </ThemeProvider>
         </StylesProvider>
     </React.StrictMode>,

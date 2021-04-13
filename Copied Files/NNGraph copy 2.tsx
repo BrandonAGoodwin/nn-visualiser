@@ -1,21 +1,21 @@
 // import React, { Component, createRef } from 'react'
 // import * as d3 from 'd3'
 // import * as vis from '../visControl'
-// import { Dataset2D } from '../datasets';
+// import { Datapoint2D } from '../datasets';
 
 // type GraphProps = {
-//     dataset: Dataset2D[],
+//     dataset: Datapoint2D[],
 //     density: number,
 //     canvasWidth: number;
 //     margin: number,
 //     numCells: number;
 //     xDomain: number[];
 //     yDomain: number[];
-//     decisionBoundary: Dataset2D[];
+//     decisionBoundary: Datapoint2D[];
 // }
 
 // type GraphState = {
-//     decisionBoundary: Dataset2D[]
+//     decisionBoundary: Datapoint2D[]
 //     svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>
 // }
 
@@ -82,7 +82,7 @@
 //             .enter().append('circle')
 //             .attr('class', 'circle')
 //             .attr("r", 5)
-//             .attr("fill", function (datapoint: Dataset2D): string {
+//             .attr("fill", function (datapoint: Datapoint2D): string {
 //                 let colour = "black";
 //                 if (datapoint.y === 1) colour = "#621fa2";
 //                 //if(datapoint.y === -1) color = "#F50000";//"#fbfb39";
@@ -91,15 +91,15 @@
 //                 return colour;
 //             })
 //             .style("stroke", "white")
-//             .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2) + this.margin)
-//             .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2) + this.margin)
+//             .attr("cx", (datapoint: Datapoint2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2) + this.margin)
+//             .attr("cy", (datapoint: Datapoint2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2) + this.margin)
 
 
 //     }
 
 
 
-//     updateBackground(svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>, data: Dataset2D[], discretize: boolean): void {
+//     updateBackground(svgCanvas: d3.Selection<SVGGElement, unknown, null, undefined>, data: Datapoint2D[], discretize: boolean): void {
 
 //         let cellWidth = (this.canvasWidth / (this.props.numCells)) // this.scale
 //         let cellHeight = cellWidth
@@ -125,11 +125,11 @@
 //         svgCanvas.selectAll("rect")
 //             .data(data)
 //             .enter().append("rect")
-//             .attr("x", (datapoint: Dataset2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2))
-//             .attr("y", (datapoint: Dataset2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2)) // Note will probably need to be flipped
+//             .attr("x", (datapoint: Datapoint2D) => (datapoint.x1 * this.scale) + (this.canvasWidth / 2))
+//             .attr("y", (datapoint: Datapoint2D) => -(datapoint.x2 * this.scale) + (this.canvasHeight / 2)) // Note will probably need to be flipped
 //             .attr("width", cellWidth)
 //             .attr("height", cellHeight)
-//             .attr("fill", (datapoint: Dataset2D) => {
+//             .attr("fill", (datapoint: Datapoint2D) => {
 //                 let value = datapoint.y < 0.5 ? 0 : 1
 //                 return color(value) || "#FF0000"
 //             })

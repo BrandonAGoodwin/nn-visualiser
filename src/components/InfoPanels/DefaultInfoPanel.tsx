@@ -4,7 +4,7 @@ import positiveLink from "../../PositiveLink.png";
 import negativeLink from "../../NegativeLink.png";
 import { ThemeContext } from "../../contexts/ThemeContext";
 
-function DefaultInfoPanel(props: NNConfig) {
+function DefaultInfoPanel() {
     // const linkSvgContainer: any = useRef<any>(null);
     // const drawDemoLink = () => {
 

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
-import { Dataset2D } from '../datasets';
+import { Datapoint2D } from '../datasets';
 import NNGraph from './NNGraph';
 import { Button, InputLabel, MenuItem, Select, FormControl, Typography, Divider, IconButton } from '@material-ui/core';
 import * as nn from './../NeuralNet';
@@ -19,6 +19,10 @@ import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
 import ColourScale from './ColourScale';
 import { NNConfig, useNetwork } from '../NetworkController';
+import { InfoPanelContext } from '../contexts/InfoPanelContext';
+import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
+import ConfigBar from './ConfigBar';
+import ControlPanel from './ControlPanel';
 
 // export interface NNConfig {
 //     networkShape: number[];
@@ -34,11 +38,12 @@ interface PageProps {
     numCells: number;
     updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
     nnConfig: NNConfig;
+    dgConfig: DGConfig;
 }
 
-const StyledButton = styled(Button)`
-    margin: 5px;
-`;
+// const StyledButton = styled(Button)`
+//     margin: 5px;
+// `;
 
 const StyledFormControl = styled(FormControl)`
     margin-left: 10px;
@@ -87,7 +92,7 @@ const LinksDiv = styled("div")`
 `;
 
 
-const ContainerSection = styled("div")`
+export const ContainerSection = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
@@ -105,24 +110,24 @@ const ContainerSection = styled("div")`
 `;
 
 // Fix so that this doesn't use hard coded paddings
-const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar" {...props} />)`
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    padding-left: 30px;
-    padding-top: 10px;
-`;
+// const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar" {...props} />)`
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: left;
+//     padding-left: 30px;
+//     padding-top: 10px;
+// `;
 
-const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-    justify-content: left;
-`;
+// const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
+//     display: flex;
+//     flex-direction: column;
+//     align-items: stretch;
+//     padding-top: 15px;
+//     padding-bottom: 15px;
+//     padding-left: 10px;
+//     padding-right: 10px;
+//     justify-content: left;
+// `;
 
 const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network" {...props} />)`
     display: flex;
@@ -187,7 +192,7 @@ const ColouredBox = styled("div")`
 export interface NetworkState {
     noise: number;
     datasetType: string;
-    dataset: Dataset2D[];
+    dataset: Datapoint2D[];
     config: NNConfig;
     decisionBoundaries: { [nodeId: string]: number[] };
     decisionBoundary: number[];
@@ -196,11 +201,24 @@ export interface NetworkState {
     lossData: [number, number][];
 }
 
-
 function MainPage(props: PageProps) {
-    const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
+    const { minColour,
+        minColourName,
+        maxColour,
+        maxColourName,
+        midColour
+    } = useContext(ThemeContext);
+
     const {
-        config,
+        infoPanelData,
+        setInfoPanelWrapper,
+        handleInfoPanelForward,
+        handleInfoPanelBackward,
+        handleInfoPanelHome
+    } = useContext(InfoPanelContext);
+
+    const {
+        nnConfig,
         network,
         setActivationFunction,
         setLearningRate,
@@ -213,54 +231,17 @@ function MainPage(props: PageProps) {
         addLayer,
         removeLayer
     } = useNetwork(props.nnConfig);
-    /* const defaultConfig: NNConfig = {
-        networkShape: [2, 2, 2, 1],
-        activationFunction: "Tanh",
-        learningRate: 0.03,
-        inputs: {
-            "x": true,
-            "y": true,
-            "xSquared": false,
-            "ySquared": false,
-            "xTimesY": false,
-            "sinX": false,
-            "sinY": false
-        },
-        batchSize: 10,
-        datasetType: "Gaussian2",
-        numSamples: 100,
-        noise: 0.2,
-        // dataset: [], // Probably shouldn't be in here
-        // decisionBoundaries: {}, // Probably shouldn't be in here
-        // decisionBoundary: [], // Probably shouldn't in in here / should be refactored entirely
-        // epochs: 0, // Probably shouldn't be in here
-        // loss: 0, // Probably shouldn't be in here
-        // lossData: [], // Probably shouldn't be in here
 
-    } */
+    const {
+        dgConfig,
+        generateDataset,
+        trainingData,
+        testData,
+        setDatasetType,
+        setNoise,
+        setNumSamples,
+    } = useDatasetGenerator(props.dgConfig);
 
-    const [numSamples, setNumSamples] = useState<number>(100);
-    const [noise, setNoise] = useState<number>(0.2);
-    const [datasetType, setDatasetType] = useState<string>("Gaussian2");
-    const [dataset, setDataset] = useState<Dataset2D[]>([]);
-    // const [config, setConfig] = useState<NNConfig>(
-    //     {
-    //         networkShape: [2, 2, 2, 1],
-    //         activationFunction: "Tanh",
-    //         learningRate: 0.03,
-    //         inputs: {
-    //             "x": true,
-    //             "y": true,
-    //             "xSquared": false,
-    //             "ySquared": false,
-    //             "xTimesY": false,
-    //             "sinX": false,
-    //             "sinY": false
-    //         },
-    //         batchSize: 10, // CHange this back to 10
-    //     }
-    // );
-    // const [network, setNetwork] = useState<nn.Node[][]>();
     const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
     const [loss, setLoss] = useState<number>(0);
@@ -269,13 +250,9 @@ function MainPage(props: PageProps) {
     const [lossData, setLossData] = useState<[number, number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
-    // const [networkSeed, setNetworkSeed] = useState<string>();
     const [compareMode, setCompareMode] = useState<boolean>(false);
-    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config}  />);
     // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
-    // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
-    const [infoPanelHistory, setInfoPanelHistory] = useState<JSX.Element[]>([]);
-    const [infoPanelFuture, setInfoPanelFuture] = useState<JSX.Element[]>([]);
+    // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
 
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
@@ -284,7 +261,7 @@ function MainPage(props: PageProps) {
         if (training) toggleAutoTrain();
         // generateNetwork();
         generateDataset();
-    }, [config]);
+    }, [nnConfig]);
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -303,14 +280,14 @@ function MainPage(props: PageProps) {
 
     useEffect(() => {
         if (epochs === 0 || !network) return;
-        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
+        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]));
     }, [epochs]);
 
 
-    const generateDataset = () => {
-        console.log("Generating dataset");
-        setDataset(vis.getDataset(datasetType, numSamples, noise));
-    }
+    // const generateDataset = () => {
+    //     console.log("Generating dataset");
+    //     setDataset(vis.getDataset(datasetType, numSamples, noise));
+    // }
 
     // const generateNetwork = () => {
     //     console.log("Generating network");
@@ -336,14 +313,14 @@ function MainPage(props: PageProps) {
         console.log("Updating decision boundaries");
         if (network) {
             // Don't like numcells having to be the same
-            setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, config.inputs));
-            dataset && setLoss(vis.getCost(network, dataset, config.inputs));
+            setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, nnConfig.inputs));
+            trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
         }
     }
 
     const updateDecisionBoundary = () => {
         console.log("Updating decision boundary");
-        network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
+        network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, nnConfig.inputs));
     }
 
     const handleReset = () => {
@@ -357,7 +334,7 @@ function MainPage(props: PageProps) {
 
     const handleStep = () => {
         console.log("HandleStep")
-        step(dataset);
+        step(trainingData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
@@ -382,7 +359,7 @@ function MainPage(props: PageProps) {
     // };
 
     const toggleDiscreetOutput = () => {
-        setDiscreetBoundary(!discreetBoundary);
+        setDiscreetBoundary((prevDiscreetBoundary) => !prevDiscreetBoundary);
     };
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
@@ -394,38 +371,38 @@ function MainPage(props: PageProps) {
         // Do I want a whole new controller made or just to change the current one?
     };
 
-    const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        // setConfig({ ...config, learningRate: e.target.value as number });
-        setLearningRate(e.target.value as number);
-    };
+    // const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    //     // setConfig({ ...config, learningRate: e.target.value as number });
+    //     setLearningRate(e.target.value as number);
+    // };
 
-    const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setDatasetType(e.target.value as string);
-    };
+    // const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    //     setDatasetType(e.target.value as string);
+    // };
 
     const handleRegenerateDataset = () => {
         generateDataset();
         if (training) toggleAutoTrain();
     };
 
-    const handleNoiseChange = (e: any, newValue: number | number[]) => {
-        setNoise(newValue as number);
-    };
+    // const handleNoiseChange = (e: any, newValue: number | number[]) => {
+    //     setNoise(newValue as number);
+    // };
 
-    const handleNumSamplesChange = (e: any, newValue: number | number[]) => {
-        setNumSamples(newValue as number);
-    }
+    // const handleNumSamplesChange = (e: any, newValue: number | number[]) => {
+    //     setNumSamples(newValue as number);
+    // }
 
-    const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
-        // setConfig({ ...config, batchSize: newValue as number });
-        setBatchSize(newValue as number);
-    }
+    // const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
+    //     // setConfig({ ...config, batchSize: newValue as number });
+    //     setBatchSize(newValue as number);
+    // }
 
-    const handleInputNodeClick = (nodeId: string, active: boolean) => {
-        // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
-        // Change this implemntation input is highly coupled with visControl
-        toggleInputNode(nodeId, active);
-    }
+    // const handleInputNodeClick = (nodeId: string, active: boolean) => {
+    //     // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
+    //     // Change this implemntation input is highly coupled with visControl
+    //     toggleInputNode(nodeId, active);
+    // }
 
     // const removeLayer = () => {
     // console.log("Running removeLayer");
@@ -487,14 +464,16 @@ function MainPage(props: PageProps) {
     // }
 
     const toggleAutoTrain = () => {
-        if (training) {
-            clearInterval(trainingInterval);
-        } else {
-            setTrainingInterval(setInterval(() => {
-                handleStep();
-            }, 500));
-        }
-        setTraining(!training);
+        setTraining((training) => {
+            if (training) {
+                clearInterval(trainingInterval);
+            } else {
+                setTrainingInterval(setInterval(() => {
+                    handleStep();
+                }, 500));
+            }
+            return !training;
+        })
     }
 
     // const saveNetworkState = () => {
@@ -519,172 +498,74 @@ function MainPage(props: PageProps) {
     //     setCompareMode(false);
     // }
 
-    const setInfoPanelWrapper = (newInfoPanel: JSX.Element) => {
-        console.log(newInfoPanel);
-        let newInfoPanelHistory = infoPanelHistory;
-        newInfoPanelHistory.push(infoPanel);
-        console.log(newInfoPanelHistory);
-        console.log(infoPanel)
-        setInfoPanel(newInfoPanel);
-        setInfoPanelHistory(newInfoPanelHistory);
-        setInfoPanelFuture([]);
-    }
+    // const setInfoPanelWrapper = (newInfoPanel: JSX.Element) => {
+    //     console.log(newInfoPanel);
+    //     let newInfoPanelHistory = infoPanelHistory;
+    //     newInfoPanelHistory.push(infoPanel);
+    //     console.log(newInfoPanelHistory);
+    //     console.log(infoPanel)
+    //     setInfoPanel(newInfoPanel);
+    //     setInfoPanelHistory(newInfoPanelHistory);
+    //     setInfoPanelFuture([]);
+    // }
 
-    const handleInfoPanelForward = () => {
-        if (infoPanelFuture.length !== 0) {
-            let newInfoPanelHistory = infoPanelHistory;
-            let newInfoPanelFuture = infoPanelFuture;
-            let newPanel = newInfoPanelFuture.shift();
+    // const handleInfoPanelForward = () => {
+    //     if (infoPanelFuture.length !== 0) {
+    //         let newInfoPanelHistory = infoPanelHistory;
+    //         let newInfoPanelFuture = infoPanelFuture;
+    //         let newPanel = newInfoPanelFuture.shift();
 
-            newInfoPanelHistory.push(infoPanel);
+    //         newInfoPanelHistory.push(infoPanel);
 
-            setInfoPanelHistory(newInfoPanelHistory);
-            setInfoPanelFuture(newInfoPanelFuture);
-            if (newPanel) setInfoPanel(newPanel);
-        }
-    }
+    //         setInfoPanelHistory(newInfoPanelHistory);
+    //         setInfoPanelFuture(newInfoPanelFuture);
+    //         if (newPanel) setInfoPanel(newPanel);
+    //     }
+    // }
 
-    const handleInfoPanelBackward = () => {
-        if (infoPanelHistory.length !== 0) {
-            let newInfoPanelHistory = infoPanelHistory;
-            let newInfoPanelFuture = infoPanelFuture;
-            let newPanel = newInfoPanelHistory.pop();
+    // const handleInfoPanelBackward = () => {
+    //     if (infoPanelHistory.length !== 0) {
+    //         let newInfoPanelHistory = infoPanelHistory;
+    //         let newInfoPanelFuture = infoPanelFuture;
+    //         let newPanel = newInfoPanelHistory.pop();
 
-            newInfoPanelFuture.unshift(infoPanel);
+    //         newInfoPanelFuture.unshift(infoPanel);
 
-            setInfoPanelHistory(newInfoPanelHistory);
-            setInfoPanelFuture(newInfoPanelFuture);
-            if (newPanel) setInfoPanel(newPanel);
-        }
-    }
+    //         setInfoPanelHistory(newInfoPanelHistory);
+    //         setInfoPanelFuture(newInfoPanelFuture);
+    //         if (newPanel) setInfoPanel(newPanel);
+    //     }
+    // }
 
-    const handleInfoPanelHome = () => {
-        setInfoPanelWrapper(<DefaultInfoPanel{...config} />);
-    }
+    // const handleInfoPanelHome = () => {
+    //     setInfoPanelWrapper(<DefaultInfoPanel{...config} />);
+    // }
 
     return (
         <Container id="main-page">
-             <ConfigBar>
-                <StyledFormControl variant="filled">
-                    <InputLabel>Activation</InputLabel>
-                    <StyledSelect
-                        value={config.activationFunction}
-                        onChange={handleActivationChange}
-                    >
-                        <MenuItem value="Tanh">Tanh</MenuItem>
-                        <MenuItem value="ReLU">ReLU</MenuItem>
-                        <MenuItem value="Sigmoid">Sigmoid</MenuItem>
-                    </StyledSelect>
-                </StyledFormControl>
-                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper} />}>
-                    <React.Fragment>
-                        <Typography color="inherit">Activation Function (&Phi;)</Typography>
-                        <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
-                        <u>Click the icon to get more information</u>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
-                <StyledFormControl variant="filled">
-                    <InputLabel>Learning Rate</InputLabel>
-                    <StyledSelect
-                        value={config.learningRate}
-                        onChange={handleLearningRateChange}
-                    >
-                        <MenuItem value="0.03">0.03</MenuItem>
-                        <MenuItem value="0.005">0.005</MenuItem>
-                    </StyledSelect>
-                </StyledFormControl>
-                <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningInfoRatePanel {...config} />}>
-                    <React.Fragment>
-                        <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
-                        <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
-                        <u>Click the icon to get more information</u>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
-                <StyledFormControl variant="filled">
-                    <InputLabel>Dataset</InputLabel>
-                    <StyledSelect
-                        value={datasetType}
-                        onChange={handleDatasetChange}
-                    >
-                        <MenuItem value="Gaussian2">2 Gaussian</MenuItem>
-                        <MenuItem value="Gaussian3">3 Gaussian</MenuItem>
-                        <MenuItem value="XOR">XOR</MenuItem>
-                    </StyledSelect>
-                </StyledFormControl>
-                <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanelWrapper} infoPanel={<DatasetInfoPanel {...config} />}>
-                    <React.Fragment>
-                        <Typography color="inherit">Datasets</Typography>
-                        <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br />
-                        <u>Click the icon to get more information</u>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
-                <LabeledSlider
-                    label="Dataset Size"
-                    min={10}
-                    step={10}
-                    max={500}
-                    defaultValue={numSamples}
-                    onChange={handleNumSamplesChange}
-                    appendValueToLabel={true}
-                />
-                <StyledInfoButton title="Sample Size Tooltip">
-                    <React.Fragment>
-                        {<Typography color="inherit">Noise</Typography>}
-                        <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
-                <LabeledSlider
-                    label="Noise"
-                    min={0}
-                    step={0.1}
-                    max={1}
-                    defaultValue={noise}
-                    onChange={handleNoiseChange}
-                    appendValueToLabel={true}
-                />
-                <StyledInfoButton title="Noise Tooltip">
-                    <React.Fragment>
-                        <Typography color="inherit">Noise</Typography>
-                        <Typography variant="body2">This sets the noise in the generated data set. The more noise the greater the variance in the generated data.</Typography>
-                    </React.Fragment>
-                </StyledInfoButton>
-                <Divider orientation="vertical" flexItem />
-                <LabeledSlider
-                    label={"Batch Size"}
-                    min={1}
-                    step={1}
-                    max={10}
-                    defaultValue={config.batchSize}
-                    onChange={handleBatchSizeChange}
-                    appendValueToLabel={true}
-                />
-                <StyledInfoButton title="Batch Size Tooltip">
-                    <React.Fragment>
-                         <Typography color="inherit">Batch Size</Typography> 
-                        {/* Could create an info panel for Stochastic Gradient Decent*/}
-                        <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
-                    </React.Fragment> 
-                 </StyledInfoButton>
-            </ConfigBar>  
-             <ControlPanel>
-                <StyledButton variant={"contained"} onClick={() => handleStep()}> Step </StyledButton>
-                <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
-                <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
-                <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
-                <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
-                {/* <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton> 
-                <StyledButton variant={"contained"} onClick={loadSavedState} disabled={(!networkController.compareMode) || false}> Load Network State </StyledButton>
-                <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton> */}
-             </ControlPanel>
+            <ConfigBar
+                nnConfig={nnConfig}
+                dgConfig={dgConfig}
+                setActivationFunction={setActivationFunction}
+                setLearningRate={setLearningRate}
+                setDatasetType={setDatasetType}
+                setNoise={setNoise}
+                setNumSamples={setNumSamples}
+                setBatchSize={setBatchSize}
+            />
+            <ControlPanel
+                training={training}
+                handleStep={handleStep}
+                toggleAutoTrain={toggleAutoTrain}
+                toggleDiscreetOutput={toggleDiscreetOutput}
+                handleRegenerateDataset={handleRegenerateDataset}
+                handleReset={handleReset}
+            />
 
-             <GraphPanel>
+            <GraphPanel>
                 <div style={{ display: "flex", marginLeft: "25px" }}>
                     <Typography variant="h6">Output</Typography>
-                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
+                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...nnConfig} />}>
                         <React.Fragment>
                             <Typography color="inherit">Output</Typography>
                             <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> {minColourName} <ColouredBox colour={minColour} /> sections of the graph are classified as class -1 and points that are in <br /> {maxColourName} <ColouredBox colour={maxColour} /> sections of the graph are classified as class +1.</Typography><br />
@@ -703,8 +584,8 @@ function MainPage(props: PageProps) {
                         horizontal={true}
                     />
                 </div>
-                {dataset && network && <NNGraph
-                    dataset={dataset}
+                {trainingData && network && <NNGraph
+                    dataset={trainingData}
                     density={25}
                     canvasWidth={250}
                     marginLeft={35}
@@ -721,7 +602,7 @@ function MainPage(props: PageProps) {
                     <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {epochs} </p>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
                         <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
-                        <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
+                        <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...nnConfig} />}>
                             <React.Fragment>
                                 <Typography color="inherit">Loss</Typography>
                                 <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
@@ -738,12 +619,12 @@ function MainPage(props: PageProps) {
                 </div>
             </GraphPanel>
             <NetworkPanel>
-                {dataset && network && <NeuralNetworkVis
+                {trainingData && network && <NeuralNetworkVis
                     network={network}
                     decisionBoundaries={decisionBoundaries}
                     discreetBoundary={discreetBoundary}
-                    inputs={config.inputs}
-                    config={config}
+                    inputs={nnConfig.inputs}
+                    config={nnConfig}
                     networkWidth={650}
                     networkHeight={550}
                     handleOnClick={toggleInputNode}
@@ -758,7 +639,7 @@ function MainPage(props: PageProps) {
 
             </StatsBar>
             <InfoPanel>
-                {infoPanel}
+                {infoPanelData.infoPanel}
                 <div style={{ position: "absolute", right: "40px", top: "30px" }}>
                     <IconButton onClick={handleInfoPanelBackward}>
                         <ArrowBackIos />

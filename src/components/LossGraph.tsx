@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import { Dataset2D } from '../datasets';
+import { Datapoint2D } from '../datasets';
 import BackgroundCanvas from './BackgroundCanvas';
 
 export type LossData = {

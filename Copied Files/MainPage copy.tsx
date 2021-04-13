@@ -3,7 +3,7 @@ export class S {
 // import React, { Component, createRef } from 'react';
 // import * as d3 from 'd3';
 // import * as vis from '../visControl'
-// import { Dataset2D } from '../datasets';
+// import { Datapoint2D } from '../datasets';
 // import NNGraph from './NNGraph';
 // import { Button } from '@material-ui/core';
 
@@ -13,7 +13,7 @@ export class S {
 // }
 
 // type PageState = {
-//     decisionBoundary: Dataset2D[];
+//     decisionBoundary: Datapoint2D[];
 // }
 
 // class MainPage extends React.Component<PageProps, PageState> {

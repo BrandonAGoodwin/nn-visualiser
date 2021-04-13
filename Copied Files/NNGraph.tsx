@@ -1,11 +1,11 @@
 import React, { createRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
-import { Dataset2D } from '../datasets';
+import { Datapoint2D } from '../datasets';
 import { NodeWithTypeArguments } from 'typescript';
 
 type GraphProps = {
     id: string;
-    dataset: Dataset2D[],
+    dataset: Datapoint2D[],
     density: number,
     canvasWidth: number;
     canvasHeight: number;
@@ -13,11 +13,11 @@ type GraphProps = {
     numCells: number;
     xDomain: number[];
     yDomain: number[];
-    decisionBoundary?: Dataset2D[];
+    decisionBoundary?: Datapoint2D[];
 }
 
 // type GraphState = {
-//     decisionBoundary: Dataset2D[]
+//     decisionBoundary: Datapoint2D[]
 //     graph: d3.Selection<SVGGElement, unknown, null, undefined>
 // }
 
@@ -76,7 +76,7 @@ function NNGraph (props: GraphProps): JSX.Element {
         }
     }, [props, props.decisionBoundary])
 
-    //const [decisionBoundary, setDecisionBoundary] = useState<Dataset2D[]>([])
+    //const [decisionBoundary, setDecisionBoundary] = useState<Datapoint2D[]>([])
 
     const createGraph = () => {
         console.log("Creating graph")
@@ -136,7 +136,7 @@ function NNGraph (props: GraphProps): JSX.Element {
             .enter().append('circle')
             .attr('class', `circle-${props.id}`)
             .attr("r", 5)
-            .attr("fill", function (datapoint: Dataset2D): string {
+            .attr("fill", function (datapoint: Datapoint2D): string {
                 let colour = "black";
                 if (datapoint.y === 1) colour = "#621fa2";
                 //if(datapoint.y === -1) color = "#F50000";//"#fbfb39";
@@ -145,13 +145,13 @@ function NNGraph (props: GraphProps): JSX.Element {
                 return colour;
             })
             .style("stroke", "white")
-            .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2) + props.margin)
-            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasHeight / 2) + props.margin)
+            .attr("cx", (datapoint: Datapoint2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2) + props.margin)
+            .attr("cy", (datapoint: Datapoint2D) => -(datapoint.x2 * scale) + (props.canvasHeight / 2) + props.margin)
 
 
     }
 
-    const updateBackground = (graph: d3.Selection<SVGGElement, unknown, HTMLElement, undefined>, data: Dataset2D[], discretize: boolean): void => {
+    const updateBackground = (graph: d3.Selection<SVGGElement, unknown, HTMLElement, undefined>, data: Datapoint2D[], discretize: boolean): void => {
         console.log("Update background")
         
         let start = Date.now();
@@ -182,11 +182,11 @@ function NNGraph (props: GraphProps): JSX.Element {
             .data(data)
             .enter().append("rect")
             .attr("class", `rect-${props.id}`)
-            .attr("x", (datapoint: Dataset2D) => (datapoint.x1 * scale) + halfCanvasWidth)
-            .attr("y", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + halfCanvasWidth) // Note will probably need to be flipped
+            .attr("x", (datapoint: Datapoint2D) => (datapoint.x1 * scale) + halfCanvasWidth)
+            .attr("y", (datapoint: Datapoint2D) => -(datapoint.x2 * scale) + halfCanvasWidth) // Note will probably need to be flipped
             .attr("width", cellWidth)
             .attr("height", cellHeight)
-            .attr("fill", (datapoint: Dataset2D) => {
+            .attr("fill", (datapoint: Datapoint2D) => {
                 let value = datapoint.y < 0 ? -1 : 1
                 return color(value) || "#FF0000"
             })

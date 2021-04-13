@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
-import { Dataset2D } from "../datasets";
+import { Datapoint2D } from "../datasets";
 import BackgroundCanvas from "./BackgroundCanvas";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 interface GraphProps  {
-    dataset: Dataset2D[];
+    dataset: Datapoint2D[];
     density: number;
     canvasWidth: number;
 
@@ -147,7 +147,7 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         addFormattedText(yAxisLabel, yAxisText);
 
-        let filteredDataset = props.dataset.filter((p: Dataset2D) => {
+        let filteredDataset = props.dataset.filter((p: Datapoint2D) => {
             return p.x1 >= x.domain()[0] && p.x1 <= x.domain()[1]
               && p.x2 >= y.domain()[0] && p.x2 <= y.domain()[1];
           });
@@ -157,7 +157,7 @@ function NNGraph(props: GraphProps): JSX.Element {
             .enter().append("circle")
             .attr("class", `circle`)
             .attr("r", scale / 7)
-            .attr("fill", function (datapoint: Dataset2D): string {
+            .attr("fill", function (datapoint: Datapoint2D): string {
                 let colour = "black";
                 if (datapoint.y === 1) colour = maxColour;
                 if (datapoint.y === -1) colour = minColour;
@@ -165,8 +165,8 @@ function NNGraph(props: GraphProps): JSX.Element {
                 return colour;
             })
             .style("stroke", "black")
-            .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
-            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
+            .attr("cx", (datapoint: Datapoint2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
+            .attr("cy", (datapoint: Datapoint2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
     
 
         }

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
-import { Dataset2D } from '../datasets';
+import { Datapoint2D } from '../datasets';
 import NNGraph from './NNGraph';
 import { Button, InputLabel, MenuItem, Select, FormControl, Typography, Divider, IconButton } from '@material-ui/core';
 import * as nn from './../NeuralNet';
@@ -187,7 +187,7 @@ const ColouredBox = styled("div")`
 export interface NetworkState {
     noise: number;
     datasetType: string;
-    dataset: Dataset2D[];
+    dataset: Datapoint2D[];
     config: NNConfig;
     decisionBoundaries: { [nodeId: string]: number[] };
     decisionBoundary: number[];
@@ -229,7 +229,7 @@ function MainPage(props: PageProps) {
     const [numSamples, setNumSamples] = useState<number>(100);
     const [noise, setNoise] = useState<number>(0.2);
     const [datasetType, setDatasetType] = useState<string>("Gaussian2");
-    const [dataset, setDataset] = useState<Dataset2D[]>([]);
+    const [dataset, setDataset] = useState<Datapoint2D[]>([]);
     // const [config, setConfig] = useState<NNConfig>(
     //     {
     //         networkShape: [2, 2, 2, 1],

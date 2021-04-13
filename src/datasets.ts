@@ -1,13 +1,13 @@
 import * as d3 from "d3";
 
 // Maybe refactor to Datapoint
-export type Dataset2D = {
+export type Datapoint2D = {
     x1: number,
     x2: number,
     y: number
 };
 
-export type DatasetGenerator = (numSamples: number, noise: number) => Dataset2D[];
+export type DatasetGenerator = (numSamples: number, noise: number) => Datapoint2D[];
 
 
 export class Dataset {
@@ -16,7 +16,7 @@ export class Dataset {
         // When noise = 0, variance = 0.5 and when noise = 1, variance = 8
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
-        let samples: Dataset2D[] = [];
+        let samples: Datapoint2D[] = [];
 
         /**
          * Generate a gaussian dataset with centre point (/mean) at cx, cy
@@ -43,7 +43,7 @@ export class Dataset {
     public static GAUSSIAN_3: DatasetGenerator = (numSamples, noise) => {
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
-        let samples: Dataset2D[] = [];
+        let samples: Datapoint2D[] = [];
 
         /**
          * Generate a gaussian dataset with centre point (/mean) at cx, cy
@@ -70,7 +70,7 @@ export class Dataset {
 
     public static XOR: DatasetGenerator = (numSamples, noise) => {
         let noiseScale = d3.scaleLinear().domain([0, 1]).range([-0.5, 0.5]);
-        let samples: Dataset2D[] = [];
+        let samples: Datapoint2D[] = [];
         function generateUniformData(cx1: number, cx2: number, width: number, height: number, y: number) {
             let x1Scale = d3.scaleLinear().domain([0, 1]).range([cx1 - (width / 2), cx1 + (width / 2)]);
             let x2Scale = d3.scaleLinear().domain([0, 1]).range([cx2 - (height / 2), cx2 + (height / 2)]);
@@ -114,7 +114,7 @@ function normalDistribution(mean: number, variance: number): number {
     return mean + Math.sqrt(variance) * y;
 }
 
-function shuffle(dataset: Dataset2D[]): Dataset2D[] {
+function shuffle(dataset: Datapoint2D[]): Datapoint2D[] {
     var currentIndex = dataset.length, temporaryValue, randomIndex;
   
     // While there remain elements to shuffle...

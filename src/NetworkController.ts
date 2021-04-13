@@ -1,6 +1,6 @@
 import { ThreeDRotationSharp } from "@material-ui/icons";
 import { useEffect, useState } from "react";
-import { Dataset, Dataset2D, DatasetGenerator } from "./datasets";
+import { Dataset, Datapoint2D, DatasetGenerator } from "./datasets";
 import * as nn from "./NeuralNet";
 import * as vis from "./visControl";
 
@@ -42,7 +42,7 @@ export interface NNConfig {
     batchSize: number;
     noise: number;
     datasetType: string;
-    // dataset: Dataset2D[];
+    // dataset: Datapoint2D[];
     // decisionBoundaries: { [nodeId: string]: number[] };
     // decisionBoundary: number[];
     // loss: number;
@@ -57,7 +57,7 @@ export interface NNConfig {
 export interface NetworkState {
     noise: number;
     datasetType: string;
-    dataset: Dataset2D[];
+    dataset: Datapoint2D[];
     config: NNConfig;
     decisionBoundaries: { [nodeId: string]: number[] };
     decisionBoundary: number[];
@@ -71,15 +71,15 @@ export interface NetworkState {
 // export class NetworkController {
 
 //     network: nn.Node[][];
-//     dataset: Dataset2D[];
+//     dataset: Datapoint2D[];
 
 //     // Maybe instead extract config for easier access
 //     // config: NNConfig;
 
 //     compareMode: boolean;
 
-//     trainingData: Dataset2D[];
-//     testData: Dataset2D[];
+//     trainingData: Datapoint2D[];
+//     testData: Datapoint2D[];
 
 //     networkShape: number[];
 //     activationFunction: string;
@@ -88,7 +88,7 @@ export interface NetworkState {
 //     batchSize: number;
 //     noise: number;
 //     datasetType: string;
-//     // dataset: Dataset2D[];
+//     // dataset: Datapoint2D[];
 //     decisionBoundaries: { [nodeId: string]: number[] };
 //     decisionBoundary: number[];
 //     loss: number;
@@ -170,14 +170,14 @@ export interface NetworkState {
 //         return constructedInputs;
 //     }
 
-//     private splitDataset(dataset: Dataset2D[]) {
+//     private splitDataset(dataset: Datapoint2D[]) {
 //         let testDataIndex = Math.floor(dataset.length * 0.8);
 //         let trainingData = dataset.slice(0, testDataIndex);
 //         let testData = dataset.slice(testDataIndex, dataset.length);
 //         return [trainingData, testData];
 //     }
 
-//     //    step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): void {
+//     //    step(network: nn.Node[][], trainingData: Datapoint2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): void {
 //     //         for (let i = 0; i < trainingData.length; i++) {
 //     //             let sample = trainingData[i];
 //     //             nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2, inputs));
@@ -197,7 +197,7 @@ export interface NetworkState {
 //         }
 //     }
 
-//     // getCost(network: nn.Node[][], data: Dataset2D[], inputs: { [key: string]: boolean }/* , costFunction: nn.CostFunction */): number {
+//     // getCost(network: nn.Node[][], data: Datapoint2D[], inputs: { [key: string]: boolean }/* , costFunction: nn.CostFunction */): number {
 //     //     let totalCost = 0;
 //     //     for (let i = 0; i < data.length; i++) {
 //     //         let dataPoint = data[i];
@@ -208,7 +208,7 @@ export interface NetworkState {
 //     // }
 
 //     // Maybe this should be private
-//     getCost(dataset: Dataset2D[]): number {
+//     getCost(dataset: Datapoint2D[]): number {
 //         let totalCost = 0;
 //         for (let i = 0; i < dataset.length; i++) {
 //             let dataPoint = dataset[i];
@@ -259,11 +259,11 @@ export interface NetworkState {
 //     //     return nn.copyNetwork(network);
 //     // }
 
-//     // export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: { [key: string]: boolean }): Dataset2D[] {
+//     // export function getOutputDecisionBoundary(network: nn.Node[][], density: number, xDomain: number[], yDomain: number[], inputs: { [key: string]: boolean }): Datapoint2D[] {
 
 //     //     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
 //     //     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
-//     //     let boundary: Dataset2D[] = [];
+//     //     let boundary: Datapoint2D[] = [];
 
 //     //     for (let i = 0; i < density; i++) {
 //     //         for (let j = 0; j < density; j++) {
@@ -273,7 +273,7 @@ export interface NetworkState {
 //     //             let input = constructInputs(x || 0, y || 0, inputs);
 //     //             nn.forwardPropagate(network, input);
 
-//     //             let dataPoint: Dataset2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
+//     //             let dataPoint: Datapoint2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
 
 //     //             boundary.push(dataPoint);
 //     //         }
@@ -283,11 +283,11 @@ export interface NetworkState {
 //     // }
 
 //     // Maybe this should be private and replace get with generate
-//     // getOutputDecisionBoundary(): Dataset2D[] {
+//     // getOutputDecisionBoundary(): Datapoint2D[] {
 
 //     //     let xScale = d3.scaleLinear().domain([0, density]).range(xDomain);
 //     //     let yScale = d3.scaleLinear().domain([density, 0]).range(yDomain);
-//     //     let boundary: Dataset2D[] = [];
+//     //     let boundary: Datapoint2D[] = [];
 
 //     //     for (let i = 0; i < density; i++) {
 //     //         for (let j = 0; j < density; j++) {
@@ -297,7 +297,7 @@ export interface NetworkState {
 //     //             let input = constructInputs(x || 0, y || 0, inputs);
 //     //             nn.forwardPropagate(network, input);
 
-//     //             let dataPoint: Dataset2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
+//     //             let dataPoint: Datapoint2D = { x1: x || 0, x2: y || 0, y: nn.getOutputNode(network).output }
 
 //     //             boundary.push(dataPoint);
 //     //         }
@@ -440,7 +440,7 @@ export function useNetwork(
     defaultData: NNConfig = defaultNetworkData,
     defaultState: NNState = defaultNetworkState
 ) {
-    const [config, setConfig] = useState<NNConfig>(defaultData);
+    const [nnConfig, setNNConfig] = useState<NNConfig>(defaultData);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [state, setState] = useState<NNState>(defaultState); // Maybe refactor to networkState or something else
     const [init, setInit] = useState<boolean>(false);
@@ -457,7 +457,7 @@ export function useNetwork(
         reset();
         // generateNetwork();
         // generateDataset();
-    }, [config]);
+    }, [nnConfig]);
 
 
 
@@ -497,7 +497,7 @@ export function useNetwork(
     const generateNetwork = () => {
         console.log("Generating network");
 
-        setNetwork(vis.start(config));
+        setNetwork(vis.start(nnConfig)); // maybe move this from vis into network controller
 
         // if (!state.compareMode) {
         //     let newNetwork = vis.start(config);
@@ -517,27 +517,27 @@ export function useNetwork(
     }
 
     const setActivationFunction = (activationFunction: string) => {
-        setConfig((prev) => ({ ...prev, activationFunction: activationFunction }));
+        setNNConfig((prev) => ({ ...prev, activationFunction: activationFunction }));
     }
 
     const setLearningRate = (learningRate: number) => {
-        setConfig((prev) => ({ ...prev, learningRate: learningRate }));
+        setNNConfig((prev) => ({ ...prev, learningRate: learningRate }));
     }
 
     // const setInputs = ()
 
     const setBatchSize = ((batchSize: number) => {
-        setConfig((prev) => ({ ...prev, batchSize: batchSize }));
+        setNNConfig((prev) => ({ ...prev, batchSize: batchSize }));
     })
 
     const toggleInputNode = (nodeId: string, active: boolean) => {
-        setConfig((prevConfig) => {
+        setNNConfig((prevConfig) => {
             let inputs = prevConfig.inputs;
             let networkShape = prevConfig.networkShape;
 
             if (active) {
                 let noActiveNodes = 0;
-                Object.keys(config.inputs).forEach((inputId) => { if (config.inputs[inputId]) noActiveNodes++; });
+                Object.keys(nnConfig.inputs).forEach((inputId) => { if (nnConfig.inputs[inputId]) noActiveNodes++; });
                 if (noActiveNodes > 1) {
                     inputs[nodeId] = false;
                     networkShape[0] = networkShape[0] - 1;
@@ -556,7 +556,7 @@ export function useNetwork(
 
     const addNode = (layerNum: number) => {
         console.log("Running addNode");
-        setConfig((prevConfig) => {
+        setNNConfig((prevConfig) => {
             let newNetworkShape = prevConfig.networkShape;
             if (prevConfig.networkShape[layerNum] < 5) {
                 let newNetworkShape = prevConfig.networkShape;
@@ -570,8 +570,8 @@ export function useNetwork(
 
     const removeNode = (layerNum: number) => {
         console.log("Running removeNode");
-        setConfig((prevConfig) => {
-            if (config.networkShape[layerNum] > 1) {
+        setNNConfig((prevConfig) => {
+            if (nnConfig.networkShape[layerNum] > 1) {
                 prevConfig.networkShape[layerNum] = prevConfig.networkShape[layerNum] - 1;
                 // setConfig({ ...config, networkShape: newNetworkShape });
             }
@@ -581,7 +581,7 @@ export function useNetwork(
 
     const addLayer = () => {
         console.log("Running addLayer");
-        setConfig((prevConfig) => {
+        setNNConfig((prevConfig) => {
             let newNetworkShape = prevConfig.networkShape;
             if (newNetworkShape.length < 6) {
                 newNetworkShape.pop();
@@ -596,7 +596,7 @@ export function useNetwork(
 
     const removeLayer = () => {
         console.log("Running removeLayer");
-        setConfig((prevConfig) => {
+        setNNConfig((prevConfig) => {
             let newNetworkShape = prevConfig.networkShape;
             if (newNetworkShape.length > 2) {
                 newNetworkShape.pop();
@@ -610,13 +610,13 @@ export function useNetwork(
     }
 
     // Might not work because config values aren't aquired from setConfig function call
-    const step = (dataset: Dataset2D[]) => {
+    const step = (dataset: Datapoint2D[]) => {
         setNetwork((prevNetwork) => {
             console.log("Running step insid netowrk controller")
             console.log(prevNetwork)
             if (prevNetwork) {
                 console.log("here");
-                return vis.step(prevNetwork, dataset, config.learningRate, config.inputs, config.batchSize);
+                return vis.step(prevNetwork, dataset, nnConfig.learningRate, nnConfig.inputs, nnConfig.batchSize); // maybe move step from vis to here
                 // let network = vis.step(prevNetwork, dataset, config.learningRate, config.inputs, config.batchSize)
                 // return [...network];
             } else {
@@ -631,7 +631,7 @@ export function useNetwork(
     }
 
     return {
-        config,
+        nnConfig,
         state,
         network,
         setActivationFunction,
