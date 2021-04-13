@@ -7,12 +7,13 @@ import { INPUTS } from "../visControl"
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { IconButton, Typography } from "@material-ui/core";
-import { NNConfig, StyledInfoButton } from "./MainPage";
+import { StyledInfoButton } from "./MainPage";
 import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
 import MouseTooltip from "./MouseTooltip";
 import ResizeSensor from "css-element-queries";
 import useEventListener from "./UseEventListener";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { NNConfig } from "../NetworkController";
 
 interface ContainerBox {
     top: number;
@@ -113,6 +114,7 @@ interface CanvasProps {
 const FadeCanvas = styled("canvas") <CanvasProps>`
     position: absolute;
     background-color: white;
+    border-radius: 30px;
 
     ${({ visible }) => visible && `
     transition: opacity 1.1s;

@@ -18,7 +18,7 @@ import LossInfoPanel from './InfoPanels/LossInfoPanel';
 import { DefinedTerm, DefX1, DefX2 } from './Definitions';
 import { ThemeContext } from '../contexts/ThemeContext';
 import ColourScale from './ColourScale';
-import { NNConfig, useNetwork } from '../NetworkController';
+import { NetworkController, NNConfig, useNetwork } from '../NetworkController';
 
 // export interface NNConfig {
 //     networkShape: number[];
@@ -33,7 +33,7 @@ interface PageProps {
     yDomain: number[];
     numCells: number;
     updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
-    nnConfig: NNConfig;
+    config: NNConfig;
 }
 
 const StyledButton = styled(Button)`
@@ -199,45 +199,32 @@ export interface NetworkState {
 
 function MainPage(props: PageProps) {
     const { minColour, minColourName, maxColour, maxColourName, midColour } = useContext(ThemeContext);
-    const {
-        config,
-        network,
-        setActivationFunction,
-        setLearningRate,
-        setBatchSize,
-        step,
-        reset,
-        toggleInputNode,
-        addNode,
-        removeNode,
-        addLayer,
-        removeLayer
-    } = useNetwork(props.nnConfig);
-    /* const defaultConfig: NNConfig = {
-        networkShape: [2, 2, 2, 1],
-        activationFunction: "Tanh",
-        learningRate: 0.03,
-        inputs: {
-            "x": true,
-            "y": true,
-            "xSquared": false,
-            "ySquared": false,
-            "xTimesY": false,
-            "sinX": false,
-            "sinY": false
-        },
-        batchSize: 10,
-        datasetType: "Gaussian2",
-        numSamples: 100,
-        noise: 0.2,
-        // dataset: [], // Probably shouldn't be in here
-        // decisionBoundaries: {}, // Probably shouldn't be in here
-        // decisionBoundary: [], // Probably shouldn't in in here / should be refactored entirely
-        // epochs: 0, // Probably shouldn't be in here
-        // loss: 0, // Probably shouldn't be in here
-        // lossData: [], // Probably shouldn't be in here
+    const { config, setActivation } = useNetwork(props.config);
+    const defaultConfig: NNConfig = {
+            networkShape: [2, 2, 2, 1],
+            activationFunction: "Tanh",
+            learningRate: 0.03,
+            inputs: {
+                "x": true,
+                "y": true,
+                "xSquared": false,
+                "ySquared": false,
+                "xTimesY": false,
+                "sinX": false,
+                "sinY": false
+            },
+            batchSize: 10,
+            datasetType: "Gaussian2",
+            numSamples: 100,
+            noise: 0.2,
+            // dataset: [], // Probably shouldn't be in here
+            // decisionBoundaries: {}, // Probably shouldn't be in here
+            // decisionBoundary: [], // Probably shouldn't in in here / should be refactored entirely
+            // epochs: 0, // Probably shouldn't be in here
+            // loss: 0, // Probably shouldn't be in here
+            // lossData: [], // Probably shouldn't be in here
 
-    } */
+    }
 
     const [numSamples, setNumSamples] = useState<number>(100);
     const [noise, setNoise] = useState<number>(0.2);
@@ -261,17 +248,17 @@ function MainPage(props: PageProps) {
     //     }
     // );
     // const [network, setNetwork] = useState<nn.Node[][]>();
-    const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
-    const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
-    const [loss, setLoss] = useState<number>(0);
-    const [epochs, setEpochs] = useState<number>(0);
+    // const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
+    // const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
+    // const [loss, setLoss] = useState<number>(0);
+    // const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
     const [lossData, setLossData] = useState<[number, number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
     // const [networkSeed, setNetworkSeed] = useState<string>();
-    const [compareMode, setCompareMode] = useState<boolean>(false);
-    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel{...config}  />);
+    // const [compareMode, setCompareMode] = useState<boolean>(false);
+    const [infoPanel, setInfoPanel] = useState<JSX.Element>(<DefaultInfoPanel/* {...config}  *//>);
     // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
     const [infoPanelHistory, setInfoPanelHistory] = useState<JSX.Element[]>([]);
@@ -279,38 +266,48 @@ function MainPage(props: PageProps) {
 
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
-    useEffect(() => {
-        console.log("Config change useEffect");
-        if (training) toggleAutoTrain();
-        // generateNetwork();
-        generateDataset();
-    }, [config]);
+    const [networkController, setNetworkController] = useState<NetworkController>(new NetworkController(defaultConfig));
 
-    useEffect(() => {
-        updateDecisionBoundary();
-    }, [decisionBoundaries]);
+    // useEffect(() => {
+    //     setNetworkController(new NetworkController(defaultConfig));
+    // }, []);
 
-    useEffect(() => {
-        console.log("Network change useEffect");
-        updateDecisionBoundaries();
-    }, [network]);
+    // useEffect(() => {
+    //     console.log("Config change useEffect");
+    //     if (training) toggleAutoTrain();
+    //     generateNetwork();
+    //     generateDataset();
+    // }, [config]);
+
+    // useEffect(() => {
+    //     setNetworkController(new NetworkController(config));
+    // }, [config]);
+
+    // useEffect(() => {
+    //     updateDecisionBoundary();
+    // }, [decisionBoundaries]);
+
+    // useEffect(() => {
+    //     console.log("Config change useEffect");
+    //     updateDecisionBoundaries();
+    // }, [network]);
 
 
     // useEffect(() => {
     //     console.log("Dataset/Noise change useEffect");
-    //     rese(); // Change reset implementation
+    //     reset();
     // }, [datasetType, noise, numSamples]);
 
-    useEffect(() => {
-        if (epochs === 0 || !network) return;
-        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
-    }, [epochs]);
+    // useEffect(() => {
+    //     if (epochs === 0 || !network) return;
+    //     setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, dataset, config.inputs)]]));
+    // }, [epochs]);
 
 
-    const generateDataset = () => {
-        console.log("Generating dataset");
-        setDataset(vis.getDataset(datasetType, numSamples, noise));
-    }
+    // const generateDataset = () => {
+    //     console.log("Generating dataset");
+    //     setDataset(vis.getDataset(datasetType, numSamples, noise));
+    // }
 
     // const generateNetwork = () => {
     //     console.log("Generating network");
@@ -332,35 +329,27 @@ function MainPage(props: PageProps) {
     //     setLossData([]);
     // }
 
-    const updateDecisionBoundaries = () => {
-        console.log("Updating decision boundaries");
-        if (network) {
-            // Don't like numcells having to be the same
-            setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, config.inputs));
-            dataset && setLoss(vis.getCost(network, dataset, config.inputs));
-        }
-    }
+    // const updateDecisionBoundaries = () => {
+    //     // console.log("Updating decision boundaries");
+    //     if (network) {
+    //         // Don't like numcells having to be the same
+    //         setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, config.inputs));
+    //         dataset && setLoss(vis.getCost(network, dataset, config.inputs));
+    //     }
+    // }
 
-    const updateDecisionBoundary = () => {
-        console.log("Updating decision boundary");
-        network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
-    }
+    // const updateDecisionBoundary = () => {
+    //     // console.log("Updating decision boundary");
+    //     network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, config.inputs));
+    // }
 
-    const handleReset = () => {
-        console.log("Reset");
-        if (training) toggleAutoTrain();
-        reset();// generateNetwork();
-        setEpochs(0);
-        setLossData([]);
-        if (!compareMode) generateDataset();
-    };
+    // const reset = () => {
+    //     console.log("Reset");
+    //     if (training) toggleAutoTrain();
+    //     generateNetwork();
+    //     if (!compareMode) generateDataset();
+    // };
 
-    const handleStep = () => {
-        console.log("HandleStep")
-        step(dataset);
-        setEpochs((prevEpochs) => prevEpochs + 1);
-        updateDecisionBoundaries();
-    }
     // const step = (noSteps: number) => {
     //     console.log(`MainPage step(${noSteps})`);
     //     if (!network || !dataset) return;
@@ -370,6 +359,7 @@ function MainPage(props: PageProps) {
     //         vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
     //         setEpochs(epochs => epochs + 1);
     //     }
+
 
     //     let delta = Date.now() - start;
     //     // console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
@@ -381,76 +371,90 @@ function MainPage(props: PageProps) {
     //     // console.log(lossData);
     // };
 
-    const toggleDiscreetOutput = () => {
-        setDiscreetBoundary(!discreetBoundary);
-    };
+    // const toggleDiscreetOutput = () => {
+    //     setDiscreetBoundary(!discreetBoundary);
+    // };
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         // setConfig({ ...config, activationFunction: e.target.value as string });
         // Method 1
-        setActivationFunction(e.target.value as string); // ??
+        setActivation(e.target.value as string); // ??
         // Method 2
         // let networkController = useNetwork(props.nnConfig, props.nnState);
         // Do I want a whole new controller made or just to change the current one?
     };
 
-    const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        // setConfig({ ...config, learningRate: e.target.value as number });
-        setLearningRate(e.target.value as number);
-    };
+    // const handleLearningRateChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    //     setConfig({ ...config, learningRate: e.target.value as number });
+    // };
 
-    const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-        setDatasetType(e.target.value as string);
-    };
+    // const handleDatasetChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    //     setDatasetType(e.target.value as string);
+    // };
 
-    const handleRegenerateDataset = () => {
-        generateDataset();
-        if (training) toggleAutoTrain();
-    };
+    // const handleRegenerateDataset = () => {
+    //     generateDataset();
+    //     if (training) toggleAutoTrain();
+    // };
 
-    const handleNoiseChange = (e: any, newValue: number | number[]) => {
-        setNoise(newValue as number);
-    };
+    // const handleNoiseChange = (e: any, newValue: number | number[]) => {
+    //     setNoise(newValue as number);
+    // };
 
-    const handleNumSamplesChange = (e: any, newValue: number | number[]) => {
-        setNumSamples(newValue as number);
-    }
+    // const handleNumSamplesChange = (e: any, newValue: number | number[]) => {
+    //     setNumSamples(newValue as number);
+    // }
 
-    const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
-        // setConfig({ ...config, batchSize: newValue as number });
-        setBatchSize(newValue as number);
-    }
+    // const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
+    //     setConfig({ ...config, batchSize: newValue as number });
+    // }
 
-    const handleInputNodeClick = (nodeId: string, active: boolean) => {
-        // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
-        // Change this implemntation input is highly coupled with visControl
-        toggleInputNode(nodeId, active);
-    }
-
-    // const removeLayer = () => {
-    // console.log("Running removeLayer");
-    // if (config.networkShape.length > 2) {
+    // const handleInputNodeClick = (nodeId: string, active: boolean) => {
+    //     // console.log(`Input node click (NodeId: ${nodeId}, Active: ${active})`);
+    //     // Change this implemntation input is highly coupled with visControl
+    //     let newInputs: { [inputId: string]: boolean } = { ...config.inputs };
     //     let newNetworkShape = config.networkShape;
-    //     newNetworkShape.pop();
-    //     newNetworkShape.pop();
-    //     newNetworkShape.push(1);
-    //     console.log(newNetworkShape);
-    //     setConfig({ ...config, networkShape: newNetworkShape });
+
+    //     if (active) {
+    //         let noActiveNodes = 0;
+    //         Object.keys(config.inputs).forEach((inputId) => { if (config.inputs[inputId]) noActiveNodes++; });
+    //         if (noActiveNodes > 1) {
+    //             newInputs[nodeId] = false;
+    //             newNetworkShape[0] = newNetworkShape[0] - 1;
+    //         } else {
+    //             return;
+    //         }
+    //     } else {
+    //         newInputs[nodeId] = true;
+    //         newNetworkShape[0] = newNetworkShape[0] + 1;
+    //     }
+    //     setConfig({ ...config, inputs: newInputs, networkShape: newNetworkShape });
     // }
 
-    // }
+    const removeLayer = () => {
+        // console.log("Running removeLayer");
+        // if (config.networkShape.length > 2) {
+        //     let newNetworkShape = config.networkShape;
+        //     newNetworkShape.pop();
+        //     newNetworkShape.pop();
+        //     newNetworkShape.push(1);
+        //     console.log(newNetworkShape);
+        //     setConfig({ ...config, networkShape: newNetworkShape });
+        // }
 
-    // const addLayer = () => {
-    // console.log("Running addLayer");
-    // if (config.networkShape.length < 6) {
-    //     let newNetworkShape = config.networkShape;
-    //     newNetworkShape.pop();
-    //     newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
-    //     newNetworkShape.push(1);
-    //     console.log(newNetworkShape);
-    //     setConfig({ ...config, networkShape: newNetworkShape });
-    // }
-    // }
+    }
+
+    const addLayer = () => {
+        // console.log("Running addLayer");
+        // if (config.networkShape.length < 6) {
+        //     let newNetworkShape = config.networkShape;
+        //     newNetworkShape.pop();
+        //     newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
+        //     newNetworkShape.push(1);
+        //     console.log(newNetworkShape);
+        //     setConfig({ ...config, networkShape: newNetworkShape });
+        // }
+    }
 
     // const removeNode = (layerNum: number) => {
     //     console.log("Running removeNode");
@@ -491,7 +495,7 @@ function MainPage(props: PageProps) {
             clearInterval(trainingInterval);
         } else {
             setTrainingInterval(setInterval(() => {
-                handleStep();
+                step(1);
             }, 500));
         }
         setTraining(!training);
@@ -501,18 +505,18 @@ function MainPage(props: PageProps) {
     //     setCompareMode(true);
     // }
 
-    // const loadOriginalState = () => {
+    const loadOriginalState = () => {
 
-    // }
+    }
 
     // const saveCurrentState = () => {
     //     saveComparisionData();
     //     setCompareMode(true);
     // }
 
-    // const loadSavedState = () => {
-    //     handleReset(); // This is defo broken
-    // }
+    const loadSavedState = () => {
+        reset();
+    }
 
     // const clearNetworkState = () => {
     //     setComaparisonData(undefined);
@@ -558,17 +562,17 @@ function MainPage(props: PageProps) {
         }
     }
 
-    const handleInfoPanelHome = () => {
-        setInfoPanelWrapper(<DefaultInfoPanel{...config} />);
-    }
+    // const handleInfoPanelHome = () => {
+    //     setInfoPanelWrapper(<DefaultInfoPanel{...config}/>);
+    // }
 
     return (
         <Container id="main-page">
-             <ConfigBar>
+            <ConfigBar>
                 <StyledFormControl variant="filled">
                     <InputLabel>Activation</InputLabel>
                     <StyledSelect
-                        value={config.activationFunction}
+                        value={networkController.activationFunction}
                         onChange={handleActivationChange}
                     >
                         <MenuItem value="Tanh">Tanh</MenuItem>
@@ -576,7 +580,7 @@ function MainPage(props: PageProps) {
                         <MenuItem value="Sigmoid">Sigmoid</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper} />}>
+                <StyledInfoButton title="Activation Tooltip" /* onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={config} setInfoPanel={setInfoPanelWrapper} />} */>
                     <React.Fragment>
                         <Typography color="inherit">Activation Function (&Phi;)</Typography>
                         <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
@@ -587,14 +591,14 @@ function MainPage(props: PageProps) {
                 <StyledFormControl variant="filled">
                     <InputLabel>Learning Rate</InputLabel>
                     <StyledSelect
-                        value={config.learningRate}
+                        value={networkController.learningRate}
                         onChange={handleLearningRateChange}
                     >
                         <MenuItem value="0.03">0.03</MenuItem>
                         <MenuItem value="0.005">0.005</MenuItem>
                     </StyledSelect>
                 </StyledFormControl>
-                <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningInfoRatePanel {...config} />}>
+                <StyledInfoButton title="Learning Rate Tooltip" /* onClick={setInfoPanelWrapper} infoPanel={<LearningInfoRatePanel {...config} />} */>
                     <React.Fragment>
                         <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
                         <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
@@ -632,7 +636,7 @@ function MainPage(props: PageProps) {
                 />
                 <StyledInfoButton title="Sample Size Tooltip">
                     <React.Fragment>
-                        {<Typography color="inherit">Noise</Typography>}
+                        {/* <Typography color="inherit">Noise</Typography> */}
                         <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
@@ -664,24 +668,24 @@ function MainPage(props: PageProps) {
                 />
                 <StyledInfoButton title="Batch Size Tooltip">
                     <React.Fragment>
-                         <Typography color="inherit">Batch Size</Typography> 
+                        {/* <Typography color="inherit">Noise</Typography> */}
                         {/* Could create an info panel for Stochastic Gradient Decent*/}
                         <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
-                    </React.Fragment> 
-                 </StyledInfoButton>
-            </ConfigBar>  
-             <ControlPanel>
-                <StyledButton variant={"contained"} onClick={() => handleStep()}> Step </StyledButton>
+                    </React.Fragment>
+                </StyledInfoButton>
+            </ConfigBar>
+            <ControlPanel>
+                <StyledButton variant={"contained"} onClick={() => step(1)}> Step 1</StyledButton>
                 <StyledButton variant={"contained"} onClick={() => toggleAutoTrain()}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
                 <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
                 <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
-                <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
-                {/* <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton> 
+                <StyledButton variant={"contained"} color={"secondary"} onClick={reset}> Reset </StyledButton>
+                <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton>
                 <StyledButton variant={"contained"} onClick={loadSavedState} disabled={(!networkController.compareMode) || false}> Load Network State </StyledButton>
-                <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton> */}
-             </ControlPanel>
+                <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
+            </ControlPanel>
 
-             <GraphPanel>
+            <GraphPanel>
                 <div style={{ display: "flex", marginLeft: "25px" }}>
                     <Typography variant="h6">Output</Typography>
                     <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
@@ -718,7 +722,7 @@ function MainPage(props: PageProps) {
                     discreetBoundary={discreetBoundary}
                 />}
                 <div style={{ marginLeft: "10px" }}>
-                    <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {epochs} </p>
+                    <p style={{ marginTop: "0px", marginBottom:"0px" }}> Epochs: {epochs} </p>
                     <div style={{ display: "flex", justifyContent: "flex-start" }}>
                         <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
                         <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel {...config} />}>
@@ -746,7 +750,7 @@ function MainPage(props: PageProps) {
                     config={config}
                     networkWidth={650}
                     networkHeight={550}
-                    handleOnClick={toggleInputNode}
+                    handleOnClick={handleInputNodeClick}
                     addNode={addNode}
                     removeNode={removeNode}
                     addLayer={addLayer}
@@ -764,7 +768,7 @@ function MainPage(props: PageProps) {
                         <ArrowBackIos />
                     </IconButton>
                     <IconButton onClick={handleInfoPanelHome}>
-                        <Home fontSize={"large"} />
+                        <Home fontSize={"large"}/>
                     </IconButton>
                     <IconButton onClick={handleInfoPanelForward}>
                         <ArrowForwardIos />

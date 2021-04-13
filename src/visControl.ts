@@ -1,8 +1,8 @@
 import * as nn from "./NeuralNet";
 import { Dataset2D, DatasetGenerator, Dataset } from "./datasets";
-import { NNConfig } from "./components/MainPage";
 import * as d3 from "d3";
 import seedrandom from "seedrandom";
+import { NNConfig } from "./NetworkController";
 
 
 interface InputFunc {
@@ -59,14 +59,14 @@ export function constructInputs(x: number, y: number, inputs: { [key: string]: b
 
 }
 
-export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): void {
+export function step(network: nn.Node[][], trainingData: Dataset2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): nn.Node[][] {
     for (let i = 0; i < trainingData.length; i++) {
         let sample = trainingData[i];
         nn.forwardPropagate(network, constructInputs(sample.x1, sample.x2, inputs));
         nn.backPropagate(network, nn.Costs.SQUARE, sample.y);
         if ((i + 1) % batchSize === 0) nn.train(network, learningRate);
     }
-
+    return network;
 }
 
 export function getCost(network: nn.Node[][], data: Dataset2D[], inputs: { [key: string]: boolean }/* , costFunction: nn.CostFunction */): number {

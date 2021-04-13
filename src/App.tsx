@@ -8,13 +8,14 @@ import ComparePage from './components/ComparePage';
 import MainPage, { NetworkState } from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
+import { useNetwork } from "./NetworkController";
 
 
 // export const ThemeContext = createContext<Partial<ThemeProps>>({});
 
-const StyledMainPage = styled(MainPage)`
+// const StyledMainPage = styled(MainPage)`
 
-`
+// `
 
 const StyledComparePage = styled(ComparePage)`
 `
@@ -93,7 +94,7 @@ interface ComparisonData {
 
 function App() {
     const {background} = useContext(ThemeContext);
-
+    const { config } = useNetwork();
     const mainContainer = createRef<HTMLDivElement>();
 
     const [pageState, setPageState] = useState<string>("main");
@@ -115,7 +116,7 @@ function App() {
 
     useEffect(() => {
         setTimeout(function() {
-            console.log(pageState);
+            // console.log(pageState);
             setTransitioning(false);
             updateContainerSize();
             // updateButtonPosition();
@@ -134,7 +135,7 @@ function App() {
     }
 
     const updateContainerSize = () => {
-        console.log("Updating container size");
+        // console.log("Updating container size");
 
         const maxMarginSize = 140;
         if (pageState === "main") {
@@ -145,22 +146,22 @@ function App() {
 
             if (!container || !mainPage || !margin) return;
 
-            console.log("Conatainer width: " + container.offsetWidth);
-            console.log("Page width: " + mainPage.offsetWidth);
+            // console.log("Conatainer width: " + container.offsetWidth);
+            // console.log("Page width: " + mainPage.offsetWidth);
 
-            console.log("Margin width: " + marginWidth);
+            // console.log("Margin width: " + marginWidth);
 
             if ((container.offsetWidth - marginWidth) < (mainPage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((mainPage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
                 setMarginWidth(newMarginWidth);
-                console.log("Margin added");
+                // console.log("Margin added");
             } else {
                 margin.style.minWidth = "0px";
                 setMarginAdded(false);
                 setMarginWidth(0);
-                console.log("Margin removed");
+                // console.log("Margin removed");
             }
         }
 
@@ -172,22 +173,22 @@ function App() {
 
             if (!container || !comparePage || !margin) return;
 
-            console.log("Conatainer width: " + container.offsetWidth);
-            console.log("Page width: " + comparePage.offsetWidth);
+            // console.log("Conatainer width: " + container.offsetWidth);
+            // console.log("Page width: " + comparePage.offsetWidth);
 
-            console.log("Margin width: " + marginWidth);
+            // console.log("Margin width: " + marginWidth);
 
             if ((container.offsetWidth - marginWidth) < (comparePage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((comparePage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
                 setMarginWidth(newMarginWidth);
-                console.log("Margin added");
+                // console.log("Margin added");
             } else {
                 margin.style.minWidth = "0px";
                 setMarginAdded(false);
                 setMarginWidth(0);
-                console.log("Margin removed");
+                // console.log("Margin removed");
             }
 
         }
@@ -195,16 +196,16 @@ function App() {
 
     // Maybe convert to refs for better design. (Note: can't ref mainPage)
     const updateButtonPosition = () => {
-        console.log("Updating button position");
+        // console.log("Updating button position");
 
         let button = document.getElementById("transition-button");
 
         if(!button) return;
 
 
-        console.log("Margin added: " + marginAdded);
-        console.log("Transitioning: " + transitioning);
-        console.log("Pagestate: " + pageState);
+        // console.log("Margin added: " + marginAdded);
+        // console.log("Transitioning: " + transitioning);
+        // console.log("Pagestate: " + pageState);
 
         if(transitioning) {
             button.style.left = pageState === "compare" ? "5%" : "95%";
@@ -227,11 +228,11 @@ function App() {
                     button.style.left = `${pageRect.right + 20}px`;
                 } else {
                     button.style.left = `min(95%, calc(${pageRect.x + pageRect.width}px + 2%))`;
-                    console.log("here");
+                    // console.log("here");
 
                 }
-                console.log(pageRect);
-                console.log(containerRect);
+            //     console.log(pageRect);
+            //     console.log(containerRect);
             }
 
             if (pageState === "compare") {
@@ -249,14 +250,14 @@ function App() {
                     button.style.right = "100%";
                 } else {
                     button.style.left = `min(95%, calc(${pageRect.x + pageRect.width}px + 2%))`;
-                    console.log("here");
+                    // console.log("here");
 
                 }
-                console.log(pageRect);
-                console.log(containerRect);
+                // console.log(pageRect);
+                // console.log(containerRect);
             }
         } else {
-            console.log("heer");
+            // console.log("heer");
             button.style.left = pageState === "main" ? "95%" : "5%";
         }
     }
@@ -278,11 +279,12 @@ function App() {
             }`}/>
             <Container id="main-container" className="animated main" ref={mainContainer}>
                 {/* <StyledMargin/> */}
-                <StyledMainPage
+                <MainPage
                     xDomain={[-8, 8]}
                     yDomain={[-8, 8]}
                     numCells={100}
                     updateComparisionData={updateComparisionData}
+                    nnConfig={config}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>

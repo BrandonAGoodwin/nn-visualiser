@@ -1,5 +1,5 @@
 import React from "react";
-import { NNConfig } from "../MainPage";
+import { NNConfig } from "../../NetworkController";
 
 function LossInfoPanel(props: NNConfig) {
 

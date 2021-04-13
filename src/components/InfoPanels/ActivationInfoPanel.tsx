@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { DefinedTerm, DefNode } from "../Definitions";
-import { NNConfig } from "../MainPage";
+import { NNConfig } from "../../NetworkController";
 import sigmoid from "../SVGs/Sigmoid-function-2.svg";
 import NodeInfoPanel from "./NodeInfoPanel";
 

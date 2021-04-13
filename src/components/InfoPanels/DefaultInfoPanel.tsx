@@ -1,5 +1,5 @@
 import React, { useContext, useRef } from "react";
-import { NNConfig } from "../MainPage";
+import { NNConfig } from "../../NetworkController";
 import positiveLink from "../../PositiveLink.png";
 import negativeLink from "../../NegativeLink.png";
 import { ThemeContext } from "../../contexts/ThemeContext";
