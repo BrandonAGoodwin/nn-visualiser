@@ -5,18 +5,12 @@ import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
 import React, { createRef, useContext, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
-import MainPage, { NetworkState } from './components/MainPage';
+import MainPage  from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
-import { useNetwork } from "./NetworkController";
+import { NetworkState, useNetwork } from "./NetworkController";
 import { useDatasetGenerator } from "./DatasetGenerator";
 
-
-// export const ThemeContext = createContext<Partial<ThemeProps>>({});
-
-// const StyledMainPage = styled(MainPage)`
-
-// `
 
 const StyledComparePage = styled(ComparePage)`
 `
@@ -58,9 +52,6 @@ const Container = styled("div")`
     }
 `
 
-// const MainContainer = styled(Container)`
-
-// `
 
 const AuxContainer = styled("div")`
     position: relative;

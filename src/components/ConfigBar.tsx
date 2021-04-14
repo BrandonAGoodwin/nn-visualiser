@@ -73,7 +73,6 @@ function ConfigBar(props: ConfigBarProps) {
     }
 
     const handleBatchSizeChange = (e: any, newValue: number | number[]) => {
-        // setConfig({ ...config, batchSize: newValue as number });
         setBatchSize(newValue as number);
     }
 

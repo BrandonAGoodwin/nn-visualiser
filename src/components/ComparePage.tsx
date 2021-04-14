@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
+import { NetworkState } from "../NetworkController";
 import LossGraph from "./LossGraph";
-import { NetworkState } from "./MainPage";
 
 
 const ContainerSection = styled("div")`

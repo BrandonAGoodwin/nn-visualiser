@@ -34,6 +34,10 @@ Tasks:
         ✔ Implement variance for XOR @done (02/04/2021, 15:56:53)
         ☐ Fix Slider label font size
         ☐ Explain somewhere that mini-batch gradient decent is being used by default
+        ☐ Figure out if discreet boundary makes network boundaries discreet too
+        ☐ Probably make a comparison/ analytics custom hook
+            Epochs, loss, comparison data, loss data, etc..
+        ☐ But when changing parameters while training (Comparison data doesn't reset)
     If I have time:
         ☐ Could create an info panel for Stochastic Gradient Decent
         ☐ Make a hand crafted overfitting example dataset
