@@ -22,7 +22,7 @@ import { NNConfig, useNetwork } from '../NetworkController';
 import { InfoPanelContext } from '../contexts/InfoPanelContext';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
-import ControlPanel from './ControlPanel';bv 
+import ControlPanel from './ControlPanel';
 
 interface PageProps {
     xDomain: number[];
