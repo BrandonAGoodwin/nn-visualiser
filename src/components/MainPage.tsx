@@ -22,15 +22,7 @@ import { NNConfig, useNetwork } from '../NetworkController';
 import { InfoPanelContext } from '../contexts/InfoPanelContext';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
-import ControlPanel from './ControlPanel';
-
-// export interface NNConfig {
-//     networkShape: number[];
-//     activationFunction: string;
-//     learningRate: number;
-//     inputs: { [key: string]: boolean };
-//     batchSize: number;
-// }
+import ControlPanel from './ControlPanel';bv 
 
 interface PageProps {
     xDomain: number[];
@@ -109,25 +101,6 @@ export const ContainerSection = styled("div")`
     justify-content: center;
 `;
 
-// Fix so that this doesn't use hard coded paddings
-// const ConfigBar = styled((props: any) => <ContainerSection gridArea="config-bar" {...props} />)`
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: left;
-//     padding-left: 30px;
-//     padding-top: 10px;
-// `;
-
-// const ControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
-//     display: flex;
-//     flex-direction: column;
-//     align-items: stretch;
-//     padding-top: 15px;
-//     padding-bottom: 15px;
-//     padding-left: 10px;
-//     padding-right: 10px;
-//     justify-content: left;
-// `;
 
 const NetworkPanel = styled((props: any) => <ContainerSection gridArea="network" {...props} />)`
     display: flex;
@@ -160,24 +133,9 @@ const InfoPanel = styled((props: any) => <ContainerSection gridArea="info" {...p
     /* max-width: fit-content; */
 `;
 
-const NeuralNetworkControls = styled("div")`
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-`;
-
 export const StyledInfoButton = styled(InfoButton)`
     font-size: 14px;
 `
-
-function removeItemOnce(arr: string[], value: string) {
-    var index = arr.indexOf(value);
-    if (index > -1) {
-        arr.splice(index, 1);
-    }
-    return arr;
-}
 
 const ColouredBox = styled("div")`
     float: left;
@@ -261,7 +219,7 @@ function MainPage(props: PageProps) {
         if (training) toggleAutoTrain();
         // generateNetwork();
         generateDataset();
-    }, [nnConfig]);
+    }, [nnConfig, dgConfig]);
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -404,48 +362,7 @@ function MainPage(props: PageProps) {
     //     toggleInputNode(nodeId, active);
     // }
 
-    // const removeLayer = () => {
-    // console.log("Running removeLayer");
-    // if (config.networkShape.length > 2) {
-    //     let newNetworkShape = config.networkShape;
-    //     newNetworkShape.pop();
-    //     newNetworkShape.pop();
-    //     newNetworkShape.push(1);
-    //     console.log(newNetworkShape);
-    //     setConfig({ ...config, networkShape: newNetworkShape });
-    // }
-
-    // }
-
-    // const addLayer = () => {
-    // console.log("Running addLayer");
-    // if (config.networkShape.length < 6) {
-    //     let newNetworkShape = config.networkShape;
-    //     newNetworkShape.pop();
-    //     newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
-    //     newNetworkShape.push(1);
-    //     console.log(newNetworkShape);
-    //     setConfig({ ...config, networkShape: newNetworkShape });
-    // }
-    // }
-
-    // const removeNode = (layerNum: number) => {
-    //     console.log("Running removeNode");
-    //     if (config.networkShape[layerNum] > 1) {
-    //         let newNetworkShape = config.networkShape;
-    //         newNetworkShape[layerNum] = config.networkShape[layerNum] - 1;
-    //         setConfig({ ...config, networkShape: newNetworkShape });
-    //     }
-    // }
-
-    // const addNode = (layerNum: number) => {
-    //     console.log("Running addNode");
-    //     if (config.networkShape[layerNum] < 5) {
-    //         let newNetworkShape = config.networkShape;
-    //         newNetworkShape[layerNum] = config.networkShape[layerNum] + 1;
-    //         setConfig({ ...config, networkShape: newNetworkShape });
-    //     }
-    // }
+   
 
     // const saveComparisionData = () => {
     //     let newComparisionData: NetworkState = {
@@ -498,48 +415,7 @@ function MainPage(props: PageProps) {
     //     setCompareMode(false);
     // }
 
-    // const setInfoPanelWrapper = (newInfoPanel: JSX.Element) => {
-    //     console.log(newInfoPanel);
-    //     let newInfoPanelHistory = infoPanelHistory;
-    //     newInfoPanelHistory.push(infoPanel);
-    //     console.log(newInfoPanelHistory);
-    //     console.log(infoPanel)
-    //     setInfoPanel(newInfoPanel);
-    //     setInfoPanelHistory(newInfoPanelHistory);
-    //     setInfoPanelFuture([]);
-    // }
 
-    // const handleInfoPanelForward = () => {
-    //     if (infoPanelFuture.length !== 0) {
-    //         let newInfoPanelHistory = infoPanelHistory;
-    //         let newInfoPanelFuture = infoPanelFuture;
-    //         let newPanel = newInfoPanelFuture.shift();
-
-    //         newInfoPanelHistory.push(infoPanel);
-
-    //         setInfoPanelHistory(newInfoPanelHistory);
-    //         setInfoPanelFuture(newInfoPanelFuture);
-    //         if (newPanel) setInfoPanel(newPanel);
-    //     }
-    // }
-
-    // const handleInfoPanelBackward = () => {
-    //     if (infoPanelHistory.length !== 0) {
-    //         let newInfoPanelHistory = infoPanelHistory;
-    //         let newInfoPanelFuture = infoPanelFuture;
-    //         let newPanel = newInfoPanelHistory.pop();
-
-    //         newInfoPanelFuture.unshift(infoPanel);
-
-    //         setInfoPanelHistory(newInfoPanelHistory);
-    //         setInfoPanelFuture(newInfoPanelFuture);
-    //         if (newPanel) setInfoPanel(newPanel);
-    //     }
-    // }
-
-    // const handleInfoPanelHome = () => {
-    //     setInfoPanelWrapper(<DefaultInfoPanel{...config} />);
-    // }
 
     return (
         <Container id="main-page">
@@ -662,7 +538,5 @@ function MainPage(props: PageProps) {
         </Container>
     );
 }
-
-// const useNetworkController = () 
 
 export default MainPage;
