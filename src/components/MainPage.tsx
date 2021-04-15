@@ -1,18 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
-import { Datapoint2D } from '../datasets';
-import NNGraph from './NNGraph';
-import { Typography, IconButton } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
 import { GitHub } from '@material-ui/icons';
-import LossGraph from './LossGraph';
-import LossInfoPanel from './InfoPanels/LossInfoPanel';
-import { DefinedTerm, DefX1, DefX2 } from './Definitions';
-import { ThemeContext } from '../contexts/ThemeContext';
-import ColourScale from './ColourScale';
 import { NetworkState, NNConfig, useNetwork } from '../NetworkController';
-import { InfoPanelContext } from '../contexts/InfoPanelContext';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
 import ControlPanel from './ControlPanel';
@@ -79,15 +71,11 @@ export const StyledInfoButton = styled(InfoButton)`
     font-size: 14px;
 `
 
-const ColouredBox = styled("div")`
-    float: left;
-    height: 1em;
-    width: 1em;
-    border: 1px solid black;
-    background-color: ${((props: { colour: string }) => props.colour)};
-    clear: both;
-    margin-right: 5px;
-`
+export interface AnalyticsData {
+    trainingLoss: number[];
+    testLoss: number[];
+    ephochs: number;
+}
 
 interface MainPageProps {
     xDomain: number[];
@@ -103,6 +91,7 @@ function MainPage(props: MainPageProps) {
     const {
         nnConfig,
         network,
+        analyticsData,
         setActivationFunction,
         setLearningRate,
         setBatchSize,
@@ -130,13 +119,13 @@ function MainPage(props: MainPageProps) {
     const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
-    const [lossData, setLossData] = useState<[number, number][]>([]);
+    const [lossData, setLossData] = useState<[epoch: number, trainingLoss: number, testLoss: number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
     const [compareMode, setCompareMode] = useState<boolean>(false);
     // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
-
+    const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
     useEffect(() => {
@@ -163,8 +152,8 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         if (epochs === 0 || !network) return;
-        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]));
-    }, [epochs]);
+        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs), vis.getCost(network, testData, nnConfig.inputs)]]));
+    }, [epochs]); 
 
 
     // const generateNetwork = () => {
@@ -212,7 +201,7 @@ function MainPage(props: MainPageProps) {
 
     const handleStep = () => {
         console.log("HandleStep")
-        step(trainingData);
+        step(trainingData, testData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
@@ -247,15 +236,15 @@ function MainPage(props: MainPageProps) {
 
     // const saveComparisionData = () => {
     //     let newComparisionData: NetworkState = {
-    //         config: config,
-    //         dataset: dataset,
-    //         datasetType: datasetType,
+    //         nnConfig: nnConfig,
+    //         dataset: trainingData,
+    //         datasetType: dgConfig.datasetType,
     //         decisionBoundaries: decisionBoundaries,
     //         decisionBoundary: decisionBoundary,
     //         epochs: epochs,
     //         loss: loss,
     //         lossData: lossData,
-    //         noise: noise
+    //         noise: dgConfig.noise
     //     }
 
     //     setComaparisonData(newComparisionData);
@@ -325,9 +314,11 @@ function MainPage(props: MainPageProps) {
                 yDomain={props.yDomain}
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
-                epochs={epochs}
-                loss={loss}
-                lossData={lossData}
+                // epochs={epochs}
+                // loss={loss}
+                // lossData={lossData}
+                analyticsData={analyticsData}
+                comparisonAnalyticsData={comparisonData?.analyticsData}
                 comparisonData={comparisonData}
             />
             { network && <NetworkPanel

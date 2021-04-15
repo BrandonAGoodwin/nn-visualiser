@@ -29,15 +29,18 @@ interface PageProps {
 
 function ComparePage(props: PageProps) {
 
-    return(
+    return (
         <ContainerSection id="compare-page">
 
             {props.currentState && <LossGraph
                 height={60}
                 width={170}
                 margin={5}
-                dataset={props.currentState.lossData}
-                comparisionData={props.savedState?.lossData}/> }
+                //dataset={props.currentState.lossData}
+                analyticsData={props.currentState.analyticsData}
+                comparisonAnalyticsData={props.savedState?.analyticsData}
+                // comparisionData={props.savedState?.lossData}
+            />}
         </ContainerSection>
     );
 }

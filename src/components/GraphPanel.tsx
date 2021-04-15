@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import { Typography } from "@material-ui/core";
-import React, { useContext } from "react";
+import { FormControlLabel, FormGroup, IconButton, Switch, Typography } from "@material-ui/core";
+import React, { useContext, useState } from "react";
 import { Datapoint2D } from "../datasets";
 import ColourScale from "./ColourScale";
 import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
@@ -11,7 +11,7 @@ import NNGraph from "./NNGraph";
 import * as nn from "../NeuralNet"
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { NetworkState } from "../NetworkController";
+import { AnalyticsData, NetworkState } from "../NetworkController";
 import OutputInfoPanel from "./InfoPanels/LossInfoPanel";
 
 const ColouredBox = styled("div")`
@@ -37,9 +37,11 @@ interface GraphPanelProps {
     yDomain: number[];
     decisionBoundary: number[];
     discreetBoundary: boolean;
-    epochs: number;
-    loss: number;
-    lossData: [number, number][];
+    // epochs: number;
+    // loss: number;
+    // lossData: [number, number][];
+    analyticsData: AnalyticsData;
+    comparisonAnalyticsData: AnalyticsData | undefined;
     comparisonData: NetworkState | undefined;
 }
 
@@ -55,11 +57,20 @@ function GraphPanel(props: GraphPanelProps) {
         yDomain,
         decisionBoundary,
         discreetBoundary,
-        epochs,
-        loss,
-        lossData,
-        comparisonData
+        // epochs,
+        // loss,
+        // lossData,
+        comparisonData,
+        analyticsData,
+        comparisonAnalyticsData,
     } = props;
+
+    let [showTestData, setShowTestData] = useState(false);
+
+    let [epoch, loss]: [number, number] = [0, 0];
+    if (analyticsData.testLossData.length > 0) {
+        [epoch, loss] = analyticsData.trainingLossData[analyticsData.trainingLossData.length - 1];
+    }
 
     return (
         <StyledGraphPanel>
@@ -99,7 +110,17 @@ function GraphPanel(props: GraphPanelProps) {
                 discreetBoundary={discreetBoundary}
             />}
             <div style={{ marginLeft: "10px" }}>
-                <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {epochs} </p>
+                <FormGroup>
+                    <FormControlLabel
+                        control={<Switch
+                            checked={showTestData}
+                            onChange={() => setShowTestData((prevShowTestData) => !prevShowTestData)}
+                            name="showTestData"
+                        />}
+                        label="Show test data"
+                    />
+                </FormGroup>
+                <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {analyticsData.epochs} & {epoch}</p>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                     <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
                     <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />}>
@@ -114,8 +135,12 @@ function GraphPanel(props: GraphPanelProps) {
                     height={60}
                     width={170}
                     margin={5}
-                    dataset={lossData}
-                    comparisionData={comparisonData?.lossData} />
+                    analyticsData={analyticsData}
+                    comparisonAnalyticsData={comparisonAnalyticsData}
+                    showTestData={showTestData}
+                // dataset={lossData}
+                // comparisionData={comparisonData?.lossData} 
+                />
             </div>
         </StyledGraphPanel>
     );
