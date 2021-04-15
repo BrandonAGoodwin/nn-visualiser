@@ -5,7 +5,7 @@ import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
 import React, { createRef, useContext, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
-import MainPage  from './components/MainPage';
+import MainPage from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
 import { NetworkState, useNetwork } from "./NetworkController";
@@ -73,7 +73,7 @@ const TransitionButton = styled(IconButton)`
     top: 50%;
     left: 95%;
     z-index: 500;
-    transition: all ${(props: {transitioning: boolean}) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
+    transition: all ${(props: { transitioning: boolean }) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
     &.active {
         left: 5%;
     }
@@ -85,7 +85,7 @@ interface ComparisonData {
 }
 
 function App() {
-    const {background} = useContext(ThemeContext);
+    const { background } = useContext(ThemeContext);
     const { nnConfig } = useNetwork();
     const { dgConfig } = useDatasetGenerator();
     const mainContainer = createRef<HTMLDivElement>();
@@ -98,17 +98,17 @@ function App() {
     const [comparisonData, setComparisonData] = useState<ComparisonData>();
 
     const updateComparisionData = (currentState: NetworkState, savedState: NetworkState) => {
-        setComparisonData({currentState: currentState, savedState: savedState});
+        setComparisonData({ currentState: currentState, savedState: savedState });
     }
 
     useEffect(() => {
-        if(transitioning) {
+        if (transitioning) {
             updateButtonPosition();
         }
     }, [transitioning])
 
     useEffect(() => {
-        setTimeout(function() {
+        setTimeout(function () {
             // console.log(pageState);
             setTransitioning(false);
             updateContainerSize();
@@ -193,14 +193,14 @@ function App() {
 
         let button = document.getElementById("transition-button");
 
-        if(!button) return;
+        if (!button) return;
 
 
         // console.log("Margin added: " + marginAdded);
         // console.log("Transitioning: " + transitioning);
         // console.log("Pagestate: " + pageState);
 
-        if(transitioning) {
+        if (transitioning) {
             button.style.left = pageState === "compare" ? "5%" : "95%";
             return;
         }
@@ -224,8 +224,8 @@ function App() {
                     // console.log("here");
 
                 }
-            //     console.log(pageRect);
-            //     console.log(containerRect);
+                //     console.log(pageRect);
+                //     console.log(containerRect);
             }
 
             if (pageState === "compare") {
@@ -259,16 +259,16 @@ function App() {
         updateContainerSize();
         updateButtonPosition();
     });
-    
-    useEventListener("scroll",  updateButtonPosition, mainContainer);
+
+    useEventListener("scroll", updateButtonPosition, mainContainer);
 
     return (
         <AuxContainer>
-        <Global
-          styles={css`
+            <Global
+                styles={css`
             body {
               background: ${background}
-            }`}/>
+            }`} />
             <Container id="main-container" className="animated main" ref={mainContainer}>
                 {/* <StyledMargin/> */}
                 <MainPage
@@ -287,7 +287,7 @@ function App() {
             </TransitionButton>
             <Container id="compare-container" className="animated compare">
                 <StyledMargin id="dynamic-margin-compare" />
-                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
+                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState} />
             </Container>
         </AuxContainer>
     );
