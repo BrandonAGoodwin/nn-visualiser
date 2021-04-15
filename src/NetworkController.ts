@@ -653,10 +653,6 @@ export function useNetwork(
                     }
                     return prevAnalyticsData;
                 });
-
-                //return vis.step(prevNetwork, trainingData, nnConfig.learningRate, nnConfig.inputs, nnConfig.batchSize); // maybe move step from vis to here
-                // let network = vis.step(prevNetwork, dataset, config.learningRate, config.inputs, config.batchSize)
-                // return [...network];
             }
             return prevNetwork;
         });
@@ -674,7 +670,6 @@ export function useNetwork(
         analyticsData,
         setActivationFunction,
         setLearningRate,
-        // setInputs,
         setBatchSize,
         step,
         reset,
@@ -683,6 +678,5 @@ export function useNetwork(
         removeNode,
         addLayer,
         removeLayer,
-        // discreet
     }
 }

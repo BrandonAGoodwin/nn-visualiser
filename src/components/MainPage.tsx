@@ -314,6 +314,7 @@ function MainPage(props: MainPageProps) {
                 yDomain={props.yDomain}
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
+                toggleDiscreetBoundary={toggleDiscreetOutput}
                 // epochs={epochs}
                 // loss={loss}
                 // lossData={lossData}

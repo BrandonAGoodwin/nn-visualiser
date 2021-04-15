@@ -37,6 +37,7 @@ interface GraphPanelProps {
     yDomain: number[];
     decisionBoundary: number[];
     discreetBoundary: boolean;
+    toggleDiscreetBoundary: () => void;
     // epochs: number;
     // loss: number;
     // lossData: [number, number][];
@@ -57,6 +58,7 @@ function GraphPanel(props: GraphPanelProps) {
         yDomain,
         decisionBoundary,
         discreetBoundary,
+        toggleDiscreetBoundary,
         // epochs,
         // loss,
         // lossData,
@@ -113,11 +115,21 @@ function GraphPanel(props: GraphPanelProps) {
                 <FormGroup>
                     <FormControlLabel
                         control={<Switch
+                            size={"small"}
                             checked={showTestData}
                             onChange={() => setShowTestData((prevShowTestData) => !prevShowTestData)}
                             name="showTestData"
                         />}
                         label="Show test data"
+                    />
+                    <FormControlLabel
+                        control={<Switch
+                            size={"small"}
+                            checked={discreetBoundary}
+                            onChange={toggleDiscreetBoundary}
+                            name="discreetBoundary"
+                        />}
+                        label="Toggle discreet boundary"
                     />
                 </FormGroup>
                 <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {analyticsData.epochs} & {epoch}</p>
