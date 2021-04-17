@@ -95,6 +95,7 @@ function MainPage(props: MainPageProps) {
         setActivationFunction,
         setLearningRate,
         setBatchSize,
+        setAnalyticsData,
         step,
         reset,
         toggleInputNode,
@@ -125,15 +126,15 @@ function MainPage(props: MainPageProps) {
     const [compareMode, setCompareMode] = useState<boolean>(false);
     // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
-    const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
+    // const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
-    useEffect(() => {
-        console.log("Config change useEffect");
-        if (training) toggleAutoTrain();
-        // generateNetwork();
-        generateDataset();
-    }, [nnConfig, dgConfig]);
+    // useEffect(() => {
+    //     console.log("Config change useEffect");
+    //     if (training) toggleAutoTrain();
+    //     // generateNetwork();
+    //     generateDataset();
+    // }, [nnConfig, dgConfig]);
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -145,14 +146,28 @@ function MainPage(props: MainPageProps) {
     }, [network]);
 
 
-    // useEffect(() => {
-    //     console.log("Dataset/Noise change useEffect");
-    //     rese(); // Change reset implementation
-    // }, [datasetType, noise, numSamples]);
+    useEffect(() => {
+        console.log("Dataset/Noise change useEffect");
+        handleReset(); // Change reset implementation
+    }, [nnConfig, dgConfig]);
 
     useEffect(() => {
-        if (epochs === 0 || !network) return;
-        setLossData(lossData => lossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs), vis.getCost(network, testData, nnConfig.inputs)]]));
+        network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
+            if (prevAnalyticsData) {
+                const { trainingLossData, testLossData } = prevAnalyticsData;
+
+                //return { epochs: prevAnalyticsData?.epochs + 1, trainingLossData: prevAnalyticsData}
+                // let trainingLoss = vis.getCost(updatedNetwork, trainingData, nnConfig.inputs);
+                // let testLoss = vis.getCost(updatedNetwork, testData, nnConfig.inputs);
+                // let epoch = epochs + 1;
+                let newTrainingLossData = trainingLossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]);
+                let newTestLossData = testLossData.concat([[epochs, vis.getCost(network, testData, nnConfig.inputs)]]);
+                return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs};
+            }
+            return prevAnalyticsData;
+        });
+
+    
     }, [epochs]); 
 
 
@@ -166,7 +181,7 @@ function MainPage(props: MainPageProps) {
     //         console.log(newNetworkCopy);
     //         setNetworkOriginalState(newNetworkCopy);
     //     } else {
-    //         console.log("Loading network original state");
+    //         console.log("Loading networ k original state");
     //         if (networkOriginalState) {
     //             console.log(networkOriginalState);
     //             setNetwork(vis.copyNetwork(networkOriginalState));
@@ -205,6 +220,8 @@ function MainPage(props: MainPageProps) {
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
+
+    
     // const step = (noSteps: number) => {
     //     console.log(`MainPage step(${noSteps})`);
     //     if (!network || !dataset) return;
@@ -234,21 +251,21 @@ function MainPage(props: MainPageProps) {
         if (training) toggleAutoTrain();
     };
 
-    // const saveComparisionData = () => {
-    //     let newComparisionData: NetworkState = {
-    //         nnConfig: nnConfig,
-    //         dataset: trainingData,
-    //         datasetType: dgConfig.datasetType,
-    //         decisionBoundaries: decisionBoundaries,
-    //         decisionBoundary: decisionBoundary,
-    //         epochs: epochs,
-    //         loss: loss,
-    //         lossData: lossData,
-    //         noise: dgConfig.noise
-    //     }
+    const saveComparisionData = () => {
+        let newComparisionData: NetworkState = {
+            nnConfig: nnConfig,
+            dgConfig: dgConfig,
+            decisionBoundaries: decisionBoundaries,
+            decisionBoundary: decisionBoundary,
+            analyticsData: analyticsData
+            // epochs: epochs,
+            // loss: loss,
+            // lossData: lossData,
+            // noise: dgConfig.noise
+        }
 
-    //     setComaparisonData(newComparisionData);
-    // }
+        setComaparisonData(newComparisionData);
+    }
 
     const toggleAutoTrain = () => {
         setTraining((training) => {
@@ -271,19 +288,19 @@ function MainPage(props: MainPageProps) {
 
     // }
 
-    // const saveCurrentState = () => {
-    //     saveComparisionData();
-    //     setCompareMode(true);
-    // }
+    const saveNetworkState = () => {
+        saveComparisionData();
+        setCompareMode(true);
+    }
 
-    // const loadSavedState = () => {
-    //     handleReset(); // This is defo broken
-    // }
+    const loadNetworkState = () => {
+        handleReset(); // This is defo broken
+    }
 
-    // const clearNetworkState = () => {
-    //     setComaparisonData(undefined);
-    //     setCompareMode(false);
-    // }
+    const clearNetworkState = () => {
+        setComaparisonData(undefined);
+        setCompareMode(false);
+    }
 
     return (
         <Container id="main-page">
@@ -299,11 +316,15 @@ function MainPage(props: MainPageProps) {
             />
             <ControlPanel
                 training={training}
+                compareMode={compareMode}
                 handleStep={handleStep}
                 toggleAutoTrain={toggleAutoTrain}
                 toggleDiscreetOutput={toggleDiscreetOutput}
                 handleRegenerateDataset={handleRegenerateDataset}
                 handleReset={handleReset}
+                saveNetworkState={saveNetworkState}
+                loadNetworkState={loadNetworkState}
+                clearNetworkState={clearNetworkState}
             />
             <GraphPanel
                 network={network}

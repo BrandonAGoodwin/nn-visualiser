@@ -280,7 +280,7 @@ function NetworkPanel(props: NetworkProps) {
 
 
     useEffect(() => {
-        drawAllLinks(props.network);
+        // drawAllLinks(props.network);
         updateContainerBox();
     }, [props.decisionBoundaries]);
 

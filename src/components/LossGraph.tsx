@@ -83,7 +83,7 @@ function LossGraph(props: GraphProps) {
             updateGraphs()
 
         }
-    }, [props]);
+    }, [analyticsData, comparisonAnalyticsData, showTestData]);
 
 
     const createGraph = () => {
@@ -167,8 +167,8 @@ function LossGraph(props: GraphProps) {
         const compTrainingLossData = comparisonAnalyticsData?.trainingLossData;
         const compTestLossData = comparisonAnalyticsData?.testLossData;
         const compEpochs = comparisonAnalyticsData?.epochs;
-        console.log(trainingLossData)
-        const svg = d3.select(d3Container.current)
+
+        const svg = d3.select(d3Container.current);
 
         svg.selectAll(`.loss-graph`).remove();
         d3.select("body").selectAll(`.loss-graph.tooltip`).remove();

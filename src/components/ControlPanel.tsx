@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Button } from '@material-ui/core';
+import { Button, IconButton, Tooltip } from '@material-ui/core';
+import SaveIcon from '@material-ui/icons/Save';
 import React from 'react';
 import { ContainerSection } from './MainPage';
 
@@ -20,21 +21,29 @@ const StyledButton = styled(Button)`
 
 interface ControlPanelProps {
     training: boolean;
+    compareMode: boolean;
     handleStep: () => void;
     toggleAutoTrain: () => void;
     toggleDiscreetOutput: () => void;
     handleRegenerateDataset: () => void;
     handleReset: () => void;
+    saveNetworkState: () => void;
+    loadNetworkState: () => void;
+    clearNetworkState: () => void;
 }
 
 function ControlPanel(props: ControlPanelProps) {
     const {
         training,
+        compareMode,
         handleStep,
         toggleAutoTrain,
         toggleDiscreetOutput,
         handleRegenerateDataset,
-        handleReset
+        handleReset,
+        saveNetworkState,
+        loadNetworkState,
+        clearNetworkState
     } = props;
     return (
         <StyledControlPanel>
@@ -43,9 +52,14 @@ function ControlPanel(props: ControlPanelProps) {
             <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton>
             <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
             <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
-            {/* <StyledButton variant={"contained"} onClick={saveCurrentState}> Save Current Network State </StyledButton> 
-                <StyledButton variant={"contained"} onClick={loadSavedState} disabled={(!networkController.compareMode) || false}> Load Network State </StyledButton>
-                <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton> */}
+            <Tooltip title={"Save setwork state"} aria-label={"Save network state"} style={{ fontSize: 16}}>
+                <IconButton onClick={saveNetworkState} >
+                    <SaveIcon/>
+                </IconButton>
+            </Tooltip>
+            <StyledButton variant={"contained"} onClick={saveNetworkState}> Save Current Network State </StyledButton>
+            <StyledButton variant={"contained"} onClick={loadNetworkState} disabled={(!compareMode) || false}> Load Network State </StyledButton>
+            <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton>
         </StyledControlPanel>
     );
 }
