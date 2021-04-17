@@ -98,7 +98,8 @@ function GraphPanel(props: GraphPanelProps) {
                 />
             </div>
             {trainingData && network && <NNGraph
-                dataset={trainingData}
+                trainingData={trainingData}
+                testData={testData}
                 density={25}
                 canvasWidth={250}
                 marginLeft={35}
@@ -110,6 +111,7 @@ function GraphPanel(props: GraphPanelProps) {
                 yDomain={yDomain}
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
+                showTestData={showTestData}
             />}
             <div style={{ marginLeft: "10px" }}>
                 <FormGroup>
