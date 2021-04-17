@@ -3,11 +3,25 @@ import * as d3 from 'd3';
 import { Datapoint2D } from '../datasets';
 import BackgroundCanvas from './BackgroundCanvas';
 import { AnalyticsData, LossData } from '../NetworkController';
+import styled from '@emotion/styled';
 
 // export type LossData = {
 //     epoch: number;
 //     trainingLoss: number;
 // }
+
+const Tooltip = styled("div")`
+    position: absolute;			
+    text-align: center;			
+    width: 60px;					
+    height: 28px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;	
+`
 
 interface GraphProps {
     // dataset: LossData[];
@@ -88,68 +102,25 @@ function LossGraph(props: GraphProps) {
         graph: any,
         x: d3.ScaleLinear<number, number>,
         y: d3.ScaleLinear<number, number>,
-        // bounds: { minY: number, maxY: number }
+        label: string
     ) => {
 
-        // const graph = svg.append('g')
-        //     .attr("class", `loss-graph`)
-        //     .attr('transform', `translate(${props.margin}, ${props.margin})`);
+        let div = d3.select("body").append("div")
+            .attr("class", "loss-graph tooltip")
+            .style("position", "absolute")
+            .style("text-align", "center")
+            .style("width", "60px")
+            .style("height", "28px")
+            .style("padding", "2px")
+            // .style("font: 12p"
+            .style("background", "lightsteelblue")
+            .style("border", "0px")
+            .style("border-radius", "8px")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
 
-        // const x = d3.scaleLinear()
-        //     .range([0, props.width])
-        //     .domain([1, Math.max(props.dataset.length, props.comparisionDataset?.length || 0)]);
-
-        // const x = d3.scaleLinear()
-        //     .range([0, props.width])
-        //     .domain([1, Math.max(epochs, compEpochs || 0)]); // Maybe domain should start from 0 if we get initial loss
-
-        // let minY = Number.MAX_VALUE;
-        // let maxY = Number.MIN_VALUE;
-
-        // props.dataset.forEach((d: LossData) => {
-        //     let y = d[1];
-        //     minY = Math.min(minY, y);
-        //     maxY = Math.max(maxY, y);
-        // });
-
-        // lossData.forEach((d: LossData) => {
-        //     let y = d[1];
-        //     minY = Math.min(minY, y);
-        //     maxY = Math.max(maxY, y);
-        // });
-
-        // if (props.comparisionDataset) {
-        //     props.comparisionDataset.forEach((d: LossData) => {
-        //         let y = d[1];
-        //         minY = Math.min(minY, y);
-        //         maxY = Math.max(maxY, y);
-        //     });
-        // }
-
-        // if (props.analyticsData.) {
-        //     props.comparisionDataset.forEach((d: LossData) => {
-        //         let y = d[1];
-        //         minY = Math.min(minY, y);
-        //         maxY = Math.max(maxY, y);
-        //     });
-        // }
-
-        // const y = d3.scaleLinear()
-        //     .range([props.height, 0])
-        //     .domain([minY, maxY]);
-
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .attr('transform', `translate(0,${props.height})`)
-        //     .call(d3.axisBottom(x));
-
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .call(d3.axisLeft(y));
-
-
-        // let index = 1;
-        graph.append("path")
+        
+        let path = graph.append("path")
             .datum(lossData)
             .attr("fill", "none")
             .attr("stroke", colour)
@@ -158,16 +129,36 @@ function LossGraph(props: GraphProps) {
                 .x((d: [number, number]) => x(d[0]) || 0)
                 .y((d: [number, number]) => y(d[1]) || 0))
 
-        // if (props.comparisionDataset) {
-        //     graph.append("path")
-        //         .datum(props.comparisionDataset)
-        //         .attr("fill", "none")
-        //         .attr("stroke", "red")
-        //         .attr("stroke-width", 1.5)
-        //         .attr("d", d3.line()
-        //             .x((d: [number, number]) => x(d[0]) || 0)
-        //             .y((d: [number, number]) => y(d[1]) || 0))
-        // }
+            // graph.append("path")
+            // .datum(lossData)
+            // .attr("fill", "none")
+            // .attr("stroke", "grey")
+            // .attr("stroke-width", 20)
+            // .style("stroke-opacity", 0.7)
+            // .attr("pointer-events", "stroke")
+            // .attr("cursor", "pointer")
+            // .attr("d", d3.line()
+            //     .x((d: [number, number]) => x(d[0]) || 0)
+            //     .y((d: [number, number]) => y(d[1]) || 0))
+            // .on("mouseover", (event:any , d: [number, number]) => {
+            //     path.transition()
+            //         .duration(100)
+            //         .style("stroke-width", 3);
+            //     div.transition()
+            //         .duration(200)
+            //         .style("opacity", 0.9);
+            //     div.text(label)
+            //         .style("left", (event.pageX) + "px")
+            //         .style("top", (event.pageY - 28) + "px");;
+            // })
+            // .on("mouseout", (d: [number, number]) => {
+            //     path.transition()
+            //         .duration(100)
+            //         .style("stroke-width", 1.5);
+            //     div.transition()
+            //         .duration(500)
+            //         .style("opacity", 0);
+            // });
     }
 
     const updateGraphs = () => {
@@ -180,6 +171,8 @@ function LossGraph(props: GraphProps) {
         const svg = d3.select(d3Container.current)
 
         svg.selectAll(`.loss-graph`).remove();
+        d3.select("body").selectAll(`.loss-graph.tooltip`).remove();
+
 
         const graph = svg.append('g')
             .attr("class", `loss-graph`)
@@ -187,8 +180,6 @@ function LossGraph(props: GraphProps) {
             .attr("height", props.height)
             .attr('transform', `translate(${props.margin}, ${props.margin})`);
 
-        // let minY = Number.MAX_VALUE;
-        // let maxY = Number.MIN_VALUE;
 
         const lossDatasets = [trainingLossData];
         props.showTestData && lossDatasets.push(testLossData);
@@ -201,9 +192,7 @@ function LossGraph(props: GraphProps) {
 
         const y = d3.scaleLinear()
             .range([props.height, 0])
-            .domain([0,(getBounds(lossDatasets))[1]]);
-
-        // let bounds = { minY: Number.MAX_VALUE, maxY: Number.MIN_VALUE };
+            .domain([0, (getBounds(lossDatasets))[1]]);
 
         graph.append('g')
             .attr("class", `axis`)
@@ -214,80 +203,17 @@ function LossGraph(props: GraphProps) {
             .attr("class", `axis`)
             .call(d3.axisLeft(y));
 
-        drawGraph(trainingLossData, "#606060", graph, x, y);
-        showTestData && drawGraph(testLossData, "blue", graph, x, y);
-        compTrainingLossData && drawGraph(compTrainingLossData, "red", graph, x, y);
-        // const x = d3.scaleLinear()
-        //     .range([0, props.width])
-        //     .domain([1, Math.max(props.dataset.length, props.comparisionDataset?.length || 0)]);
+        // Draw training loss data
+        drawGraph(trainingLossData, "#606060", graph, x, y, "Training loss");
 
-        // const x = d3.scaleLinear()
-        //     .range([0, props.width])
-        //     .domain([1, Math.max(epochs, compEpochs || 0)]); // Maybe domain should start from 0 if we get initial loss
+        // Draw test loss data
+        showTestData && drawGraph(testLossData, "blue", graph, x, y, "Test loss");
 
-        // let minY = Number.MAX_VALUE;
-        // let maxY = Number.MIN_VALUE;
+        // Draw saved/comparison training loss data
+        compTrainingLossData && drawGraph(compTrainingLossData, "red", graph, x, y, "Saved training loss");
 
-        // props.dataset.forEach((d: LossData) => {
-        //     let y = d[1];
-        //     minY = Math.min(minY, y);
-        //     maxY = Math.max(maxY, y);
-        // });
-
-        // testD.forEach((d: LossData) => {
-        //     let y = d[1];
-        //     minY = Math.min(minY, y);
-        //     maxY = Math.max(maxY, y);
-        // });
-
-        // if (props.comparisionDataset) {
-        //     props.comparisionDataset.forEach((d: LossData) => {
-        //         let y = d[1];
-        //         minY = Math.min(minY, y);
-        //         maxY = Math.max(maxY, y);
-        //     });
-        // }
-
-        // if (props.analyticsData.) {
-        //     props.comparisionDataset.forEach((d: LossData) => {
-        //         let y = d[1];
-        //         minY = Math.min(minY, y);
-        //         maxY = Math.max(maxY, y);
-        //     });
-        // }
-
-
-
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .attr('transform', `translate(0,${props.height})`)
-        //     .call(d3.axisBottom(x));
-
-        // graph.append('g')
-        //     .attr("class", `axis`)
-        //     .call(d3.axisLeft(y));
-
-
-        // let index = 1;
-        // graph.append("path")
-        //     .datum(props.dataset)
-        //     .attr("fill", "none")
-        //     .attr("stroke", "#606060")
-        //     .attr("stroke-width", 1.5)
-        //     .attr("d", d3.line()
-        //         .x((d: LossData) => x(d[0]) || 0)
-        //         .y((d: LossData) => y(d[1]) || 0))
-
-        // if (props.comparisionDataset) {
-        //     graph.append("path")
-        //         .datum(props.comparisionDataset)
-        //         .attr("fill", "none")
-        //         .attr("stroke", "red")
-        //         .attr("stroke-width", 1.5)
-        //         .attr("d", d3.line()
-        //             .x((d: [number, number]) => x(d[0]) || 0)
-        //             .y((d: [number, number]) => y(d[1]) || 0))
-        // }
+        // Draw saved/comparison test loss data
+        showTestData && compTestLossData && drawGraph(compTestLossData, "green", graph, x, y, "Saved test loss");
     }
 
     return (
