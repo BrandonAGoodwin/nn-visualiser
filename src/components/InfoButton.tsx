@@ -39,11 +39,14 @@ interface InfoButtonProps {
     fontSize?: "small" | "inherit" | "default" | "large" | undefined;
     marginLeft?: number;
     marginRight?: number;
+    marginTop?: number | string;
+    marginBottom?: number | string;
 }
 
 const InfoButton: React.FC<InfoButtonProps> = ({
     marginLeft = 10,
     marginRight = 10,
+
     ...props
 }) => {
 
@@ -54,7 +57,12 @@ const InfoButton: React.FC<InfoButtonProps> = ({
             marginLeft={marginLeft}
             marginRight={marginRight}
         >
-            <StyledIconButton>
+            <StyledIconButton
+                style={{
+                    marginTop: (props.marginTop ? props.marginTop : "auto"),
+                    marginBottom: (props.marginBottom ? props.marginBottom : "auto")
+                }}
+            >
                 {props.icon || <Info fontSize={props.fontSize} />}
             </StyledIconButton>
         </HtmlTooltip>
