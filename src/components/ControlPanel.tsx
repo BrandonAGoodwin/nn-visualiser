@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import { Button, Divider, IconButton, Tooltip, Typography } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ReplayIcon from '@material-ui/icons/Replay';
 import React, { useContext } from 'react';
 import { ContainerSection, StyledInfoButton } from './MainPage';
 import { InfoPanelContext } from '../contexts/InfoPanelContext';
-import { DefinedTerm, DefX1, DefX2 } from './Definitions';
-import OutputInfoPanel from './InfoPanels/LossInfoPanel';
+import ComparisionInfoPanel from './InfoPanels/ComparisionInfoPanel';
 
 const StyledControlPanel = styled((props: any) => <ContainerSection gridArea="control-panel" {...props} />)`
 display: flex;
@@ -37,14 +37,12 @@ interface ControlPanelProps {
 }
 
 function ControlPanel(props: ControlPanelProps) {
-    const {} = useContext(InfoPanelContext);
+    const { setInfoPanelWrapper } = useContext(InfoPanelContext);
     const {
         training,
         compareMode,
         handleStep,
         toggleAutoTrain,
-        toggleDiscreetOutput,
-        handleRegenerateDataset,
         handleReset,
         saveNetworkState,
         loadNetworkState,
@@ -52,55 +50,63 @@ function ControlPanel(props: ControlPanelProps) {
     } = props;
     return (
         <StyledControlPanel>
+            <h3 style={{ marginTop: "20px", marginBottom: "5px" }}>Network Training</h3>
+            <Divider style={{ minWidth: "90%", marginLeft: "auto", marginRight: "auto", marginBottom: "10px" }} />
             <StyledButton variant={"contained"} onClick={handleStep}> Step </StyledButton>
             <StyledButton variant={"contained"} onClick={toggleAutoTrain}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
-            {/* <StyledButton variant={"contained"} onClick={toggleDiscreetOutput}> Toggle Discreet Boundary </StyledButton> */}
-            <StyledButton variant={"contained"} color={"primary"} onClick={handleRegenerateDataset}> Regenerate Dataset </StyledButton>
             <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
-            {/* <div> */}
-                {/* <Tooltip title={"Save network state"} aria-label={"Save network state"} style={{ fontSize: 16 }}>
-                    <IconButton onClick={saveNetworkState} >
-                        <SaveIcon />
-                    </IconButton>
-                </Tooltip> */}
-                <Divider style={{ maxWidth: "80%"}}/>
-                <div style={{ display: "flex"}}>
-                    <Tooltip title={"Save network state"} aria-label={"Save network state"} /* style={{ fontSize: 16 }} */>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            onClick={saveNetworkState}
-                            // className={classes.button}
-                            startIcon={<SaveIcon />}
-                            style={{maxWidth: "min-content"}}
-                        >
-                            Save
-                        </Button>
-                    </Tooltip>
-                    <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" /* onClick={setInfoPanelWrapper} infoPanel={<OutputInfoPanel />} */>
+
+            <div style={{ display: "flex", marginTop: "40px", alignItems: "flex-end" }}>
+                <h3 style={{ marginBottom: "5px" }}>Comparison Tools</h3>
+                <StyledInfoButton title="Output Tooltip" marginLeft={5} marginBottom={0} marginTop={"auto"} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
                     <React.Fragment>
-                        <Typography color="inherit">Output</Typography>
-                        <Typography variant="body2"></Typography><br />
+                        <Typography variant="body2"> The comparision tools allow you to save the current state of your network so that you can change the configuration and see how this effects the performance of the network. <br /> (Click on the tool tip for instructions on how to utilise this)
+                        </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
-                </div>
-                <Tooltip title={"Clear saved network state"} aria-label={"Clear saved network state"} /* style={{ fontSize: 16 }} */>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={clearNetworkState}
-                        // className={classes.button}
-                        startIcon={<DeleteIcon />}
-                        style={{maxWidth: "min-content"}}
-                    >
-                        Clear
+            </div>
+            <Divider style={{ minWidth: "90%", marginLeft: "auto", marginRight: "auto"/* , marginBottom: "10px" */ }} />
+
+            <Tooltip title={"Save network state"} aria-label={"Save network state"} /* style={{ fontSize: 16 }} */>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    // size="small"
+                    onClick={saveNetworkState}
+                    startIcon={<SaveIcon />}
+                    style={{ /* maxWidth: "min-content", */ marginTop: "10px" }}
+                >
+                    Save
+                        </Button>
+            </Tooltip>
+            <Tooltip title={"Load saved network state"} aria-label={"Load saved network state"} /* style={{ fontSize: 16 }} */>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    // size="small"
+                    onClick={loadNetworkState}
+                    startIcon={<ReplayIcon />}
+                    disabled={(!compareMode) || false}
+                    style={{ /* maxWidth: "min-content", */ marginTop: "10px" }}
+                >
+                    Load
+                        </Button>
+            </Tooltip>
+            <Tooltip title={"Clear saved network state"} aria-label={"Clear saved network state"} /* style={{ fontSize: 16 }} */>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    // size="small"
+                    onClick={clearNetworkState}
+                    startIcon={<DeleteIcon />}
+                    style={{ /* maxWidth: "min-content",  */marginTop: "10px" }}
+                >
+                    Clear
                     </Button>
-                </Tooltip>
-                {/* <StyledButton variant={"contained"} onClick={saveNetworkState}> Save Current Network State </StyledButton> */}
-                <StyledButton variant={"contained"} onClick={loadNetworkState} disabled={(!compareMode) || false}> Load Network State </StyledButton>
-                {/* <Tooltip title={"Clear saved network state"} aria-label={"Save network state"} style={{ fontSize: 16 }}>
+            </Tooltip>
+            {/* <StyledButton variant={"contained"} onClick={saveNetworkState}> Save Current Network State </StyledButton> */}
+            {/* <StyledButton variant={"contained"} onClick={loadNetworkState} disabled={(!compareMode) || false}> Load Network State </StyledButton> */}
+            {/* <Tooltip title={"Clear saved network state"} aria-label={"Save network state"} style={{ fontSize: 16 }}>
                     <IconButton onClick={clearNetworkState} >
                         <DeleteIcon />
                     </IconButton>
