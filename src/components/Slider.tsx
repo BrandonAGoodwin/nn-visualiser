@@ -11,7 +11,7 @@ interface Props {
 }
 
 const StyledDiv = styled("div")`
-    width: 110px;
+    width: 120px;
     padding-left: 10px;
     padding-right: 10px;
 `
@@ -47,7 +47,7 @@ function LabeledSlider(props: sliderProps) {
     }
     return (
         <StyledDiv>
-            <Typography gutterBottom>{props.label + ": " + currentValue}</Typography>
+            <Typography gutterBottom style={{fontSize: 14}}>{props.label + ": " + currentValue}</Typography>
             <Slider
                 // ValueLabelComponent={ValueLabelComponent}
                 //aria-label="custom thumb label"

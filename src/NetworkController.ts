@@ -182,16 +182,7 @@ export function useNetwork(
         setNNConfig((prev) => ({ ...prev, batchSize: batchSize }));
     })
 
-    // const setAnalyticsDataWrapper = (value: React.SetStateAction<NNConfig>) => {
-    //     if (compareMode) {
-    //         setAnalyticsData(values);
-    //     } else {
-    //         s
-    //     }
-    // }
-
-    // const save
-
+    
     const toggleInputNode = (nodeId: string, active: boolean) => {
         setNNConfig((prevConfig) => {
             let inputs = prevConfig.inputs;

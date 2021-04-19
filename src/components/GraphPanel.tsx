@@ -134,7 +134,7 @@ function GraphPanel(props: GraphPanelProps) {
                         label="Toggle discreet boundary"
                     />
                 </FormGroup>
-                <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {analyticsData.epochs} & {epoch}</p>
+                <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {epoch}</p>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                     <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
                     <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />}>
@@ -145,16 +145,27 @@ function GraphPanel(props: GraphPanelProps) {
                         </React.Fragment>
                     </StyledInfoButton>
                 </div>
-                <LossGraph
-                    height={60}
-                    width={170}
-                    margin={5}
-                    analyticsData={analyticsData}
-                    comparisonAnalyticsData={comparisonAnalyticsData}
-                    showTestData={showTestData}
-                // dataset={lossData}
-                // comparisionData={comparisonData?.lossData} 
-                />
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <LossGraph
+                        height={60}
+                        width={150}
+                        margin={5}
+                        analyticsData={analyticsData}
+                        comparisonAnalyticsData={comparisonAnalyticsData}
+                        showTestData={showTestData}
+                    // dataset={lossData}
+                    // comparisionData={comparisonData?.lossData}
+                    />
+                    <div style={{ fontSize: 12 }}>
+                        <p style={{ marginTop: "0px" }}>
+                            <span style={{ fontSize: 13 }}>Legend:</span><br />
+                            <ColouredBox colour={"#606060"} /> Training loss<br />
+                            <ColouredBox colour={"blue"} /> Test loss<br />
+                            <ColouredBox colour={"red"} /> Saved training loss<br />
+                            <ColouredBox colour={"green"} /> Saved test loss<br />
+                        </p>
+                    </div>
+                </div>
             </div>
         </StyledGraphPanel>
     );

@@ -68,6 +68,7 @@ function LossGraph(props: GraphProps) {
         // console.log("LossGraph init")
 
         createGraph();
+        updateGraphs();
         setInitialised(true);
     }
 

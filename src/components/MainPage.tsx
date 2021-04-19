@@ -313,6 +313,7 @@ function MainPage(props: MainPageProps) {
                 setNoise={setNoise}
                 setNumSamples={setNumSamples}
                 setBatchSize={setBatchSize}
+                handleRegenerateDataset={generateDataset}
             />
             <ControlPanel
                 training={training}

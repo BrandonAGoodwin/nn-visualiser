@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Divider, FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
+import { Button, Divider, FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
 import React, { useContext } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
@@ -37,6 +37,7 @@ interface ConfigBarProps {
     setNoise: (noise: number) => void;
     setNumSamples: (numSamples: number) => void;
     setBatchSize: (batchSize: number) => void;
+    handleRegenerateDataset: () => void;
 }
 
 function ConfigBar(props: ConfigBarProps) {
@@ -49,7 +50,8 @@ function ConfigBar(props: ConfigBarProps) {
         setDatasetType,
         setNoise,
         setNumSamples,
-        setBatchSize
+        setBatchSize,
+        handleRegenerateDataset
     } = props;
 
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
@@ -182,6 +184,8 @@ function ConfigBar(props: ConfigBarProps) {
                     <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
                 </React.Fragment>
             </StyledInfoButton>
+            <Divider orientation="vertical" flexItem />
+            <Button variant={"contained"} onClick={handleRegenerateDataset}> Regenerate Dataset </Button>
         </StyledConfigBar>
     );
 }
