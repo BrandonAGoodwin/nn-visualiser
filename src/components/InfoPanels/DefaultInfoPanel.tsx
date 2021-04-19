@@ -1,14 +1,10 @@
-import React, { useContext, useRef } from "react";
-import { NNConfig } from "../../NetworkController";
+import React, { useContext } from "react";
 import positiveLink from "../../PositiveLink.png";
 import negativeLink from "../../NegativeLink.png";
 import { ThemeContext } from "../../contexts/ThemeContext";
 
 function DefaultInfoPanel() {
-    // const linkSvgContainer: any = useRef<any>(null);
-    // const drawDemoLink = () => {
 
-    // }
     const { minColourName, maxColourName } = useContext(ThemeContext);
 
     return (
@@ -20,13 +16,7 @@ function DefaultInfoPanel() {
             {/* Maths font w? */}
             {/* Defined Term or google link for Gradient Decent*/}
             <p>Links (or edges) connect neurons in adjacent layers, each link has a weight value w that is updated by training the network using Gradient Decent.</p>
-            {/* <svg
-                ref={linkSvgContainer}
-                width={100}
-                height={40}
-                style={{pointerEvents: "none" }}
-                // id={'lines-container'}
-            /> */}
+
             <h4>Magnitude</h4>
             <p>The width of a link corresponds to the absolute magnitude of it's weight. Wider links have greater absolute weight values (and therefore have a stronger influence in the destination node) than narrower links.</p>
             <h4>Positive Value Link</h4>
@@ -35,8 +25,8 @@ function DefaultInfoPanel() {
             <h4>Negative Value Link</h4>
             <img src={negativeLink} alt="Negative link" width={100}/>
             <p>Links with a weight value &lt; 0 are {minColourName}.</p>
+            <h4>Mention/Link to:</h4>
             <ul>
-                <li>Fix history functionality</li>
                 <li>Node representation</li>
                 <li>Link representation</li>
                 <li>Inputs</li>

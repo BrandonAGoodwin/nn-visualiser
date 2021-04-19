@@ -265,8 +265,8 @@ export function useNetwork(
     // Might not work because config values aren't aquired from setConfig function call
     const step = (trainingData: Datapoint2D[], testData: Datapoint2D[]) => {
         setNetwork((prevNetwork) => {
-            console.log("Running step insid netowrk controller");
-            console.log(prevNetwork);
+            // console.log("Running step inside network controller");
+            // console.log(prevNetwork);
             if (prevNetwork) {
 
                 let updatedNetwork = vis.step(prevNetwork, trainingData, nnConfig.learningRate, nnConfig.inputs, nnConfig.batchSize);

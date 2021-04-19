@@ -132,66 +132,6 @@ const FadeCanvas = styled("canvas") <CanvasProps>`
     `}
 `;
 
-// export function generateLineConfig (link: nn.Link, minColour:string, maxColour: string) {
-//     let weightToSize = d3.scaleLinear()
-//         .domain([-1, 0, 1])
-//         .range([6, 1.5, 6])
-//         .clamp(true);
-//     return {
-//         color: (link.weight > 0 ? maxColour : minColour),
-//         size: weightToSize(link.weight),
-//     }
-// }
-
-// export function drawLink(
-//     input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } },
-//     index: number, length: number, nodeWidth: number, minColour: string, maxColour: string, container: any) {
-//     let line = d3.select(container.current).append("path");
-//     let source = node2coord[input.source.id];
-//     let dest = node2coord[input.dest.id];
-//     if (!(dest && source)) return;
-
-//     // Check X and Ys are reversed properlly
-//     let datum: any = {
-//         source:
-//             [source.cx + nodeWidth / 2 + 2, source.cy]
-//         ,
-//         target: [dest.cx - nodeWidth / 2, dest.cy]
-//     };
-
-//     let diagonal = d3.linkHorizontal()
-//         .x(function (d: any) {
-//             return d[0];
-//         }).y(function (d: any) { return d[1]; })
-//     let d = diagonal(datum);
-
-//     let linkConfig = generateLineConfig(input, minColour,  maxColour);
-
-//     d && line.attr("marker-start", "url(#markerArrow)")
-//         .attr("class", "link")
-//         .attr("id", `link-${input.source.id}-${input.dest.id}`)
-//         .attr("d", d)
-//         .attr("fill", "transparent")
-//         .attr("pointer-events", "all")
-//         .attr("stroke", linkConfig.color)
-//         .attr("stroke-width", linkConfig.size || 0)
-//         .attr("stroke-dasharray", "10,2")
-//         .on("mouseover", function (d, i) {
-//             d3.select(this).transition()
-//                 .duration(100000)
-//                 .ease(d3.easeLinear)
-//                 .attr("stroke-dashoffset", -8000)
-//         })
-//         .on("mouseout", function (d, i) {
-//             d3.select(this)
-//                 .transition();
-//         })
-//     return line;
-// }
-
-// function drawLink2() {
-
-// }
 
 interface NetworkProps {
     network: nn.Node[][];
