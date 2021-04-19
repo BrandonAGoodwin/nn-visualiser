@@ -105,8 +105,18 @@ function ConfigBar(props: ConfigBarProps) {
                     value={nnConfig.learningRate}
                     onChange={handleLearningRateChange}
                 >
+                    <MenuItem value="10">10</MenuItem>
+                    <MenuItem value="3">3</MenuItem>
+                    <MenuItem value="1">1</MenuItem>
+                    <MenuItem value="0.3">0.3</MenuItem>
+                    <MenuItem value="0.1">0.1</MenuItem>
                     <MenuItem value="0.03">0.03</MenuItem>
-                    <MenuItem value="0.005">0.005</MenuItem>
+                    <MenuItem value="0.01">0.03</MenuItem>
+                    <MenuItem value="0.003">0.003</MenuItem>
+                    <MenuItem value="0.0001">0.0001</MenuItem>
+                    <MenuItem value="0.0003">0.0001</MenuItem>
+                    <MenuItem value="0.00001">0.00001</MenuItem>
+                    <MenuItem value="0.000000001">0.000000001</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
             <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel {...nnConfig} />}>

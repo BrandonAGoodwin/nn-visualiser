@@ -8,7 +8,7 @@ Tasks:
         ☐ Inputs info panel
         ✔ Fix main page grid container @done (11/02/2021, 20:04:18)
         ✔ Put comparison line on loss graph @done (16/03/2021, 11:55:13)
-        ☐ Create test set
+        ✔ Create test set @done (19/04/2021, 15:27:28)
         ✔ Background colour usability study @done (02/04/2021, 15:05:43)
         ☐ Cypress Test Runner
         ☐ Host project on webpage
