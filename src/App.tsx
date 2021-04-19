@@ -5,16 +5,12 @@ import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
 import React, { createRef, useContext, useEffect, useState } from 'react';
 import './App.css';
 import ComparePage from './components/ComparePage';
-import MainPage, { NetworkState } from './components/MainPage';
+import MainPage from './components/MainPage';
 import useEventListener from './components/UseEventListener';
 import { css, Global } from "@emotion/react";
+import { NetworkState, useNetwork } from "./NetworkController";
+import { useDatasetGenerator } from "./DatasetGenerator";
 
-
-// export const ThemeContext = createContext<Partial<ThemeProps>>({});
-
-const StyledMainPage = styled(MainPage)`
-
-`
 
 const StyledComparePage = styled(ComparePage)`
 `
@@ -56,9 +52,6 @@ const Container = styled("div")`
     }
 `
 
-// const MainContainer = styled(Container)`
-
-// `
 
 const AuxContainer = styled("div")`
     position: relative;
@@ -80,7 +73,7 @@ const TransitionButton = styled(IconButton)`
     top: 50%;
     left: 95%;
     z-index: 500;
-    transition: all ${(props: {transitioning: boolean}) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
+    transition: all ${(props: { transitioning: boolean }) => props.transitioning ? "0.7s" : "0s"} ease-in-out;
     &.active {
         left: 5%;
     }
@@ -92,8 +85,9 @@ interface ComparisonData {
 }
 
 function App() {
-    const {background} = useContext(ThemeContext);
-
+    const { background } = useContext(ThemeContext);
+    const { nnConfig } = useNetwork();
+    const { dgConfig } = useDatasetGenerator();
     const mainContainer = createRef<HTMLDivElement>();
 
     const [pageState, setPageState] = useState<string>("main");
@@ -104,18 +98,18 @@ function App() {
     const [comparisonData, setComparisonData] = useState<ComparisonData>();
 
     const updateComparisionData = (currentState: NetworkState, savedState: NetworkState) => {
-        setComparisonData({currentState: currentState, savedState: savedState});
+        setComparisonData({ currentState: currentState, savedState: savedState });
     }
 
     useEffect(() => {
-        if(transitioning) {
+        if (transitioning) {
             updateButtonPosition();
         }
     }, [transitioning])
 
     useEffect(() => {
-        setTimeout(function() {
-            console.log(pageState);
+        setTimeout(function () {
+            // console.log(pageState);
             setTransitioning(false);
             updateContainerSize();
             // updateButtonPosition();
@@ -134,7 +128,7 @@ function App() {
     }
 
     const updateContainerSize = () => {
-        console.log("Updating container size");
+        // console.log("Updating container size");
 
         const maxMarginSize = 140;
         if (pageState === "main") {
@@ -145,22 +139,22 @@ function App() {
 
             if (!container || !mainPage || !margin) return;
 
-            console.log("Conatainer width: " + container.offsetWidth);
-            console.log("Page width: " + mainPage.offsetWidth);
+            // console.log("Conatainer width: " + container.offsetWidth);
+            // console.log("Page width: " + mainPage.offsetWidth);
 
-            console.log("Margin width: " + marginWidth);
+            // console.log("Margin width: " + marginWidth);
 
             if ((container.offsetWidth - marginWidth) < (mainPage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((mainPage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
                 setMarginWidth(newMarginWidth);
-                console.log("Margin added");
+                // console.log("Margin added");
             } else {
                 margin.style.minWidth = "0px";
                 setMarginAdded(false);
                 setMarginWidth(0);
-                console.log("Margin removed");
+                // console.log("Margin removed");
             }
         }
 
@@ -172,22 +166,22 @@ function App() {
 
             if (!container || !comparePage || !margin) return;
 
-            console.log("Conatainer width: " + container.offsetWidth);
-            console.log("Page width: " + comparePage.offsetWidth);
+            // console.log("Conatainer width: " + container.offsetWidth);
+            // console.log("Page width: " + comparePage.offsetWidth);
 
-            console.log("Margin width: " + marginWidth);
+            // console.log("Margin width: " + marginWidth);
 
             if ((container.offsetWidth - marginWidth) < (comparePage.offsetWidth + maxMarginSize)) {
                 let newMarginWidth = Math.min((comparePage.offsetWidth + maxMarginSize) - container.offsetWidth, maxMarginSize);
                 margin.style.minWidth = `${newMarginWidth}px`;
                 setMarginAdded(true);
                 setMarginWidth(newMarginWidth);
-                console.log("Margin added");
+                // console.log("Margin added");
             } else {
                 margin.style.minWidth = "0px";
                 setMarginAdded(false);
                 setMarginWidth(0);
-                console.log("Margin removed");
+                // console.log("Margin removed");
             }
 
         }
@@ -195,18 +189,18 @@ function App() {
 
     // Maybe convert to refs for better design. (Note: can't ref mainPage)
     const updateButtonPosition = () => {
-        console.log("Updating button position");
+        // console.log("Updating button position");
 
         let button = document.getElementById("transition-button");
 
-        if(!button) return;
+        if (!button) return;
 
 
-        console.log("Margin added: " + marginAdded);
-        console.log("Transitioning: " + transitioning);
-        console.log("Pagestate: " + pageState);
+        // console.log("Margin added: " + marginAdded);
+        // console.log("Transitioning: " + transitioning);
+        // console.log("Pagestate: " + pageState);
 
-        if(transitioning) {
+        if (transitioning) {
             button.style.left = pageState === "compare" ? "5%" : "95%";
             return;
         }
@@ -227,11 +221,11 @@ function App() {
                     button.style.left = `${pageRect.right + 20}px`;
                 } else {
                     button.style.left = `min(95%, calc(${pageRect.x + pageRect.width}px + 2%))`;
-                    console.log("here");
+                    // console.log("here");
 
                 }
-                console.log(pageRect);
-                console.log(containerRect);
+                //     console.log(pageRect);
+                //     console.log(containerRect);
             }
 
             if (pageState === "compare") {
@@ -249,14 +243,14 @@ function App() {
                     button.style.right = "100%";
                 } else {
                     button.style.left = `min(95%, calc(${pageRect.x + pageRect.width}px + 2%))`;
-                    console.log("here");
+                    // console.log("here");
 
                 }
-                console.log(pageRect);
-                console.log(containerRect);
+                // console.log(pageRect);
+                // console.log(containerRect);
             }
         } else {
-            console.log("heer");
+            // console.log("heer");
             button.style.left = pageState === "main" ? "95%" : "5%";
         }
     }
@@ -265,24 +259,25 @@ function App() {
         updateContainerSize();
         updateButtonPosition();
     });
-    
-    useEventListener("scroll",  updateButtonPosition, mainContainer);
+
+    useEventListener("scroll", updateButtonPosition, mainContainer);
 
     return (
-        // <ThemeContext.Consumer>
         <AuxContainer>
-        <Global
-          styles={css`
+            <Global
+                styles={css`
             body {
               background: ${background}
-            }`}/>
+            }`} />
             <Container id="main-container" className="animated main" ref={mainContainer}>
                 {/* <StyledMargin/> */}
-                <StyledMainPage
+                <MainPage
                     xDomain={[-8, 8]}
                     yDomain={[-8, 8]}
                     numCells={100}
                     updateComparisionData={updateComparisionData}
+                    nnConfig={nnConfig}
+                    dgConfig={dgConfig}
                 />
                 <StyledMargin id="dynamic-margin-main" />
             </Container>
@@ -292,10 +287,9 @@ function App() {
             </TransitionButton>
             <Container id="compare-container" className="animated compare">
                 <StyledMargin id="dynamic-margin-compare" />
-                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState}/>
+                <StyledComparePage currentState={comparisonData?.currentState} savedState={comparisonData?.savedState} />
             </Container>
         </AuxContainer>
-        // </ThemeContext.Consumer>
     );
 }
 

@@ -1,22 +1,22 @@
 import * as d3 from "d3";
 
-
-export type Dataset2D = {
+// Maybe refactor to Datapoint
+export type Datapoint2D = {
     x1: number,
     x2: number,
     y: number
 };
 
-export type DatasetGenerator = (numSamples: number, noise: number) => Dataset2D[];
+export type DatasetGenerator = (numSamples: number, noise: number) => Datapoint2D[];
 
 
 export class Dataset {
 
-    // Could create 3 gauss data quite easily
     public static GAUSSIAN_2: DatasetGenerator = (numSamples, noise) => {
+        // When noise = 0, variance = 0.5 and when noise = 1, variance = 8
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
-        let samples: Dataset2D[] = [];
+        let samples: Datapoint2D[] = [];
 
         /**
          * Generate a gaussian dataset with centre point (/mean) at cx, cy
@@ -37,13 +37,13 @@ export class Dataset {
         generateGaussianData(-3, -3, -1);
         generateGaussianData(3, 3, 1);
 
-        return samples;
+        return shuffle(samples);
     }
 
     public static GAUSSIAN_3: DatasetGenerator = (numSamples, noise) => {
         let varianceScale = d3.scaleLinear().domain([0, .5]).range([0.5, 4]); // Arbitrary
         let variance = varianceScale(noise) || 0;
-        let samples: Dataset2D[] = [];
+        let samples: Datapoint2D[] = [];
 
         /**
          * Generate a gaussian dataset with centre point (/mean) at cx, cy
@@ -65,18 +65,18 @@ export class Dataset {
         generateGaussianData(0, 0, 1);
         generateGaussianData(4, 4, -1);
 
-        return samples;
+        return shuffle(samples);
     }
 
     public static XOR: DatasetGenerator = (numSamples, noise) => {
-        let samples: Dataset2D[] = [];
-        // Noise currently not implemented
+        let noiseScale = d3.scaleLinear().domain([0, 1]).range([-0.5, 0.5]);
+        let samples: Datapoint2D[] = [];
         function generateUniformData(cx1: number, cx2: number, width: number, height: number, y: number) {
             let x1Scale = d3.scaleLinear().domain([0, 1]).range([cx1 - (width / 2), cx1 + (width / 2)]);
             let x2Scale = d3.scaleLinear().domain([0, 1]).range([cx2 - (height / 2), cx2 + (height / 2)]);
             for (let i = 0; i < numSamples / 4; i++) {
-                let x1 = x1Scale(Math.random()) || 0;
-                let x2 = x2Scale(Math.random()) || 0;
+                let x1 = x1Scale(Math.random() + (noiseScale(Math.random()) || 0) * noise) || 0;
+                let x2 = x2Scale(Math.random() + (noiseScale(Math.random()) || 0) * noise) || 0;
                 samples.push({ x1: x1, x2: x2, y: y });
             }
         }
@@ -86,7 +86,7 @@ export class Dataset {
         generateUniformData(-8 / 2, -8 / 2, 8, 8, -1);   // Bottom left -1
         generateUniformData(8 / 2, -8 / 2, 8, 8, 1);     // Bottom right +1
 
-        return samples;
+        return shuffle(samples);
     }
 }
 
@@ -113,3 +113,22 @@ function normalDistribution(mean: number, variance: number): number {
 
     return mean + Math.sqrt(variance) * y;
 }
+
+function shuffle(dataset: Datapoint2D[]): Datapoint2D[] {
+    var currentIndex = dataset.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = dataset[currentIndex];
+      dataset[currentIndex] = dataset[randomIndex];
+      dataset[randomIndex] = temporaryValue;
+    }
+  
+    return dataset;
+  }

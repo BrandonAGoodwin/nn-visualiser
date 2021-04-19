@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
-import { Dataset2D } from "../datasets";
+import { Datapoint2D } from "../datasets";
 import BackgroundCanvas from "./BackgroundCanvas";
 import { ThemeContext } from "../contexts/ThemeContext";
 
-interface GraphProps  {
-    dataset: Dataset2D[];
+interface GraphProps {
+    trainingData: Datapoint2D[];
+    testData: Datapoint2D[];
     density: number;
     canvasWidth: number;
-
     marginLeft: number;
     marginRight: number;
     marginTop: number;
@@ -18,18 +18,36 @@ interface GraphProps  {
     yDomain: number[];
     decisionBoundary?: number[];
     discreetBoundary: boolean;
+    showTestData: boolean;
 }
 
 
 function NNGraph(props: GraphProps): JSX.Element {
 
-    const {minColour, maxColour} = useContext(ThemeContext);
+    const {
+        trainingData,
+        testData,
+        density,
+        canvasWidth,
+        marginLeft,
+        marginRight,
+        marginTop,
+        marginBottom,
+        numCells,
+        xDomain,
+        yDomain,
+        decisionBoundary,
+        discreetBoundary,
+        showTestData
+    } = props;
+
+    const { minColour, maxColour } = useContext(ThemeContext);
 
     const d3Container: any = useRef<any>(null);
 
     const [initialised, setInitialised] = useState<boolean>(false);
 
-    let scale = props.canvasWidth / 16;
+    let scale = canvasWidth / 16;
 
 
     const init = () => {
@@ -46,21 +64,21 @@ function NNGraph(props: GraphProps): JSX.Element {
 
 
     useEffect(() => {
-        console.log("props and props.decisionboundary NNGraph useEffect")
+        console.log("props and decisionboundary NNGraph useEffect")
         if (!initialised) {
             init()
         } else {
             updateGraph()
         }
-    }, [props.decisionBoundary, props.dataset]);
+    }, [decisionBoundary, trainingData, testData, showTestData]);
 
 
     const createGraph = () => {
         console.log("Creating graph");
 
         d3.select(d3Container.currnet)
-            .attr("width", props.canvasWidth + props.marginLeft + props.marginRight)
-            .attr("height", props.canvasWidth + props.marginTop + props.marginBottom);
+            .attr("width", canvasWidth + marginLeft + marginRight)
+            .attr("height", canvasWidth + marginTop + marginBottom);
 
     }
 
@@ -99,17 +117,17 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         const graph = svg.append("g")
             .attr("class", "graph")
-            .attr("transform", `translate(${props.marginLeft}, ${props.marginTop})`);
+            .attr("transform", `translate(${marginLeft}, ${marginTop})`);
 
-        const x = d3.scaleLinear().range([0, props.canvasWidth]);
-        const y = d3.scaleLinear().range([props.canvasWidth, 0]);
+        const x = d3.scaleLinear().range([0, canvasWidth]);
+        const y = d3.scaleLinear().range([canvasWidth, 0]);
 
         x.domain([-8, 8]);
         y.domain([-8, 8]);
 
         graph.append("g")
             .attr("class", `axis`)
-            .attr("transform", `translate(0,${props.canvasWidth})`)
+            .attr("transform", `translate(0,${canvasWidth})`)
             .call(d3.axisBottom(x).tickValues([0].concat(x.ticks())));
 
         graph.append("g")
@@ -118,7 +136,7 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         graph.append("g")
             .attr("class", `axis`)
-            .attr("transform", `translate(${props.canvasWidth},0)`)
+            .attr("transform", `translate(${canvasWidth},0)`)
             .call(d3.axisRight(y).tickValues([0].concat(y.ticks())));
 
         graph.append("g")
@@ -130,8 +148,8 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         let xAxisText = graph.append("text")
             .attr("class", `axis`)
-            .attr("x", props.canvasWidth / 2)
-            .attr("y", props.canvasWidth + props.marginBottom - 7)
+            .attr("x", canvasWidth / 2)
+            .attr("y", canvasWidth + marginBottom - 7)
             .attr("text-anchor", "middle")
             .attr("alignment-baseline", "bottom");
 
@@ -139,25 +157,29 @@ function NNGraph(props: GraphProps): JSX.Element {
 
         let yAxisText = graph.append("text")
             .attr("class", `axis`)
-            .attr("y", props.canvasWidth / 2)
-            .attr("x", -props.marginLeft)
+            .attr("y", canvasWidth / 2)
+            .attr("x", -marginLeft)
             .attr("text-anchor", "left")
-            .attr("alignment-baseline", "middle")     
-        
+            .attr("alignment-baseline", "middle")
+
 
         addFormattedText(yAxisLabel, yAxisText);
 
-        let filteredDataset = props.dataset.filter((p: Dataset2D) => {
+        const outOfBoundsFilter = (p: Datapoint2D) => {
             return p.x1 >= x.domain()[0] && p.x1 <= x.domain()[1]
-              && p.x2 >= y.domain()[0] && p.x2 <= y.domain()[1];
-          });
+                && p.x2 >= y.domain()[0] && p.x2 <= y.domain()[1];
+        }
 
-        graph.selectAll(`.circle`)
-            .data(filteredDataset)
+        let filteredTrainingData = trainingData.filter(outOfBoundsFilter);
+        let filteredTestData = testData.filter(outOfBoundsFilter);
+
+
+        graph.selectAll(`.circle.train`)
+            .data(filteredTrainingData)
             .enter().append("circle")
-            .attr("class", `circle`)
+            .attr("class", `circle train`)
             .attr("r", scale / 7)
-            .attr("fill", function (datapoint: Dataset2D): string {
+            .attr("fill", function (datapoint: Datapoint2D): string {
                 let colour = "black";
                 if (datapoint.y === 1) colour = maxColour;
                 if (datapoint.y === -1) colour = minColour;
@@ -165,33 +187,51 @@ function NNGraph(props: GraphProps): JSX.Element {
                 return colour;
             })
             .style("stroke", "black")
-            .attr("cx", (datapoint: Dataset2D) => (datapoint.x1 * scale) + (props.canvasWidth / 2))
-            .attr("cy", (datapoint: Dataset2D) => -(datapoint.x2 * scale) + (props.canvasWidth / 2));
-    
+            .attr("cx", (datapoint: Datapoint2D) => (datapoint.x1 * scale) + (canvasWidth / 2))
+            .attr("cy", (datapoint: Datapoint2D) => -(datapoint.x2 * scale) + (canvasWidth / 2));
 
+        if (showTestData) {
+            graph.selectAll(`.circle.test`)
+                .data(filteredTestData)
+                .enter().append("circle")
+                .attr("class", `circle test`)
+                .attr("r", scale / 7)
+                .attr("fill", function (datapoint: Datapoint2D): string {
+                    let colour = "black";
+                    if (datapoint.y === 1) colour = maxColour;
+                    if (datapoint.y === -1) colour = minColour;
+                    return colour;
+                })
+                .attr("fill-opacity", 0.5)
+                .style("stroke", "black")
+                .style("stroke-opacity", 0.5)
+                .attr("cx", (datapoint: Datapoint2D) => (datapoint.x1 * scale) + (canvasWidth / 2))
+                .attr("cy", (datapoint: Datapoint2D) => -(datapoint.x2 * scale) + (canvasWidth / 2));
         }
+
+    }
 
     return (
         <>
-            <div style={{ position: "relative"}}>
+            <div style={{ position: "relative" }}>
                 <svg
                     ref={d3Container}
-                    width={props.canvasWidth + props.marginLeft + props.marginRight}
-                    height={props.canvasWidth + props.marginTop + props.marginBottom}
-                    style={{ position: "absolute"}}
+                    width={canvasWidth + marginLeft + marginRight}
+                    height={canvasWidth + marginTop + marginBottom}
+                    style={{ position: "absolute" }}
                 />
                 <BackgroundCanvas
-                    width={props.canvasWidth}
-                    height={props.canvasWidth}
-                    numCells={props.numCells}
-                    paddingLeft={props.marginLeft}
-                    paddingRight={props.marginRight}
-                    paddingTop={props.marginTop}
-                    paddingBottom={props.marginBottom}
+                    width={canvasWidth}
+                    height={canvasWidth}
+                    numCells={numCells}
+                    paddingLeft={marginLeft}
+                    paddingRight={marginRight}
+                    paddingTop={marginTop}
+                    paddingBottom={marginBottom}
                     disabled={false}
                     padding={true}
-                    decisionBoundary={props.decisionBoundary}
-                    discreetBoundary={props.discreetBoundary}
+                    decisionBoundary={decisionBoundary}
+                    discreetBoundary={discreetBoundary}
                 />
             </div>
         </>

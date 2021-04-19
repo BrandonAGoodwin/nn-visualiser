@@ -1,6 +1,6 @@
 import * as nn from "./NeuralNet";
 import * as vis from "./visControl";
-import { Dataset2D } from "./datasets";
+import { Datapoint2D } from "./datasets";
 
 
 describe("Forward Propagation", () => {
@@ -30,7 +30,7 @@ describe("Forward Propagation", () => {
 
 describe("Back Propagation", () => {
     let network: nn.Node[][];
-    let trainingData: Dataset2D[] = [
+    let trainingData: Datapoint2D[] = [
         {x1: -4, x2: 0, y: -1},
         {x1: 4, x2: 0, y: 1}
     ];
@@ -83,7 +83,7 @@ describe("Back Propagation", () => {
 
 describe("SGD", () => {
     let network: nn.Node[][];
-    let trainingData: Dataset2D[] = [
+    let trainingData: Datapoint2D[] = [
         {x1: -4, x2: 0, y: -1},
         {x1: 4, x2: 0, y: 1}
     ];
@@ -120,7 +120,7 @@ describe("SGD", () => {
 
 describe("Network Building", () => {
     let network: nn.Node[][];
-    let trainingData: Dataset2D[] = [
+    let trainingData: Datapoint2D[] = [
         {x1: -4, x2: 0, y: -1},
         {x1: 4, x2: 0, y: 1}
     ];

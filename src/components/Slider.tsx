@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Typography } from "@material-ui/core";
 import Slider from "@material-ui/core/Slider";
 import Tooltip from "@material-ui/core/Tooltip";
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
     children: React.ReactElement;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const StyledDiv = styled("div")`
-    width: 100px;
+    width: 120px;
     padding-left: 10px;
     padding-right: 10px;
 `
@@ -35,22 +35,29 @@ interface sliderProps {
     step: number;
     min: number;
     max: number;
+    appendValueToLabel: boolean;
 }
 
 function LabeledSlider(props: sliderProps) {
+    const [currentValue, setCurrentValue] = useState<number>(props.defaultValue);
 
+
+    const handleOnChange = (e: any, newValue: number | number[]) => {
+        setCurrentValue(newValue as number);
+    }
     return (
         <StyledDiv>
-            <Typography gutterBottom>{props.label}</Typography>
+            <Typography gutterBottom style={{fontSize: 14}}>{props.label + ": " + currentValue}</Typography>
             <Slider
-                ValueLabelComponent={ValueLabelComponent}
+                // ValueLabelComponent={ValueLabelComponent}
                 //aria-label="custom thumb label"
                 defaultValue={props.defaultValue}
                 step={props.step}
                 min={props.min}
                 max={props.max}
+                onChange={handleOnChange}
                 onChangeCommitted={props.onChange}
-                valueLabelDisplay={props.valueLabelDisplay || "auto"}
+                // valueLabelDisplay={props.valueLabelDisplay || "auto"}
             />
         </StyledDiv>
     );

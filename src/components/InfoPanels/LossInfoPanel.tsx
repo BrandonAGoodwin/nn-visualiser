@@ -1,14 +1,13 @@
 import React from "react";
-import { NNConfig } from "../MainPage";
 
-function LossInfoPanel(props: NNConfig) {
+function OutputInfoPanel() {
 
     return (
-        <div>
+        <div style={{maxWidth: "70%"}}>
             <h1>Loss</h1>
             <p></p>
         </div>
     );
 }
 
-export default LossInfoPanel;
+export default OutputInfoPanel;
