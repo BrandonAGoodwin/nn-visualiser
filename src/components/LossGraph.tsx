@@ -106,19 +106,19 @@ function LossGraph(props: GraphProps) {
         label: string
     ) => {
 
-        let div = d3.select("body").append("div")
-            .attr("class", "loss-graph tooltip")
-            .style("position", "absolute")
-            .style("text-align", "center")
-            .style("width", "60px")
-            .style("height", "28px")
-            .style("padding", "2px")
-            // .style("font: 12p"
-            .style("background", "lightsteelblue")
-            .style("border", "0px")
-            .style("border-radius", "8px")
-            .style("pointer-events", "none")
-            .style("opacity", 0);
+        // let div = d3.select("body").append("div")
+        //     .attr("class", "loss-graph tooltip")
+        //     .style("position", "absolute")
+        //     .style("text-align", "center")
+        //     .style("width", "60px")
+        //     .style("height", "28px")
+        //     .style("padding", "2px")
+        //     // .style("font: 12p"
+        //     .style("background", "lightsteelblue")
+        //     .style("border", "0px")
+        //     .style("border-radius", "8px")
+        //     .style("pointer-events", "none")
+        //     .style("opacity", 0); // This causes scrolling issues prob don't select body 
 
         
         let path = graph.append("path")

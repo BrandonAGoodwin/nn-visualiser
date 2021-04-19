@@ -38,9 +38,6 @@ interface GraphPanelProps {
     decisionBoundary: number[];
     discreetBoundary: boolean;
     toggleDiscreetBoundary: () => void;
-    // epochs: number;
-    // loss: number;
-    // lossData: [number, number][];
     analyticsData: AnalyticsData;
     comparisonAnalyticsData: AnalyticsData | undefined;
     comparisonData: NetworkState | undefined;
@@ -59,9 +56,6 @@ function GraphPanel(props: GraphPanelProps) {
         decisionBoundary,
         discreetBoundary,
         toggleDiscreetBoundary,
-        // epochs,
-        // loss,
-        // lossData,
         comparisonData,
         analyticsData,
         comparisonAnalyticsData,
@@ -69,10 +63,17 @@ function GraphPanel(props: GraphPanelProps) {
 
     let [showTestData, setShowTestData] = useState(false);
 
-    let [epoch, loss]: [number, number] = [0, 0];
+    let [trainingEpoch, trainingLoss]: [number, number] = [0, 0];
+    let [testEpoch, testLoss]: [number, number] = [0, 0];
     if (analyticsData.testLossData.length > 0) {
-        [epoch, loss] = analyticsData.trainingLossData[analyticsData.trainingLossData.length - 1];
+        [trainingEpoch, trainingLoss] = analyticsData.trainingLossData[analyticsData.trainingLossData.length - 1];
+        [testEpoch, testLoss] = analyticsData.testLossData[analyticsData.testLossData.length - 1];
     }
+
+    // let [testEpoch, testLoss]: [number, number] = [0, 0];
+    // if (comparisonAnalyticsData && comparisonAnalyticsData.testLossData.length > 0) {
+    //     [testEpoch, testLoss] = comparisonAnalyticsData.trainingLossData[comparisonAnalyticsData.trainingLossData.length - 1];
+    // }
 
     return (
         <StyledGraphPanel>
@@ -134,9 +135,12 @@ function GraphPanel(props: GraphPanelProps) {
                         label="Toggle discreet boundary"
                     />
                 </FormGroup>
-                <p style={{ marginTop: "0px", marginBottom: "0px" }}> Epochs: {epoch}</p>
+                <p style={{ marginTop: "20px", marginBottom: "0px" }}> Epochs: <b>{trainingEpoch}</b></p>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                    <p style={{ marginTop: "0px", marginBottom: "0px" }}> Loss: {loss.toFixed(3)} </p>
+                    <p style={{ marginTop: "0px", marginBottom: "0px" }}>
+                        Loss (Training): <b>{trainingLoss.toFixed(3)}</b> <br />
+                        Loss (Test): <b>{testLoss.toFixed(3)}</b>
+                    </p>
                     <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />}>
                         <React.Fragment>
                             <Typography color="inherit">Loss</Typography>
@@ -153,8 +157,6 @@ function GraphPanel(props: GraphPanelProps) {
                         analyticsData={analyticsData}
                         comparisonAnalyticsData={comparisonAnalyticsData}
                         showTestData={showTestData}
-                    // dataset={lossData}
-                    // comparisionData={comparisonData?.lossData}
                     />
                     <div style={{ fontSize: 12 }}>
                         <p style={{ marginTop: "0px" }}>
