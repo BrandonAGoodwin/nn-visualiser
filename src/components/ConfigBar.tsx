@@ -199,7 +199,7 @@ function ConfigBar(props: ConfigBarProps) {
                 size={"small"}
                 variant={"contained"}
                 onClick={handleRegenerateDataset}
-                style={{ minWidth: "min-content", maxHeight: "min-content", fontSize: 12, margin: "auto" }}
+                style={{ minWidth: "min-content", maxHeight: "min-content", fontSize: 12, marginTop: "auto", marginBottom: "auto", marginLeft: "10px" }}
             >
                 Regenerate Dataset
             </Button>

@@ -19,14 +19,26 @@ const StyledIconButton = styled(IconButton)`
     }
 
 `
+interface TooltipProps {
+    marginLeft: number;
+    marginRight: number;
+    marginTop: number | string;
+    marginBottom: number | string;
+}
 
 const HtmlTooltip = styled(Tooltip)`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box; 
 
-    margin-right: ${(props: { marginLeft: number, marginRight: number }) => `${props.marginRight}px`};
-    margin-left: ${(props: { marginLeft: number, marginRight: number }) => `${props.marginLeft}px`};
+    ${(props: TooltipProps) => `
+        margin-right: ${props.marginRight}px;
+        margin-left: ${props.marginLeft}px;
+        margin-top: ${props.marginTop}px;
+        margin-bottom: ${props.marginBottom}px;
+    `}
+    margin-right: ${(props: TooltipProps) => `${props.marginRight}px`};
+    margin-left: ${(props: TooltipProps) => `${props.marginLeft}px`};
 
 `
 
@@ -46,7 +58,8 @@ interface InfoButtonProps {
 const InfoButton: React.FC<InfoButtonProps> = ({
     marginLeft = 10,
     marginRight = 10,
-
+    marginTop = "auto",
+    marginBottom = "auto",
     ...props
 }) => {
 
@@ -56,11 +69,13 @@ const InfoButton: React.FC<InfoButtonProps> = ({
             onClick={() => props.onClick && props.infoPanel && props.onClick(props.infoPanel)}
             marginLeft={marginLeft}
             marginRight={marginRight}
+            marginTop={marginTop}
+            marginBottom={marginBottom}
         >
             <StyledIconButton
                 style={{
-                    marginTop: (props.marginTop ? props.marginTop : "auto"),
-                    marginBottom: (props.marginBottom ? props.marginBottom : "auto")
+                    marginTop: marginTop,
+                    marginBottom: marginBottom
                 }}
             >
                 {props.icon || <Info fontSize={props.fontSize} />}

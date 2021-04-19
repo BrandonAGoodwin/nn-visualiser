@@ -1,6 +1,6 @@
 {
   "name": "nn-visualiser",
-  "homepage": "http://brandonagoodwin.github.io/nn-visualiser",
+  "homepage": "./",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
