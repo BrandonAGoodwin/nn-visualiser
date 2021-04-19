@@ -12,6 +12,7 @@ interface NNNodeProps {
     handleOnClick?: (nodeId: string, active: boolean) => any;
     handleOnHover?: (nodeId: string, active: boolean) => any;
     active: boolean;
+    domain: [number, number];
 }
 
 interface ContainerProps {
@@ -34,22 +35,35 @@ const NodeContainer = styled("div") <ContainerProps>`
 
 
 function NNNode(props: NNNodeProps) {
+    const {
+        nodeWidth,
+        id,
+        nodeId,
+        decisionBoundary,
+        discreetBoundary,
+        numCells,
+        handleOnClick,
+        handleOnHover,
+        active,
+        domain
+    } = props;
 
     return (
-        <NodeContainer id={`${props.id}`}
-            nodeWidth={props.nodeWidth}
-            active={props.active}
-            onClick={() => (props.handleOnClick && props.nodeId && props.handleOnClick(props.nodeId, props.active))}
-            onMouseOver={() => (props.handleOnHover && props.nodeId && props.handleOnHover(props.nodeId, props.active))}
+        <NodeContainer id={`${id}`}
+            nodeWidth={nodeWidth}
+            active={active}
+            onClick={() => (handleOnClick && nodeId && handleOnClick(nodeId, active))}
+            onMouseOver={() => (handleOnHover && nodeId && handleOnHover(nodeId, active))}
         >
             <BackgroundCanvas
-                width={props.nodeWidth}
-                height={props.nodeWidth}
-                numCells={props.numCells}
+                width={nodeWidth}
+                height={nodeWidth}
+                numCells={numCells}
                 padding={false}
-                disabled={!props.active}
-                decisionBoundary={props.decisionBoundary}
-                discreetBoundary={props.discreetBoundary}
+                disabled={!active}
+                decisionBoundary={decisionBoundary}
+                discreetBoundary={discreetBoundary}
+                domain={domain}
             />
         </NodeContainer>
     );

@@ -60,6 +60,7 @@ export class Node {
 export interface ActivationFunction {
     output: (x: number) => number;
     derivative: (input: number) => number;
+    range: [number, number];
 }
 
 /** Also known as an error or loss function. */
@@ -88,11 +89,13 @@ export class Activations {
         derivative: (x: number) => {
             let output = Activations.SIGMOID.output(x);
             return output * (1.0 - output)
-        }
+        },
+        range: [0, 1]
     };
     public static RELU: ActivationFunction = {
         output: (x: number) => Math.max(0, x),
-        derivative: (x: number) => x > 0 ? 1 : 0
+        derivative: (x: number) => x > 0 ? 1 : 0,
+        range: [0, 1]
     };
     // Might need to polyfill not TANH implementation for +/- inf values if Math.tah doesn't exist
     public static TANH: ActivationFunction = {
@@ -101,7 +104,8 @@ export class Activations {
         derivative: (x: number) => {
             let output = Activations.TANH.output(x);
             return 1 - output * output;
-        }
+        },
+        range: [-1, 1]
     }
 }
 

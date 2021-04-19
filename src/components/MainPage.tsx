@@ -4,7 +4,7 @@ import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
 import { GitHub } from '@material-ui/icons';
-import { NetworkState, NNConfig, useNetwork } from '../NetworkController';
+import { ACTIVATIONS, NetworkState, NNConfig, useNetwork } from '../NetworkController';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
 import ControlPanel from './ControlPanel';
@@ -343,6 +343,7 @@ function MainPage(props: MainPageProps) {
                 analyticsData={analyticsData}
                 comparisonAnalyticsData={comparisonData?.analyticsData}
                 comparisonData={comparisonData}
+                domain={ACTIVATIONS["Tanh"].range}
             />
             { network && <NetworkPanel
                 network={network}
@@ -357,6 +358,8 @@ function MainPage(props: MainPageProps) {
                 removeNode={removeNode}
                 addLayer={addLayer}
                 removeLayer={removeLayer}
+                hiddenDomain={ACTIVATIONS[nnConfig.activationFunction].range}
+                outputDomain={ACTIVATIONS["Tanh"].range}
             />}
             <StatsBar>
 

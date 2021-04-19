@@ -146,6 +146,8 @@ interface NetworkProps {
     removeNode: (layer: number) => void;
     addLayer: () => void;
     removeLayer: () => void;
+    hiddenDomain: [number, number];
+    outputDomain: [number, number];
 }
 
 // Could remove the output node and point straight to the graph
@@ -511,6 +513,7 @@ function NetworkPanel(props: NetworkProps) {
                                 decisionBoundary={props.decisionBoundaries[nodeId]}
                                 discreetBoundary={props.discreetBoundary}
                                 handleOnClick={props.handleOnClick}
+                                domain={props.hiddenDomain}
                             />
                         )}
                     </Layer>
@@ -526,9 +529,11 @@ function NetworkPanel(props: NetworkProps) {
                                     active={true}
                                     decisionBoundary={props.decisionBoundaries[node.id]}
                                     discreetBoundary={props.discreetBoundary}
+                                    domain={ props.hiddenDomain }
                                 />)}
                             </Layer>
-                            {(layerNum !== network.length - 2) && <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
+                            {(layerNum !== network.length - 2) &&
+                                <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
                                 <IconButton onClick={() => props.removeNode(layerNum + 1)}>
                                     <RemoveCircleIcon />
                                 </IconButton>
@@ -549,6 +554,7 @@ function NetworkPanel(props: NetworkProps) {
                                     active={true}
                                     decisionBoundary={props.decisionBoundaries[node.id]}
                                     discreetBoundary={props.discreetBoundary}
+                                    domain={props.outputDomain}
                                 />)}
                             </Layer>
                         </div>)}

@@ -41,6 +41,7 @@ interface GraphPanelProps {
     analyticsData: AnalyticsData;
     comparisonAnalyticsData: AnalyticsData | undefined;
     comparisonData: NetworkState | undefined;
+    domain: [number, number];
 }
 
 function GraphPanel(props: GraphPanelProps) {
@@ -59,6 +60,7 @@ function GraphPanel(props: GraphPanelProps) {
         comparisonData,
         analyticsData,
         comparisonAnalyticsData,
+        domain
     } = props;
 
     let [showTestData, setShowTestData] = useState(false);
@@ -113,6 +115,7 @@ function GraphPanel(props: GraphPanelProps) {
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
                 showTestData={showTestData}
+                domain={domain}
             />}
             <div style={{ marginLeft: "10px" }}>
                 <FormGroup>

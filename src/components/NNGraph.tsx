@@ -19,8 +19,8 @@ interface GraphProps {
     decisionBoundary?: number[];
     discreetBoundary: boolean;
     showTestData: boolean;
+    domain: [number, number];
 }
-
 
 function NNGraph(props: GraphProps): JSX.Element {
 
@@ -34,11 +34,10 @@ function NNGraph(props: GraphProps): JSX.Element {
         marginTop,
         marginBottom,
         numCells,
-        xDomain,
-        yDomain,
         decisionBoundary,
         discreetBoundary,
-        showTestData
+        showTestData,
+        domain
     } = props;
 
     const { minColour, maxColour } = useContext(ThemeContext);
@@ -232,6 +231,7 @@ function NNGraph(props: GraphProps): JSX.Element {
                     padding={true}
                     decisionBoundary={decisionBoundary}
                     discreetBoundary={discreetBoundary}
+                    domain={domain}
                 />
             </div>
         </>

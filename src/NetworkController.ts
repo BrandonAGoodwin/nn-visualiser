@@ -10,7 +10,7 @@ interface InputFunc {
     label: string;
 }
 
-let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
+export let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
     "Tanh": nn.Activations.TANH,
     "ReLU": nn.Activations.RELU,
     "Sigmoid": nn.Activations.SIGMOID,

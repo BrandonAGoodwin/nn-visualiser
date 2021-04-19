@@ -17,6 +17,7 @@ interface CanvasProps {
     paddingRight?: number;
     paddingTop?: number;
     paddingBottom?: number;
+    domain: [number, number];
 }
 
 
@@ -48,7 +49,8 @@ function BackgroundCanvas(props: CanvasProps) {
         });
 
         let color: any = d3.scaleQuantize()
-            .domain([-1, 1])
+            // .domain([-1, 1])
+            .domain(props.domain)
             .range(colors);
 
         const canvas = canvasRef.current;
