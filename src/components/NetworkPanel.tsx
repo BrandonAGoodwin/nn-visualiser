@@ -327,7 +327,9 @@ function NetworkPanel(props: NetworkProps) {
 
     function drawLink(
         input: nn.Link, node2coord: { [id: string]: { cx: number, cy: number } }) {
-        let line = d3.select(svgContainer.current).append("path");
+        let container = d3.select(svgContainer.current);
+        let line = container.append("path");
+        let hoverLine = container.append("path");
         let source = node2coord[input.source.id];
         let dest = node2coord[input.dest.id];
         if (!(dest && source)) return;
@@ -353,20 +355,42 @@ function NetworkPanel(props: NetworkProps) {
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
             .attr("d", d)
             .attr("fill", "transparent")
-            .attr("pointer-events", "all")
+            // .attr("pointer-events", "all")
             .attr("stroke", linkConfig.color)
             .attr("stroke-width", linkConfig.size || 0)
             .attr("stroke-dasharray", "10,2")
+            // .attr("cursor", "pointer")
+            // .on("mouseover", function (d, i) {
+            //     d3.select(this).transition()
+            //         .duration(100000)
+            //         .ease(d3.easeLinear)
+            //         .attr("stroke-dashoffset", -8000)
+            // })
+            // .on("mouseout", function (d, i) {
+            //     d3.select(this)
+            //         .transition();
+            // })
+
+            d && hoverLine.attr("marker-start", "url(#markerArrow)")
+            .attr("class", "link")
+            .attr("id", `link-${input.source.id}-${input.dest.id}`)
+            .attr("d", d)
+            .attr("fill", "transparent")
+            .attr("pointer-events", "all")
+            .attr("stroke", "grey")
+            .attr("stroke-opacity", 0)
+            .attr("stroke-width", 10)
+            // .attr("stroke-dasharray", "10,2")
+            .attr("cursor", "pointer")
             .on("mouseover", function (d, i) {
-                d3.select(this).transition()
+                line.transition()
                     .duration(100000)
                     .ease(d3.easeLinear)
                     .attr("stroke-dashoffset", -8000)
             })
             .on("mouseout", function (d, i) {
-                d3.select(this)
-                    .transition();
-            })
+                line.transition();
+            });
         return line;
     }
 
