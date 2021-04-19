@@ -185,7 +185,14 @@ function ConfigBar(props: ConfigBarProps) {
                 </React.Fragment>
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
-            <Button variant={"contained"} onClick={handleRegenerateDataset}> Regenerate Dataset </Button>
+            <Button
+                size={"small"}
+                variant={"contained"}
+                onClick={handleRegenerateDataset}
+                style={{ minWidth: "min-content", maxHeight: "min-content", fontSize: 12, margin: "auto" }}
+            >
+                Regenerate Dataset
+            </Button>
         </StyledConfigBar>
     );
 }
