@@ -81,12 +81,12 @@ const TransitionButton = styled(IconButton)`
 
 interface ComparisonData {
     currentState: NetworkState;
-    savedState: NetworkState;
+    savedState: NetworkState | undefined;
 }
 
 function App() {
     const { background } = useContext(ThemeContext);
-    const { nnConfig } = useNetwork();
+    const networkContoller = useNetwork();
     const { dgConfig } = useDatasetGenerator();
     const mainContainer = createRef<HTMLDivElement>();
 
@@ -97,7 +97,7 @@ function App() {
 
     const [comparisonData, setComparisonData] = useState<ComparisonData>();
 
-    const updateComparisionData = (currentState: NetworkState, savedState: NetworkState) => {
+    const updateComparisionData = (currentState: NetworkState, savedState: NetworkState | undefined) => {
         setComparisonData({ currentState: currentState, savedState: savedState });
     }
 
@@ -276,7 +276,8 @@ function App() {
                     yDomain={[-8, 8]}
                     numCells={100}
                     updateComparisionData={updateComparisionData}
-                    nnConfig={nnConfig}
+                    networkController={networkContoller}
+                    // nnConfig={networkContoller}
                     dgConfig={dgConfig}
                 />
                 <StyledMargin id="dynamic-margin-main" />

@@ -112,12 +112,29 @@ const defaultNetworkState = {
 // - USE USETRACKED TO ACCESS CONTEXT IN EACH CHILD COMPONENT
 // - CUSTOM HOOK JUST FOR CONFIG
 
+export type NetworkController = {
+    nnConfig: NNConfig,
+    state: NNState,
+    network: nn.Node[][] | undefined,
+    analyticsData: AnalyticsData,
+    setActivationFunction: (activationFunction: string) => void,
+    setLearningRate: (learningRate: number) => void,
+    setBatchSize: (batchSize: number) => void,
+    setAnalyticsData:  React.Dispatch<React.SetStateAction<AnalyticsData>>,
+    step: (trainingData: Datapoint2D[]) => void,
+    reset: () => void,
+    toggleInputNode: (nodeId: string, active: boolean) => void,
+    addNode: (layerNum: number) => void,
+    removeNode: (layerNum: number) => void,
+    addLayer: () => void,
+    removeLayer: () => void
+}
 
 // Maybe remove dataset related stuff from this
 export function useNetwork(
     defaultData: NNConfig = defaultNetworkData,
     defaultState: NNState = defaultNetworkState
-) {
+): NetworkController {
     const [nnConfig, setNNConfig] = useState<NNConfig>(defaultData);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(defaultAnaLyticsData);
@@ -214,9 +231,7 @@ export function useNetwork(
             if (prevConfig.networkShape[layerNum] < 5) {
                 let newNetworkShape = prevConfig.networkShape;
                 newNetworkShape[layerNum] = prevConfig.networkShape[layerNum] + 1;
-                // setConfig({ ...config, networkShape: newNetworkShape });
             }
-            //return {...data, networkShape: newNetworkShape};
             return { ...prevConfig, networkShape: newNetworkShape };
         });
     }
@@ -226,7 +241,6 @@ export function useNetwork(
         setNNConfig((prevConfig) => {
             if (nnConfig.networkShape[layerNum] > 1) {
                 prevConfig.networkShape[layerNum] = prevConfig.networkShape[layerNum] - 1;
-                // setConfig({ ...config, networkShape: newNetworkShape });
             }
             return { ...prevConfig, networkShape: prevConfig.networkShape }; // Probably only remove node or add node will work
         });
@@ -240,8 +254,6 @@ export function useNetwork(
                 newNetworkShape.pop();
                 newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
                 newNetworkShape.push(1);
-                // console.log(newNetworkShape);
-                // setConfig({ ...config, networkShape: newNetworkShape });
             }
             return { ...prevConfig, networkShape: newNetworkShape };
         });
@@ -255,39 +267,17 @@ export function useNetwork(
                 newNetworkShape.pop();
                 newNetworkShape.pop();
                 newNetworkShape.push(1);
-                // console.log(newNetworkShape);
-                // setConfig({ ...config, networkShape: newNetworkShape });
             }
             return { ...prevConfig, networkShape: newNetworkShape };
         });
     }
 
     // Might not work because config values aren't aquired from setConfig function call
-    const step = (trainingData: Datapoint2D[], testData: Datapoint2D[]) => {
+    const step = (trainingData: Datapoint2D[]) => {
         setNetwork((prevNetwork) => {
-            // console.log("Running step inside network controller");
-            // console.log(prevNetwork);
-            if (prevNetwork) {
-
-                let updatedNetwork = vis.step(prevNetwork, trainingData, nnConfig.learningRate, nnConfig.inputs, nnConfig.batchSize);
-                // setAnalyticsData((prevAnalyticsData) => {
-                //     if (prevAnalyticsData) {
-                //         const { trainingLossData, testLossData, epochs } = prevAnalyticsData;
-
-                //         //return { epochs: prevAnalyticsData?.epochs + 1, trainingLossData: prevAnalyticsData}
-                //         // let trainingLoss = vis.getCost(updatedNetwork, trainingData, nnConfig.inputs);
-                //         // let testLoss = vis.getCost(updatedNetwork, testData, nnConfig.inputs);
-                //         let epoch = epochs + 1;
-                //         trainingLossData.push([epoch, vis.getCost(updatedNetwork, trainingData, nnConfig.inputs)]);
-                //         testLossData.push([epoch, vis.getCost(updatedNetwork, testData, nnConfig.inputs)]);
-                //         return { trainingLossData: trainingLossData, testLossData: testLossData, epochs: epochs + 1 };
-                //     }
-                //     return prevAnalyticsData;
-                // });
-            }
+            prevNetwork && vis.step(prevNetwork, trainingData, nnConfig.learningRate, nnConfig.inputs, nnConfig.batchSize);
             return prevNetwork;
         });
-        // setEpochs((epochs) => epochs + 1);
     }
 
     const reset = () => {

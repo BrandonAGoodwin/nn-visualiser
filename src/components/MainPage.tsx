@@ -4,7 +4,7 @@ import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
 import { GitHub } from '@material-ui/icons';
-import { ACTIVATIONS, NetworkState, NNConfig, useNetwork } from '../NetworkController';
+import { ACTIVATIONS, NetworkController, NetworkState, NNConfig, useNetwork } from '../NetworkController';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
 import ControlPanel from './ControlPanel';
@@ -81,9 +81,10 @@ interface MainPageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
-    updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
-    nnConfig: NNConfig;
+    updateComparisionData: (currentState: NetworkState, savedState: NetworkState | undefined) => void;
+    // nnConfig: NNConfig;
     dgConfig: DGConfig;
+    networkController: NetworkController;
 }
 
 function MainPage(props: MainPageProps) {
@@ -103,7 +104,8 @@ function MainPage(props: MainPageProps) {
         removeNode,
         addLayer,
         removeLayer
-    } = useNetwork(props.nnConfig);
+    } = props.networkController;
+    // } = useNetwork(props.nnConfig);
 
     const {
         dgConfig,
@@ -169,6 +171,10 @@ function MainPage(props: MainPageProps) {
 
     
     }, [epochs]); 
+    
+    useEffect(() => {
+        props.updateComparisionData(getNetworkState, comparisonData);
+    }, [analyticsData, comparisonData]);
 
 
     // const generateNetwork = () => {
@@ -216,7 +222,7 @@ function MainPage(props: MainPageProps) {
 
     const handleStep = () => {
         console.log("HandleStep")
-        step(trainingData, testData);
+        step(trainingData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
@@ -266,6 +272,19 @@ function MainPage(props: MainPageProps) {
 
         setComaparisonData(newComparisionData);
     }
+
+    const getNetworkState = ({
+            nnConfig: nnConfig,
+            dgConfig: dgConfig,
+            decisionBoundaries: decisionBoundaries,
+            decisionBoundary: decisionBoundary,
+            analyticsData: analyticsData
+            // epochs: epochs,
+            // loss: loss,
+            // lossData: lossData,
+            // noise: dgConfig.noise
+        })
+    
 
     const toggleAutoTrain = () => {
         setTraining((training) => {
