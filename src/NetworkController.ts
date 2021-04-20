@@ -121,7 +121,7 @@ export type NetworkController = {
     setActivationFunction: (activationFunction: string) => void,
     setLearningRate: (learningRate: number) => void,
     setBatchSize: (batchSize: number) => void,
-    setAnalyticsData:  React.Dispatch<React.SetStateAction<AnalyticsData>>,
+    setAnalyticsData: React.Dispatch<React.SetStateAction<AnalyticsData>>,
     step: (trainingData: Datapoint2D[]) => void,
     reset: () => void,
     toggleInputNode: (nodeId: string, active: boolean) => void,
@@ -148,7 +148,6 @@ export function useNetwork(
         // console.log("Config change useEffect");
         reset();
     }, [nnConfig]);
-
 
 
     // useEffect(() => {
@@ -200,7 +199,7 @@ export function useNetwork(
         setNNConfig((prev) => ({ ...prev, batchSize: batchSize }));
     })
 
-    
+
     const toggleInputNode = (nodeId: string, active: boolean) => {
         setNNConfig((prevConfig) => {
             let inputs = prevConfig.inputs;
@@ -232,8 +231,10 @@ export function useNetwork(
             if (prevConfig.networkShape[layerNum] < 5) {
                 let newNetworkShape = prevConfig.networkShape;
                 newNetworkShape[layerNum] = prevConfig.networkShape[layerNum] + 1;
+                return { ...prevConfig, networkShape: newNetworkShape };
+            } else {
+                return prevConfig;
             }
-            return { ...prevConfig, networkShape: newNetworkShape };
         });
     }
 
@@ -242,8 +243,10 @@ export function useNetwork(
         setNNConfig((prevConfig) => {
             if (nnConfig.networkShape[layerNum] > 1) {
                 prevConfig.networkShape[layerNum] = prevConfig.networkShape[layerNum] - 1;
+                return { ...prevConfig, networkShape: prevConfig.networkShape }; // Probably only remove node or add node will work
+            } else {
+                return prevConfig;
             }
-            return { ...prevConfig, networkShape: prevConfig.networkShape }; // Probably only remove node or add node will work
         });
     }
 
@@ -255,8 +258,11 @@ export function useNetwork(
                 newNetworkShape.pop();
                 newNetworkShape.push(newNetworkShape[newNetworkShape.length - 1]);
                 newNetworkShape.push(1);
+                return { ...prevConfig, networkShape: newNetworkShape };
+            } else {
+                return prevConfig;
             }
-            return { ...prevConfig, networkShape: newNetworkShape };
+
         });
     }
 
@@ -268,8 +274,11 @@ export function useNetwork(
                 newNetworkShape.pop();
                 newNetworkShape.pop();
                 newNetworkShape.push(1);
+                return { ...prevConfig, networkShape: newNetworkShape };
+            } else {
+                return prevConfig;
             }
-            return { ...prevConfig, networkShape: newNetworkShape };
+
         });
     }
 

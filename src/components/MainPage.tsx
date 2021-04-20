@@ -153,7 +153,7 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        handleReset(); // Change reset implementation
+        handleReset(false); // Change reset implementation
     }, [nnConfig, dgConfig]);
 
     useEffect(() => {
@@ -214,13 +214,13 @@ function MainPage(props: MainPageProps) {
         network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, nnConfig.inputs));
     }
 
-    const handleReset = () => {
+    const handleReset = (resetDataset: boolean = true) => {
         console.log("Reset");
         if (training) toggleAutoTrain();
         reset();// generateNetwork();
         setEpochs(0);
         // setLossData([]);
-        if (!compareMode) generateDataset();
+        if (!compareMode && resetDataset) generateDataset();
     };
 
     const handleStep = () => {
