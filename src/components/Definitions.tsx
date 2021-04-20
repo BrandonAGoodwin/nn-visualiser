@@ -40,6 +40,16 @@ export function DefActivationFunction() {
     );
 }
 
+export function DefLearningRate() {
+    return (
+        <>
+            <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
+            <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
+            <u>Click the icon to get more information</u>
+        </>
+    );
+}
+
 export function DefX1() {
     return (
         <Typography variant="body2">

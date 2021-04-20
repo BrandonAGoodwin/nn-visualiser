@@ -187,7 +187,12 @@ export function useNetwork(
     }
 
     const setActivationFunction = (activationFunction: string) => {
-        setNNConfig((prev) => ({ ...prev, activationFunction: activationFunction }));
+        setNNConfig((prev) => {
+            if(activationFunction === "Linear" && prev.learningRate > 0.03) {
+                return {...prev, activationFunction: activationFunction, learningRate: 0.03}
+            }
+            return { ...prev, activationFunction: activationFunction }
+        });
     }
 
     const setLearningRate = (learningRate: number) => {

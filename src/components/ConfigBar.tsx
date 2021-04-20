@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { NNConfig } from "../NetworkController";
-import { DefActivationFunction } from "./Definitions";
+import { DefActivationFunction, DefLearningRate } from "./Definitions";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
 import DatasetInfoPanel from "./InfoPanels/DatasetInfoPanel";
 import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
@@ -81,6 +81,10 @@ function ConfigBar(props: ConfigBarProps) {
         setBatchSize(newValue as number);
     }
 
+    const linearActivationFunction = (nnConfig: NNConfig) => {
+        return nnConfig.activationFunction === "Linear";
+    }
+
     return (
         <StyledConfigBar>
             <StyledFormControl variant="filled">
@@ -105,26 +109,24 @@ function ConfigBar(props: ConfigBarProps) {
                     value={nnConfig.learningRate}
                     onChange={handleLearningRateChange}
                 >
-                    <MenuItem value="10">10</MenuItem>
-                    <MenuItem value="3">3</MenuItem>
-                    <MenuItem value="1">1</MenuItem>
-                    <MenuItem value="0.3">0.3</MenuItem>
-                    <MenuItem value="0.1">0.1</MenuItem>
+
+                    <MenuItem disabled={linearActivationFunction(nnConfig)} value="10">10</MenuItem>
+                    <MenuItem disabled={linearActivationFunction(nnConfig)} value="3">3</MenuItem>
+                    <MenuItem disabled={linearActivationFunction(nnConfig)} value="1">1</MenuItem>
+                    <MenuItem disabled={linearActivationFunction(nnConfig)} value="0.3">0.3</MenuItem>
+                    <MenuItem disabled={linearActivationFunction(nnConfig)} value="0.1">0.1</MenuItem>
                     <MenuItem value="0.03">0.03</MenuItem>
                     <MenuItem value="0.01">0.01</MenuItem>
                     <MenuItem value="0.003">0.003</MenuItem>
+                    <MenuItem value="0.001">0.001</MenuItem>
+                    <MenuItem value="0.0003">0.0003</MenuItem>
                     <MenuItem value="0.0001">0.0001</MenuItem>
-                    <MenuItem value="0.0003">0.0001</MenuItem>
                     <MenuItem value="0.00001">0.00001</MenuItem>
                     <MenuItem value="0.000000001">0.000000001</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel {...nnConfig} />}>
-                <React.Fragment>
-                    <Typography color="inherit">Learning Rate (&epsilon;)</Typography>
-                    <Typography variant="body2">This affects the rate at which the weights and biases change when training the neural network.</Typography><br />
-                    <u>Click the icon to get more information</u>
-                </React.Fragment>
+            <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>
+                {DefLearningRate()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
             <StyledFormControl variant="filled">
