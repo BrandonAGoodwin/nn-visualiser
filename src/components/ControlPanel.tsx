@@ -76,7 +76,7 @@ function ControlPanel(props: ControlPanelProps) {
                 <StyledInfoButton title="Comparison Tools Tooltip" marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
                     <React.Fragment>
                         <Typography variant="body2">
-                            The comparision tools allow you to save the current state of your network so that you can change the configuration and see how this effects the performance of the network. <br />
+                            The comparision tools allow you to save the current state of your network so that you can change the configuration and see how the changes effect the performance of the network. <br />
                             <u>(Click on the tool tip for instructions on how to utilise this)</u>
                         </Typography>
                     </React.Fragment>

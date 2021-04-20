@@ -108,6 +108,26 @@ function InsightsPanel(props: InsightsPanelProps) {
         return nnConfig.batchSize === Math.floor(dgConfig.numSamples * 0.8);
     }
 
+    const narrowNetwork = (nnConfig: NNConfig) => {
+        let hiddenNodes = 0;
+        for (let i = 1; i < nnConfig.networkShape.length - 1; i++) {
+            hiddenNodes += nnConfig.networkShape[1];
+        }
+        console.log(hiddenNodes);
+
+        let x = hiddenNodes / (nnConfig.networkShape.length - 2);
+        console.log(x)
+        if ((nnConfig.networkShape.length - 2 >= 3 && x < 1) || (nnConfig.networkShape.length - 2 >= 4 && x <= 4)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const manyLayers = (nnConfig: NNConfig) => {
+        return nnConfig.networkShape.length >= 6;
+    }
+
     return (
         <StyledInsightsPanel onMouseLeave={handleMouseLeave}>
             {insight &&
@@ -121,7 +141,7 @@ function InsightsPanel(props: InsightsPanelProps) {
                     <StyledInfoButton title="Output Tooltip" fontSize={"small"} marginLeft={5} >
                         <React.Fragment>
                             <Typography variant="body2">
-                                Insights define properties or features of the current network configuration and state.
+                                Insights reveals properties or features of the current network configuration and state.
                             </Typography>
                         </React.Fragment>
                     </StyledInfoButton>
@@ -144,6 +164,9 @@ function InsightsPanel(props: InsightsPanelProps) {
                     }
                     {largeLearningRate(nnConfig) &&
                         <li><LargeLearningRateInsight setInsight={setInsightWrapper} /></li>
+                    }
+                    {narrowNetwork(nnConfig) &&
+                        <li><NarrowNetworkInsight setInsight={setInsightWrapper} /></li>
                     }
                 </StyledList>
             </div>
@@ -255,6 +278,24 @@ function LargeLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) =
 
     return (
         <InsightLink onClick={() => props.setInsight(insight)}>Very large learning rate value</InsightLink>
+    );
+}
+
+function NarrowNetworkInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    // const { setInfoPanelWrapper } = useContext(InfoPanelContext);
+    const insight = (
+        <>
+            <h4>Narrow Network</h4>
+            <StyledList>
+                <li>This can<b> cause training to slow down significantly</b> as outputs from each layer have less and less inpact on the following layer</li>
+                <li>Can be seen by the colour of the boundaries in each layer getting more and more faint</li>
+                <li>Increasing layer widths can help this</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Narrow Network</InsightLink>
     );
 }
 
