@@ -129,13 +129,6 @@ function MainPage(props: MainPageProps) {
     // const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
 
-    // useEffect(() => {
-    //     console.log("Config change useEffect");
-    //     if (training) toggleAutoTrain();
-    //     // generateNetwork();
-    //     generateDataset();
-    // }, [nnConfig, dgConfig]);
-
     useEffect(() => {
         updateDecisionBoundary();
     }, [decisionBoundaries]);
@@ -149,20 +142,21 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        handleReset(false); // Change reset implementation
+        handleReset(false);
+        const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
+        if (nnConfig.batchSize > numTrainingSamples) {
+            setBatchSize(numTrainingSamples);
+        }
     }, [nnConfig, dgConfig]);
 
     useEffect(() => {
         network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
             if (prevAnalyticsData) {
                 const { trainingLossData, testLossData } = prevAnalyticsData;
-
-                //return { epochs: prevAnalyticsData?.epochs + 1, trainingLossData: prevAnalyticsData}
-                // let trainingLoss = vis.getCost(updatedNetwork, trainingData, nnConfig.inputs);
-                // let testLoss = vis.getCost(updatedNetwork, testData, nnConfig.inputs);
-                // let epoch = epochs + 1;
+                
                 let newTrainingLossData = trainingLossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]);
                 let newTestLossData = testLossData.concat([[epochs, vis.getCost(network, testData, nnConfig.inputs)]]);
+                console.log(newTrainingLossData);
                 return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs};
             }
             return prevAnalyticsData;

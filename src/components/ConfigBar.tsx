@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { Button, Divider, FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { NNConfig } from "../NetworkController";
@@ -55,6 +55,8 @@ function ConfigBar(props: ConfigBarProps) {
         handleRegenerateDataset
     } = props;
 
+    // const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
+
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setActivationFunction(e.target.value as string);
     };
@@ -93,7 +95,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="Linear">Linear</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel/>}>
+            <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel />}>
                 {DefActivationFunction()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
@@ -109,7 +111,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="0.3">0.3</MenuItem>
                     <MenuItem value="0.1">0.1</MenuItem>
                     <MenuItem value="0.03">0.03</MenuItem>
-                    <MenuItem value="0.01">0.03</MenuItem>
+                    <MenuItem value="0.01">0.01</MenuItem>
                     <MenuItem value="0.003">0.003</MenuItem>
                     <MenuItem value="0.0001">0.0001</MenuItem>
                     <MenuItem value="0.0003">0.0001</MenuItem>
@@ -180,8 +182,9 @@ function ConfigBar(props: ConfigBarProps) {
                 label={"Batch Size"}
                 min={1}
                 step={1}
-                max={10}
-                defaultValue={nnConfig.batchSize}
+                // value={nnConfig.batchSize}
+                max={Math.min(Math.floor(dgConfig.numSamples * 0.8), 100)}
+                defaultValue={Math.min(nnConfig.batchSize, Math.floor(dgConfig.numSamples * 0.8))}
                 onChange={handleBatchSizeChange}
                 appendValueToLabel={true}
             />
