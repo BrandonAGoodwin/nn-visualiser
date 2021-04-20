@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { NNConfig } from "../NetworkController";
-import { DefActivationFunction, DefLearningRate } from "./Definitions";
+import { DefActivationFunction, DefBatchSize, DefLearningRate } from "./Definitions";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
 import DatasetInfoPanel from "./InfoPanels/DatasetInfoPanel";
 import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
@@ -184,18 +184,13 @@ function ConfigBar(props: ConfigBarProps) {
                 label={"Batch Size"}
                 min={1}
                 step={1}
-                // value={nnConfig.batchSize}
                 max={Math.min(Math.floor(dgConfig.numSamples * 0.8), 100)}
                 defaultValue={Math.min(nnConfig.batchSize, Math.floor(dgConfig.numSamples * 0.8))}
                 onChange={handleBatchSizeChange}
                 appendValueToLabel={true}
             />
             <StyledInfoButton title="Batch Size Tooltip">
-                <React.Fragment>
-                    <Typography color="inherit">Batch Size</Typography>
-                    {/* Could create an info panel for Stochastic Gradient Decent*/}
-                    <Typography variant="body2">Specifies the number of training samples used in each epoch of <a href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.<br />(When batch size = 1, this is equivalent to <a href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>) </Typography>
-                </React.Fragment>
+                {DefBatchSize()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
             <Button

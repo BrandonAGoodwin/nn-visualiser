@@ -53,6 +53,7 @@ interface InfoButtonProps {
     marginRight?: number;
     marginTop?: number | string;
     marginBottom?: number | string;
+    interactive?: boolean;
 }
 
 const InfoButton: React.FC<InfoButtonProps> = ({
@@ -60,11 +61,12 @@ const InfoButton: React.FC<InfoButtonProps> = ({
     marginRight = 10,
     marginTop = "auto",
     marginBottom = "auto",
+    interactive = true,
     ...props
 }) => {
 
     return (
-        <HtmlTooltip interactive arrow
+        <HtmlTooltip interactive={interactive} arrow
             title={props.children || props.title}
             onClick={() => props.onClick && props.infoPanel && props.onClick(props.infoPanel)}
             marginLeft={marginLeft}

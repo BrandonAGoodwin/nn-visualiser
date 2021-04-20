@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
-import { FormControlLabel, FormGroup, IconButton, Switch, Typography } from "@material-ui/core";
+import { FormControlLabel, FormGroup, Switch, Typography } from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import { Datapoint2D } from "../datasets";
 import ColourScale from "./ColourScale";
-import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
 import LossInfoPanel from "./InfoPanels/LossInfoPanel";
 import LossGraph from "./LossGraph";
 import { ContainerSection, StyledInfoButton } from "./MainPage";
@@ -13,8 +12,9 @@ import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { AnalyticsData, NetworkState } from "../NetworkController";
 import OutputInfoPanel from "./InfoPanels/LossInfoPanel";
+import { DefLoss, DefOutput } from "./Definitions";
 
-const ColouredBox = styled("div")`
+export const ColouredBox = styled("div")`
     float: left;
     height: 1em;
     width: 1em;
@@ -46,7 +46,7 @@ interface GraphPanelProps {
 
 function GraphPanel(props: GraphPanelProps) {
     const { setInfoPanelWrapper } = useContext(InfoPanelContext);
-    const { maxColour, minColour, midColour, minColourName, maxColourName } = useContext(ThemeContext);
+    const { maxColour, minColour, midColour } = useContext(ThemeContext);
     const {
         network,
         trainingData,
@@ -82,10 +82,7 @@ function GraphPanel(props: GraphPanelProps) {
             <div style={{ display: "flex", marginLeft: "25px" }}>
                 <Typography variant="h6">Output</Typography>
                 <StyledInfoButton title="Output Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<OutputInfoPanel />}>
-                    <React.Fragment>
-                        <Typography color="inherit">Output</Typography>
-                        <Typography variant="body2">This graph shows the final output of the neural network in the domain (-8, +8) for both the <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm> features.<br /> The samples in the data sets used only have 2 classes (-1 and +1); the neural network defines a decision boundary so that points that are in<br /> {minColourName} <ColouredBox colour={minColour} /> sections of the graph are classified as class -1 and points that are in <br /> {maxColourName} <ColouredBox colour={maxColour} /> sections of the graph are classified as class +1.</Typography><br />
-                    </React.Fragment>
+                    {DefOutput()}
                 </StyledInfoButton>
                 <ColourScale
                     width={150}
@@ -145,11 +142,7 @@ function GraphPanel(props: GraphPanelProps) {
                         Loss (Test): <b>{testLoss.toFixed(3)}</b>
                     </p>
                     <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />}>
-                        <React.Fragment>
-                            <Typography color="inherit">Loss</Typography>
-                            <Typography variant="body2">This is loss calculated using the <a href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</a> between the output of our neural network and the expected output from out training set.</Typography><br />
-                            <u>Click the icon to get more information</u>
-                        </React.Fragment>
+                        {DefLoss()}
                     </StyledInfoButton>
                 </div>
                 <div style={{ display: "flex", alignItems: "center" }}>

@@ -52,7 +52,7 @@ function ControlPanel(props: ControlPanelProps) {
         <StyledControlPanel>
             <div style={{ display: "flex", marginTop: "0px", alignItems: "flex-end" }}>
                 <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Network Training</h4>
-                <StyledInfoButton title="Output Tooltip" marginLeft={5} >
+                <StyledInfoButton title="Network Training Tooltip" interactive={false} marginLeft={5} >
                     <React.Fragment>
                         <Typography variant="body2">
                             <b>Step:</b> Run one epoch of training on the network. <br />

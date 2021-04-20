@@ -138,7 +138,7 @@ function InsightsPanel(props: InsightsPanelProps) {
             {!insight && <div>
                 <div style={{ display: "flex", marginTop: "0px", alignItems: "flex-end", marginLeft: "10px" }}>
                     <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Insights</h4>
-                    <StyledInfoButton title="Output Tooltip" fontSize={"small"} marginLeft={5} >
+                    <StyledInfoButton title="Insights Tooltip" interactive={false} fontSize={"small"} marginLeft={5}>
                         <React.Fragment>
                             <Typography variant="body2">
                                 Insights reveals properties or features of the current network configuration and state.
@@ -184,6 +184,7 @@ function LinearNetworkInsight(props: ({ setInsight: (insight: JSX.Element) => vo
                 <li>All inputs are linear (X1 and/or X2)</li>
                 <li>Activation function is linear</li>
                 <li>Can only solve linearly seperable problems</li>
+                <li>Slow training</li>
             </StyledList>
         </>
     );
@@ -215,7 +216,7 @@ function StochasticGradientDecentInsight(props: ({ setInsight: (insight: JSX.Ele
         <>
             <h4>Stochastic Gradient Decent</h4>
             <StyledList>
-                <li>When batch size is 1 this is equivalent to stochastic gradient decent</li>
+                <li>When <b>batch size is 1</b> this is equivalent to stochastic gradient decent</li>
                 <li>This means the weights and biases are updated every time back propagation is done with a training sample</li>
             </StyledList>
         </>
@@ -231,7 +232,7 @@ function BatchGradientDecentInsight(props: ({ setInsight: (insight: JSX.Element)
         <>
             <h4>Batch Gradient Decent</h4>
             <StyledList>
-                <li>When batch size is equal to the number of training samples this is equivalent to batch gradient decent</li>
+                <li>When <b>batch size is equal to the number of training samples</b> this is equivalent to batch gradient decent</li>
                 <li>This means the weights and biases are updated once after back propagation has been done with all training samples</li>
             </StyledList>
         </>
