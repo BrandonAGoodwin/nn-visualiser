@@ -2,7 +2,7 @@ import React from "react";
 import { NNConfig } from "../../NetworkController";
 import { MathComponent } from "mathjax-react";
 
-function LearningRateInfoPanel(props: NNConfig) {
+function LearningRateInfoPanel() {
 
     return (
         <div style={{ float: "left"}}>

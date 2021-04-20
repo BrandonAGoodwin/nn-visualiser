@@ -103,7 +103,6 @@ function MainPage(props: MainPageProps) {
         addLayer,
         removeLayer
     } = props.networkController;
-    // } = useNetwork(props.nnConfig);
 
     const {
         dgConfig,
@@ -153,10 +152,8 @@ function MainPage(props: MainPageProps) {
         network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
             if (prevAnalyticsData) {
                 const { trainingLossData, testLossData } = prevAnalyticsData;
-                
                 let newTrainingLossData = trainingLossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]);
                 let newTestLossData = testLossData.concat([[epochs, vis.getCost(network, testData, nnConfig.inputs)]]);
-                console.log(newTrainingLossData);
                 return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs};
             }
             return prevAnalyticsData;
@@ -359,9 +356,6 @@ function MainPage(props: MainPageProps) {
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
                 toggleDiscreetBoundary={toggleDiscreetOutput}
-                // epochs={epochs}
-                // loss={loss}
-                // lossData={lossData}
                 analyticsData={analyticsData}
                 comparisonAnalyticsData={comparisonData?.analyticsData}
                 comparisonData={comparisonData}
@@ -383,9 +377,6 @@ function MainPage(props: MainPageProps) {
                 hiddenDomain={ACTIVATIONS[nnConfig.activationFunction].range}
                 outputDomain={ACTIVATIONS["Tanh"].range}
             />}
-            <StatsBar>
-
-            </StatsBar>
             <InfoPanel/>
             <LinksDiv>
                 <a href="https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/bxg796" target="_blank">
