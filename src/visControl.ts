@@ -2,7 +2,7 @@ import * as nn from "./NeuralNet";
 import { Datapoint2D, DatasetGenerator, Dataset } from "./datasets";
 import * as d3 from "d3";
 import seedrandom from "seedrandom";
-import { NNConfig } from "./NetworkController";
+import { ACTIVATIONS, NNConfig } from "./NetworkController";
 
 
 interface InputFunc {
@@ -10,11 +10,12 @@ interface InputFunc {
     label: string;
 }
 
-let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
-    "Tanh": nn.Activations.TANH,
-    "ReLU": nn.Activations.RELU,
-    "Sigmoid": nn.Activations.SIGMOID,
-}
+// let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
+//     "Tanh": nn.Activations.TANH,
+//     "ReLU": nn.Activations.RELU,
+//     "Sigmoid": nn.Activations.SIGMOID,
+//     "Linear": nn.Activations.LINEAR,
+// }
 
 let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
     "Gaussian2": Dataset.GAUSSIAN_2,

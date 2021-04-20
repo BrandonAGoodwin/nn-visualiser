@@ -14,6 +14,7 @@ export let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
     "Tanh": nn.Activations.TANH,
     "ReLU": nn.Activations.RELU,
     "Sigmoid": nn.Activations.SIGMOID,
+    "Linear": nn.Activations.LINEAR,
 }
 
 let GENERATORS: { [datasetType: string]: DatasetGenerator } = {

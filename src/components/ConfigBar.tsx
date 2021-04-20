@@ -89,6 +89,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="Tanh">Tanh</MenuItem>
                     <MenuItem value="ReLU">ReLU</MenuItem>
                     <MenuItem value="Sigmoid">Sigmoid</MenuItem>
+                    <MenuItem value="Linear">Linear</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
             <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={nnConfig} setInfoPanel={setInfoPanelWrapper} />}>
