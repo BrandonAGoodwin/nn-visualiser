@@ -50,31 +50,34 @@ function ControlPanel(props: ControlPanelProps) {
     } = props;
     return (
         <StyledControlPanel>
-            <div style={{ display: "flex", marginTop: "10px", alignItems: "flex-end" }}>
-                <h3 style={{ marginBottom: "5px", marginTop: "0px" }}>Network Training</h3>
+            <div style={{ display: "flex", marginTop: "0px", alignItems: "flex-end" }}>
+                <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Network Training</h4>
                 <StyledInfoButton title="Output Tooltip" marginLeft={5} >
                     <React.Fragment>
                         <Typography variant="body2">
                             <b>Step:</b> Run one epoch of training on the network. <br />
+                            <b>Auto Train:</b> Set the network to repeatedly train at a fixed rate.
                         </Typography>
                     </React.Fragment>
                 </StyledInfoButton>
             </div>
             <Divider style={{ minWidth: "90%", marginLeft: "auto", marginRight: "auto", marginBottom: "5px" }} />
-            <Tooltip placement={"right-end"} title={<p style={{ fontSize: 12 }}>Run one epoch of training on the network"</p>} aria-label={"Run one epoch of training on the network"} > 
-                <StyledButton variant={"contained"} onClick={handleStep}> Step </StyledButton>
-            </Tooltip> 
+            {/* <Tooltip placement={"right-end"} title={<p style={{ fontSize: 12 }}>Run one epoch of training on the network"</p>} aria-label={"Run one epoch of training on the network"} >  */}
+            <StyledButton variant={"contained"} onClick={handleStep}> Step </StyledButton>
+            {/* </Tooltip>  */}
             {/* <Tooltip placement={"right-end"} title={<p style={{ fontSize: 12 }}>Set the network to repeatedly train at a fixed rate</p>} aria-label={"Set the network to repeatedly train at a fixed rate"}> */}
             <StyledButton variant={"contained"} onClick={toggleAutoTrain}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
             {/* </Tooltip> */}
             {/* <Tooltip placement={"left-end"} title={<p style={{ fontSize: 12 }}>Reset the network and the training data</p>} aria-label={"Reset the network and the training data"}> */}
             <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
             {/* </Tooltip> */}
-            <div style={{ display: "flex", marginTop: "40px", alignItems: "flex-end" }}>
-                <h3 style={{ marginBottom: "5px", marginTop: "0px" }}>Comparison Tools</h3>
-                <StyledInfoButton title="Output Tooltip" marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
+            <div style={{ display: "flex", marginTop: "10px", alignItems: "flex-end" }}>
+                <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Comparison Tools</h4>
+                <StyledInfoButton title="Comparison Tools Tooltip" marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
                     <React.Fragment>
-                        <Typography variant="body2"> The comparision tools allow you to save the current state of your network so that you can change the configuration and see how this effects the performance of the network. <br /> (Click on the tool tip for instructions on how to utilise this)
+                        <Typography variant="body2">
+                            The comparision tools allow you to save the current state of your network so that you can change the configuration and see how this effects the performance of the network. <br />
+                            <u>(Click on the tool tip for instructions on how to utilise this)</u>
                         </Typography>
                     </React.Fragment>
                 </StyledInfoButton>

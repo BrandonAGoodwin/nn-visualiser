@@ -13,6 +13,7 @@ import InfoPanel from './InfoPanel';
 import NetworkPanel from './NetworkPanel';
 import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
+import InsightsPanel from './InsightsPanel';
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -32,12 +33,13 @@ const Container = styled("div")`
 
     // Using values from NeuralNetworkVis for middle column
     grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
-    grid-template-rows: 90px 1fr 80px auto;
+    grid-template-rows: 90px auto 1fr auto;
+    /* grid-template-rows: 90px 1fr 80px auto; */
     grid-gap: 15px;
     grid-template-areas: 
         "config-bar config-bar config-bar"
         "control-panel network nn-graph"
-        "stats stats stats"
+        "insights network nn-graph"
         "info info info";
 `;
 
@@ -71,12 +73,6 @@ export const ContainerSection = styled("div")`
 export const StyledInfoButton = styled(InfoButton)`
     font-size: 14px;
 `
-
-export interface AnalyticsData {
-    trainingLoss: number[];
-    testLoss: number[];
-    ephochs: number;
-}
 
 interface MainPageProps {
     xDomain: number[];
@@ -353,6 +349,11 @@ function MainPage(props: MainPageProps) {
                 saveNetworkState={saveNetworkState}
                 loadNetworkState={loadNetworkState}
                 clearNetworkState={clearNetworkState}
+            />
+            <InsightsPanel
+                nnConfig={nnConfig}
+                dgConfig={dgConfig}
+                analyticsData={analyticsData}
             />
             <GraphPanel
                 network={network}

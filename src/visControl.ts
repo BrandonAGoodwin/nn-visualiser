@@ -36,7 +36,7 @@ export let INPUTS: { [name: string]: InputFunc } = {
 
 
 export function start(config: NNConfig): nn.Node[][] {
-    let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], nn.Activations.TANH, config.inputs);
+    let network = nn.generateNetwork(config.networkShape, ACTIVATIONS[config.activationFunction], config.activationFunction === "Linear" ? nn.Activations.LINEAR : nn.Activations.TANH, config.inputs);
     console.log(network);
 
     return network;

@@ -108,7 +108,7 @@ export class Activations {
     }
     public static LINEAR: ActivationFunction = {
         output: (x: number) => x,
-        derivative: (x: number) => 0,
+        derivative: (x: number) => 1,
         range: [-1, 1]
     }
 }
@@ -300,10 +300,8 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
 }
 
 /**
- * 
- * @param network 
- * @param trainingData 
- * @param costFunction 
+ * Applies the weight and bias updates to the neural network. (Should be done after performing some number of back propagation steps)
+ * @param network The neural network that will be trained
  * @param learningRate The hyperparameter that determines how much weights a biases change on each iteration (AKA epsilon)
  */
 export function train(network: Node[][], learningRate: number) {

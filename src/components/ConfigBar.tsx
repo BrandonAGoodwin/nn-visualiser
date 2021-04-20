@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { NNConfig } from "../NetworkController";
+import { DefActivationFunction } from "./Definitions";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
 import DatasetInfoPanel from "./InfoPanels/DatasetInfoPanel";
 import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
@@ -92,12 +93,8 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="Linear">Linear</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel config={nnConfig} setInfoPanel={setInfoPanelWrapper} />}>
-                <React.Fragment>
-                    <Typography color="inherit">Activation Function (&Phi;)</Typography>
-                    <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
-                    <u>Click the icon to get more information</u>
-                </React.Fragment>
+            <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel/>}>
+                {DefActivationFunction()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
             <StyledFormControl variant="filled">

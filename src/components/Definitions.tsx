@@ -30,6 +30,16 @@ export function DefinedTerm(props: DefinedTermProps) {
     );
 }
 
+export function DefActivationFunction() {
+    return (
+        <>
+            <Typography color="inherit">Activation Function (&Phi;)</Typography>
+            <Typography variant="body2">The activation defines the output of a neuron (node).</Typography><br />
+            <u>Click the icon to get more information</u>
+        </>
+    );
+}
+
 export function DefX1() {
     return (
         <Typography variant="body2">
@@ -53,8 +63,8 @@ export function DefX2() {
 export function DefNode() {
     return (
         <Typography variant="body2">
-           Nodes are the individual functions that make up the neural network and are connected to nodes in adjacent layers by links.<br/>
-           <u>Click the icon to get more information</u>
+            Nodes are the individual functions that make up the neural network and are connected to nodes in adjacent layers by links.<br />
+            <u>Click the icon to get more information</u>
         </Typography>
     );
 }
@@ -64,5 +74,5 @@ export function DefLink() {
         <Typography variant="body2">
 
         </Typography>
-    )
+    );
 }
