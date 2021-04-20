@@ -140,7 +140,7 @@ function GraphPanel(props: GraphPanelProps) {
                 </FormGroup>
                 <p style={{ marginTop: "20px", marginBottom: "0px" }}> Epochs: <b>{trainingEpoch}</b></p>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                    <p style={{ marginTop: "0px", marginBottom: "0px" }}>
+                    <p style={{ marginTop: "20px", marginBottom: "0px" }}>
                         Loss (Training): <b>{trainingLoss.toFixed(3)}</b> <br />
                         Loss (Test): <b>{testLoss.toFixed(3)}</b>
                     </p>

@@ -4,8 +4,9 @@ import React, { useContext, useState } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { AnalyticsData, NNConfig } from "../NetworkController";
-import { DefActivationFunction, DefinedTerm } from "./Definitions";
+import { DefActivationFunction, DefinedTerm, DefLearningRate } from "./Definitions";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
+import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
 import { ContainerSection, StyledInfoButton } from "./MainPage";
 
 
@@ -33,6 +34,7 @@ const InsightSection = styled("div")`
 const StyledInsightsPanel = styled((props: any) => <ContainerSection gridArea="insights" {...props} />)`
     display: block;
     padding-left: 10px;
+    min-height: 250px;
 `
 
 interface InsightsPanelProps {
@@ -60,11 +62,7 @@ function InsightsPanel(props: InsightsPanelProps) {
     const [insight, setInsight] = useState<JSX.Element>();
 
     const inputsAreLinear = (nnConfig: NNConfig) => {
-        console.log(nnConfig.inputs);
         for (let nonLinearInput of nonLinearInputs) {
-
-            console.log(nonLinearInput)
-            console.log(nnConfig.inputs[nonLinearInput])
             if (nnConfig.inputs[nonLinearInput]) return false;
         }
         return true;
@@ -94,6 +92,22 @@ function InsightsPanel(props: InsightsPanelProps) {
         return setInsight(insight);
     }
 
+    const smallLearningRate = (nnConfig: NNConfig) => {
+        return nnConfig.learningRate <= 0.0005;
+    }
+
+    const largeLearningRate = (nnConfig: NNConfig) => {
+        return nnConfig.learningRate >= 1;
+    }
+
+    const stochasticGradientDecent = (nnConfig: NNConfig) => {
+        return nnConfig.batchSize === 1;
+    }
+
+    const batchGradientDecent = (nnConfig: NNConfig, dgConfig: DGConfig) => {
+        return nnConfig.batchSize === Math.floor(dgConfig.numSamples * 0.8);
+    }
+
     return (
         <StyledInsightsPanel onMouseLeave={handleMouseLeave}>
             {insight &&
@@ -117,9 +131,20 @@ function InsightsPanel(props: InsightsPanelProps) {
                         <li><LinearNetworkInsight setInsight={setInsightWrapper} /></li>
                     }
                     {configurationIsUnsolveable(nnConfig, dgConfig) &&
-                        <li><Unsolveable setInsight={setInsightWrapper} /></li>
+                        <li><UnsolveableInsight setInsight={setInsightWrapper} /></li>
                     }
-                    { }
+                    {stochasticGradientDecent(nnConfig) &&
+                        <li><StochasticGradientDecentInsight setInsight={setInsightWrapper} /></li>
+                    }
+                    {batchGradientDecent(nnConfig, dgConfig) &&
+                        <li><BatchGradientDecentInsight setInsight={setInsightWrapper} /></li>
+                    }
+                    {smallLearningRate(nnConfig) &&
+                        <li><SmallLearningRateInsight setInsight={setInsightWrapper} /></li>
+                    }
+                    {largeLearningRate(nnConfig) &&
+                        <li><LargeLearningRateInsight setInsight={setInsightWrapper} /></li>
+                    }
                 </StyledList>
             </div>
             }
@@ -145,7 +170,7 @@ function LinearNetworkInsight(props: ({ setInsight: (insight: JSX.Element) => vo
     );
 }
 
-function Unsolveable(props: ({ setInsight: (insight: JSX.Element) => void })) {
+function UnsolveableInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
     const { setInfoPanelWrapper } = useContext(InfoPanelContext);
     const insight = (
         <>
@@ -161,5 +186,78 @@ function Unsolveable(props: ({ setInsight: (insight: JSX.Element) => void })) {
         <InsightLink onClick={() => props.setInsight(insight)}>Data set is unsolveable</InsightLink>
     );
 }
+
+function StochasticGradientDecentInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    const insight = (
+        <>
+            <h4>Stochastic Gradient Decent</h4>
+            <StyledList>
+                <li>When batch size is 1 this is equivalent to stochastic gradient decent</li>
+                <li>This means the weights and biases are updated every time back propagation is done with a training sample</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Using stochastic gradient decent</InsightLink>
+    );
+}
+
+function BatchGradientDecentInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    const insight = (
+        <>
+            <h4>Batch Gradient Decent</h4>
+            <StyledList>
+                <li>When batch size is equal to the number of training samples this is equivalent to batch gradient decent</li>
+                <li>This means the weights and biases are updated once after back propagation has been done with all training samples</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Using batch gradient decent</InsightLink>
+    );
+}
+
+function SmallLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    const { setInfoPanelWrapper } = useContext(InfoPanelContext);
+    const insight = (
+        <>
+            <h4>Small Learning Rate</h4>
+            <StyledList>
+                <li>The <b>
+                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>learning rate</DefinedTerm> value is significantly lower
+                </b> than what would normally be used for standard gradient decent</li>
+                <li>This can lead very slow learning (requiring many epochs of training)</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Very small learning rate value</InsightLink>
+    );
+}
+
+function LargeLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    const { setInfoPanelWrapper } = useContext(InfoPanelContext);
+    const insight = (
+        <>
+            <h4>Large Learning Rate</h4>
+            <StyledList>
+                <li>The <b>
+                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>learning rate</DefinedTerm> value is significantly larger
+                </b> than what would normally be used for standard gradient decent</li>
+                <li>This can cause "overshooting" during gradient decent which can cause divergent behaviour</li>
+                <li>Loss will tend to fluctuate</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Very large learning rate value</InsightLink>
+    );
+}
+
+
 
 export default InsightsPanel;
