@@ -51,9 +51,9 @@ export class Dataset {
          * @param cy Mean of distribution along y
          * @param variance Variance of distribution
          */
-        function generateGaussianData(cx1: number, cx2: number, y: number) {
+        function generateGaussianData(numSamples: number, cx1: number, cx2: number, y: number) {
             // Workiung with an -8, 8 grid non-variable for the forseeable future
-            for (let i = 0; i < numSamples / 3; i++) {
+            for (let i = 0; i < numSamples; i++) {
                 let x1 = normalDistribution(cx1, variance);
                 let x2 = normalDistribution(cx2, variance);
                 samples.push({ x1: x1, x2: x2, y: y });
@@ -61,9 +61,9 @@ export class Dataset {
         }
 
         // Generate two sets of gauss distributed data with mean at points (-3, -3) and (3, 3) each with 
-        generateGaussianData(-4, -4, -1);
-        generateGaussianData(0, 0, 1);
-        generateGaussianData(4, 4, -1);
+        generateGaussianData(numSamples / 4, -4, -4, -1);
+        generateGaussianData(numSamples / 2, 0, 0, 1);
+        generateGaussianData(numSamples / 4, 4, 4, -1);
 
         return shuffle(samples);
     }
@@ -116,19 +116,19 @@ function normalDistribution(mean: number, variance: number): number {
 
 function shuffle(dataset: Datapoint2D[]): Datapoint2D[] {
     var currentIndex = dataset.length, temporaryValue, randomIndex;
-  
+
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
-  
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-  
-      // And swap it with the current element.
-      temporaryValue = dataset[currentIndex];
-      dataset[currentIndex] = dataset[randomIndex];
-      dataset[randomIndex] = temporaryValue;
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = dataset[currentIndex];
+        dataset[currentIndex] = dataset[randomIndex];
+        dataset[randomIndex] = temporaryValue;
     }
-  
+
     return dataset;
-  }
+}

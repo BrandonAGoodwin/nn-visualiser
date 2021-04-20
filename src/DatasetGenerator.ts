@@ -34,8 +34,22 @@ export function useDatasetGenerator(defaultConfig: DGConfig = defaultDGConfig) {
         console.log("Generating dataset");
         let { datasetType, numSamples, noise } = dgConfig;
         let datasetGenerator = GENERATORS[datasetType];
-        let dataset = datasetGenerator(numSamples, noise);
-        let [newTrainingData, newTestData] = splitDataset(dataset);
+        
+        let [newTrainingData, newTestData]: [Datapoint2D[], Datapoint2D[]] = [[], []];
+        let negativeClassFlag: boolean = false;
+        let positiveClassFlag: boolean = false;
+        let counter = 0;
+        do {
+            negativeClassFlag = false;
+            positiveClassFlag = false;
+            let dataset = datasetGenerator(numSamples, noise);
+            [newTrainingData, newTestData] = splitDataset(dataset);
+            newTestData.forEach((d: Datapoint2D) => {
+                if(d.y === -1) negativeClassFlag = true;
+                if(d.y === 1) positiveClassFlag = true;
+            })
+            counter++;
+        } while ((!negativeClassFlag || !positiveClassFlag) && (counter < 20))
         setTrainingData(newTrainingData);
         setTestData(newTestData);
         // setDataset(dataset)

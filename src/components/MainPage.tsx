@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
+import * as nn from '../NeuralNet';
 import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
 import { GitHub } from '@material-ui/icons';
-import { ACTIVATIONS, NetworkState, NNConfig, useNetwork } from '../NetworkController';
+import { ACTIVATIONS, NetworkController, NetworkState, NNConfig, useNetwork } from '../NetworkController';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
 import ControlPanel from './ControlPanel';
@@ -12,6 +13,7 @@ import InfoPanel from './InfoPanel';
 import NetworkPanel from './NetworkPanel';
 import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
+import InsightsPanel from './InsightsPanel';
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -31,12 +33,13 @@ const Container = styled("div")`
 
     // Using values from NeuralNetworkVis for middle column
     grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
-    grid-template-rows: 90px 1fr 80px auto;
+    grid-template-rows: 90px auto 1fr auto;
+    /* grid-template-rows: 90px 1fr 80px auto; */
     grid-gap: 15px;
     grid-template-areas: 
         "config-bar config-bar config-bar"
         "control-panel network nn-graph"
-        "stats stats stats"
+        "insights network nn-graph"
         "info info info";
 `;
 
@@ -71,19 +74,14 @@ export const StyledInfoButton = styled(InfoButton)`
     font-size: 14px;
 `
 
-export interface AnalyticsData {
-    trainingLoss: number[];
-    testLoss: number[];
-    ephochs: number;
-}
-
 interface MainPageProps {
     xDomain: number[];
     yDomain: number[];
     numCells: number;
-    updateComparisionData: (currentState: NetworkState, savedState: NetworkState) => void;
-    nnConfig: NNConfig;
+    updateComparisionData: (currentState: NetworkState, savedState: NetworkState | undefined) => void;
+    // nnConfig: NNConfig;
     dgConfig: DGConfig;
+    networkController: NetworkController;
 }
 
 function MainPage(props: MainPageProps) {
@@ -92,6 +90,7 @@ function MainPage(props: MainPageProps) {
         nnConfig,
         network,
         analyticsData,
+        setNetwork,
         setActivationFunction,
         setLearningRate,
         setBatchSize,
@@ -103,7 +102,7 @@ function MainPage(props: MainPageProps) {
         removeNode,
         addLayer,
         removeLayer
-    } = useNetwork(props.nnConfig);
+    } = props.networkController;
 
     const {
         dgConfig,
@@ -124,17 +123,10 @@ function MainPage(props: MainPageProps) {
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
     const [compareMode, setCompareMode] = useState<boolean>(false);
-    // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
+    const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
     // const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
-
-    // useEffect(() => {
-    //     console.log("Config change useEffect");
-    //     if (training) toggleAutoTrain();
-    //     // generateNetwork();
-    //     generateDataset();
-    // }, [nnConfig, dgConfig]);
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -143,23 +135,23 @@ function MainPage(props: MainPageProps) {
     useEffect(() => {
         console.log("Network change useEffect");
         updateDecisionBoundaries();
+        (!compareMode) && network && setNetworkOriginalState(vis.copyNetwork(network));
     }, [network]);
 
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        handleReset(); // Change reset implementation
+        handleReset(false);
+        const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
+        if (nnConfig.batchSize > numTrainingSamples) {
+            setBatchSize(numTrainingSamples);
+        }
     }, [nnConfig, dgConfig]);
 
     useEffect(() => {
         network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
             if (prevAnalyticsData) {
                 const { trainingLossData, testLossData } = prevAnalyticsData;
-
-                //return { epochs: prevAnalyticsData?.epochs + 1, trainingLossData: prevAnalyticsData}
-                // let trainingLoss = vis.getCost(updatedNetwork, trainingData, nnConfig.inputs);
-                // let testLoss = vis.getCost(updatedNetwork, testData, nnConfig.inputs);
-                // let epoch = epochs + 1;
                 let newTrainingLossData = trainingLossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]);
                 let newTestLossData = testLossData.concat([[epochs, vis.getCost(network, testData, nnConfig.inputs)]]);
                 return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs};
@@ -169,6 +161,10 @@ function MainPage(props: MainPageProps) {
 
     
     }, [epochs]); 
+    
+    useEffect(() => {
+        props.updateComparisionData(getNetworkState, comparisonData);
+    }, [analyticsData, comparisonData]);
 
 
     // const generateNetwork = () => {
@@ -196,7 +192,7 @@ function MainPage(props: MainPageProps) {
         if (network) {
             // Don't like numcells having to be the same
             setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, nnConfig.inputs));
-            trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
+            // trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
         }
     }
 
@@ -205,18 +201,18 @@ function MainPage(props: MainPageProps) {
         network && setDecisionBoundary(vis.getOutputDecisionBoundary1D(network, props.numCells, props.xDomain, props.yDomain, nnConfig.inputs));
     }
 
-    const handleReset = () => {
+    const handleReset = (resetDataset: boolean = true) => {
         console.log("Reset");
         if (training) toggleAutoTrain();
         reset();// generateNetwork();
         setEpochs(0);
-        setLossData([]);
-        if (!compareMode) generateDataset();
+        // setLossData([]);
+        if (!compareMode && resetDataset) generateDataset();
     };
 
     const handleStep = () => {
         console.log("HandleStep")
-        step(trainingData, testData);
+        step(trainingData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
@@ -267,6 +263,19 @@ function MainPage(props: MainPageProps) {
         setComaparisonData(newComparisionData);
     }
 
+    const getNetworkState = ({
+            nnConfig: nnConfig,
+            dgConfig: dgConfig,
+            decisionBoundaries: decisionBoundaries,
+            decisionBoundary: decisionBoundary,
+            analyticsData: analyticsData
+            // epochs: epochs,
+            // loss: loss,
+            // lossData: lossData,
+            // noise: dgConfig.noise
+        })
+    
+
     const toggleAutoTrain = () => {
         setTraining((training) => {
             if (training) {
@@ -294,7 +303,12 @@ function MainPage(props: MainPageProps) {
     }
 
     const loadNetworkState = () => {
-        handleReset(); // This is defo broken
+        // handleReset(); // This is defo broken
+        networkOriginalState && setNetwork(vis.copyNetwork(networkOriginalState));
+        setEpochs(0);
+        // setLossData([]);
+        setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0});
+        // Maybe load in original data set too (maybe make it a separate button)
     }
 
     const clearNetworkState = () => {
@@ -327,6 +341,11 @@ function MainPage(props: MainPageProps) {
                 loadNetworkState={loadNetworkState}
                 clearNetworkState={clearNetworkState}
             />
+            <InsightsPanel
+                nnConfig={nnConfig}
+                dgConfig={dgConfig}
+                analyticsData={analyticsData}
+            />
             <GraphPanel
                 network={network}
                 trainingData={trainingData}
@@ -337,9 +356,6 @@ function MainPage(props: MainPageProps) {
                 decisionBoundary={decisionBoundary}
                 discreetBoundary={discreetBoundary}
                 toggleDiscreetBoundary={toggleDiscreetOutput}
-                // epochs={epochs}
-                // loss={loss}
-                // lossData={lossData}
                 analyticsData={analyticsData}
                 comparisonAnalyticsData={comparisonData?.analyticsData}
                 comparisonData={comparisonData}
@@ -361,9 +377,6 @@ function MainPage(props: MainPageProps) {
                 hiddenDomain={ACTIVATIONS[nnConfig.activationFunction].range}
                 outputDomain={ACTIVATIONS["Tanh"].range}
             />}
-            <StatsBar>
-
-            </StatsBar>
             <InfoPanel/>
             <LinksDiv>
                 <a href="https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/bxg796" target="_blank">
@@ -377,3 +390,7 @@ function MainPage(props: MainPageProps) {
 }
 
 export default MainPage;
+
+function defaultAnalyticsData(defaultAnalyticsData: any) {
+    throw new Error('Function not implemented.');
+}

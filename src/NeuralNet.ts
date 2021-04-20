@@ -97,7 +97,6 @@ export class Activations {
         derivative: (x: number) => x > 0 ? 1 : 0,
         range: [0, 1]
     };
-    // Might need to polyfill not TANH implementation for +/- inf values if Math.tah doesn't exist
     public static TANH: ActivationFunction = {
         // output: (x: number) => Math.tanh(x),
         output: (x: number) => (Math as any).tanh(x),
@@ -105,6 +104,11 @@ export class Activations {
             let output = Activations.TANH.output(x);
             return 1 - output * output;
         },
+        range: [-1, 1]
+    }
+    public static LINEAR: ActivationFunction = {
+        output: (x: number) => x,
+        derivative: (x: number) => 1,
         range: [-1, 1]
     }
 }
@@ -296,10 +300,8 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
 }
 
 /**
- * 
- * @param network 
- * @param trainingData 
- * @param costFunction 
+ * Applies the weight and bias updates to the neural network. (Should be done after performing some number of back propagation steps)
+ * @param network The neural network that will be trained
  * @param learningRate The hyperparameter that determines how much weights a biases change on each iteration (AKA epsilon)
  */
 export function train(network: Node[][], learningRate: number) {

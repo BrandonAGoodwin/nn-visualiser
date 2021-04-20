@@ -63,9 +63,12 @@ function BackgroundCanvas(props: CanvasProps) {
         const data = imageData.data;
         let iter = -1;
 
+        let lowerBound = props.domain[0];
+        let upperBound = props.domain[1];
+
         for(let i = 0; i < props.decisionBoundary.length; i++) {
             let value: number = props.decisionBoundary[i];
-            if(props.discreetBoundary) value = value > 0 ? 1 : -1;
+            if(props.discreetBoundary) value = value > (lowerBound + upperBound) / 2 ? props.domain[1] : props.domain[0];
             let c = d3.rgb(color(value));
             data[++iter] = c.r;
             data[++iter] = c.g;
