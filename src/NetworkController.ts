@@ -117,6 +117,7 @@ export type NetworkController = {
     state: NNState,
     network: nn.Node[][] | undefined,
     analyticsData: AnalyticsData,
+    setNetwork: (network: nn.Node[][]) => void;
     setActivationFunction: (activationFunction: string) => void,
     setLearningRate: (learningRate: number) => void,
     setBatchSize: (batchSize: number) => void,
@@ -292,6 +293,7 @@ export function useNetwork(
         state,
         network,
         analyticsData,
+        setNetwork,
         setActivationFunction,
         setLearningRate,
         setBatchSize,

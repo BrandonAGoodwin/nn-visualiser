@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as vis from '../visControl';
+import * as nn from '../NeuralNet';
 import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
@@ -93,6 +94,7 @@ function MainPage(props: MainPageProps) {
         nnConfig,
         network,
         analyticsData,
+        setNetwork,
         setActivationFunction,
         setLearningRate,
         setBatchSize,
@@ -126,7 +128,7 @@ function MainPage(props: MainPageProps) {
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
     const [compareMode, setCompareMode] = useState<boolean>(false);
-    // const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
+    const [networkOriginalState, setNetworkOriginalState] = useState<nn.Node[][]>();
     // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
     // const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
@@ -145,6 +147,7 @@ function MainPage(props: MainPageProps) {
     useEffect(() => {
         console.log("Network change useEffect");
         updateDecisionBoundaries();
+        (!compareMode) && network && setNetworkOriginalState(vis.copyNetwork(network));
     }, [network]);
 
 
@@ -202,7 +205,7 @@ function MainPage(props: MainPageProps) {
         if (network) {
             // Don't like numcells having to be the same
             setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, nnConfig.inputs));
-            trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
+            // trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
         }
     }
 
@@ -216,7 +219,7 @@ function MainPage(props: MainPageProps) {
         if (training) toggleAutoTrain();
         reset();// generateNetwork();
         setEpochs(0);
-        setLossData([]);
+        // setLossData([]);
         if (!compareMode) generateDataset();
     };
 
@@ -313,7 +316,12 @@ function MainPage(props: MainPageProps) {
     }
 
     const loadNetworkState = () => {
-        handleReset(); // This is defo broken
+        // handleReset(); // This is defo broken
+        networkOriginalState && setNetwork(vis.copyNetwork(networkOriginalState));
+        setEpochs(0);
+        // setLossData([]);
+        setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0});
+        // Maybe load in original data set too (maybe make it a separate button)
     }
 
     const clearNetworkState = () => {
@@ -396,3 +404,7 @@ function MainPage(props: MainPageProps) {
 }
 
 export default MainPage;
+
+function defaultAnalyticsData(defaultAnalyticsData: any) {
+    throw new Error('Function not implemented.');
+}
