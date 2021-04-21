@@ -15,8 +15,8 @@ import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
 import InsightsPanel from './InsightsPanel';
 import { Datapoint2D } from '../datasets';
-import { BatchSizeExercise, Exercise } from '../Exercises/Exercise';
-import { config } from 'process';
+import { Exercise } from '../Exercises/Exercise';
+import BatchSizeExercise from '../Exercises/BatchSizeExercise';
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -149,7 +149,7 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        if (!importedNetwork && !exercise) {
+        if (!importedNetwork) {
             handleReset(false);
             const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
             if (nnConfig.batchSize > numTrainingSamples) {
@@ -157,36 +157,25 @@ function MainPage(props: MainPageProps) {
             }
         } else {
             console.log("Setting imported network");
-
-
-            if (exercise) {
-                handleReset(false);
-            } else {
-                importedNetwork && setNetwork(importedNetwork);
-                setImportedNetwork(undefined);
-            }
+            importedNetwork && setNetwork(importedNetwork);
+            setImportedNetwork(undefined);
             setEpochs(0);
         }
     }, [nnConfig]);
 
-
     useEffect(() => {
-        if (!importedDataset && !exercise) {
+        if (!importedDataset) {
             generateDataset();
-            loadNetworkState();
         } else {
             console.log("Setting imported dataset");
             if (importedDataset) {
-                console.log("hi")
                 let [importedTrainingData, importedTestData] = importedDataset;
                 setTrainingData(importedTrainingData);
                 setTestData(importedTestData);
                 setImportedDataset(undefined);
             }
         }
-
     }, [dgConfig]);
-
 
     useEffect(() => {
         network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
@@ -199,6 +188,11 @@ function MainPage(props: MainPageProps) {
             return prevAnalyticsData;
         });
 
+        // if (network) {
+        //     let networkString = vis.NetworkToString(network, nnConfig);
+        //     let [testConfig, testNetwork] = vis.StringToNetwork(networkString);
+        //     downloadNetwork(network, nnConfig);
+        // }
     }, [epochs]);
 
 
@@ -206,20 +200,20 @@ function MainPage(props: MainPageProps) {
         props.updateComparisionData(getNetworkState, comparisonData);
     }, [analyticsData, comparisonData]);
 
-
     useEffect(() => {
-        if (importedFile && !exercise) {
+        if (importedFile) {
             let fileReader = new FileReader();
             fileReader.onloadend = function (e) {
 
                 const networkString = fileReader.result;
-                // console.log(networkString);
+                console.log(networkString);
 
                 if (typeof networkString === "string") {
                     const { nnConfig, dgConfig } = vis.StringToNetwork(networkString);
 
                     setNNConfig(nnConfig);
                     setDGConfig(dgConfig);
+                    // setNetwork(importedNetwork);
                 }
             }
             fileReader.readAsText(importedFile);
@@ -227,24 +221,40 @@ function MainPage(props: MainPageProps) {
         }
     }, [importedFile]);
 
-
     useEffect(() => {
         if (exercise) {
-            const { networkString } = exercise;
-
-            const { nnConfig, dgConfig } = vis.StringToNetwork(networkString);
-            setNNConfig(nnConfig);
-            setDGConfig(dgConfig);
-
-        } else {
-            setImportedNetwork(undefined);
+            const { configFile, interfaceConfig } = exercise;
+            // setInterface()
         }
     }, [exercise]);
+
+
+    // const generateNetwork = () => {
+    //     console.log("Generating network");
+
+    //     if (!compareMode) {
+    //         let newNetwork = vis.start(config);
+    //         setNetwork(newNetwork);
+    //         let newNetworkCopy = vis.copyNetwork(newNetwork);
+    //         console.log(newNetworkCopy);
+    //         setNetworkOriginalState(newNetworkCopy);
+    //     } else {
+    //         console.log("Loading networ k original state");
+    //         if (networkOriginalState) {
+    //             console.log(networkOriginalState);
+    //             setNetwork(vis.copyNetwork(networkOriginalState));
+    //         }
+    //     }
+    //     setEpochs(0);
+    //     setLossData([]);
+    // }
 
     const updateDecisionBoundaries = () => {
         console.log("Updating decision boundaries");
         if (network) {
+            // Don't like numcells having to be the same
             setDecisionBoundaries(vis.getAllDecisionBoundaries(network, 20, props.xDomain, props.yDomain, nnConfig.inputs));
+            // trainingData && setLoss(vis.getCost(network, trainingData, nnConfig.inputs));
         }
     }
 
@@ -256,25 +266,17 @@ function MainPage(props: MainPageProps) {
     const handleReset = (resetDataset: boolean = true) => {
         console.log("Reset");
         if (training) toggleAutoTrain();
-        if (exercise) {
-            console.log(importedNetwork)
-            importedNetwork && setNetwork(vis.copyNetwork(importedNetwork));
-            setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0 });
-        } else {
-            reset();
-            // if(networkOriginalState) {
-            // networkOriginalState && loadNetworkState();
-            // } else {
-            //     reset();
-            // }
-        }
+        reset();// generateNetwork();
         setEpochs(0);
-        if (!compareMode && resetDataset && !exercise) generateDataset();
+        // setLossData([]);
+        if (!compareMode && resetDataset) generateDataset();
     };
 
     const handleStep = () => {
         console.log("HandleStep")
         step(trainingData);
+        console.log(trainingData);
+        console.log(testData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
@@ -301,6 +303,15 @@ function MainPage(props: MainPageProps) {
         }
     }
 
+    // const importNetworkConfig = (file: File) => {
+
+    //     let fileReader = new FileReader();
+    //     fileReader.onloadend = function(e) {
+    //         const networkString = fileReader.result;
+    //         console.log(networkString);
+    //     }
+    //     fileReader.readAsText(file);
+    // }
 
     const importNetworkConfig = (file: File) => {
         setImportedFile(file);
@@ -322,6 +333,27 @@ function MainPage(props: MainPageProps) {
 
 
 
+
+    // const step = (noSteps: number) => {
+    //     console.log(`MainPage step(${noSteps})`);
+    //     if (!network || !dataset) return;
+
+    //     let start = Date.now();
+    //     for (let i = 0; i < noSteps; i++) {
+    //         vis.step(network, dataset, config.learningRate, config.inputs, config.batchSize);
+    //         setEpochs(epochs => epochs + 1);
+    //     }
+
+    //     let delta = Date.now() - start;
+    //     // console.log(`Finished training step(${noSteps}) (Duration ${delta}ms)`);
+
+    //     start = Date.now();
+    //     updateDecisionBoundaries();
+    //     delta = Date.now() - start;
+    //     // console.log(`Finsihed updating decision boundaries (Duration ${delta}ms)`);
+    //     // console.log(lossData);
+    // };
+
     const toggleDiscreetOutput = () => {
         setDiscreetBoundary((prevDiscreetBoundary) => !prevDiscreetBoundary);
     }
@@ -338,6 +370,10 @@ function MainPage(props: MainPageProps) {
             decisionBoundaries: decisionBoundaries,
             decisionBoundary: decisionBoundary,
             analyticsData: analyticsData
+            // epochs: epochs,
+            // loss: loss,
+            // lossData: lossData,
+            // noise: dgConfig.noise
         }
 
         setComaparisonData(newComparisionData);
@@ -382,21 +418,13 @@ function MainPage(props: MainPageProps) {
         setCompareMode(false);
     }
 
-    const closeExercise = () => {
-        setExercise(undefined);
-    }
+    // const setExercise = (exercise: Exercise) => {
 
-    const startExercise = (exercise: Exercise) => {
-        clearNetworkState();
-        setExercise(exercise);
-        const { networkString } = exercise;
-        let { network, trainingData, testData } = vis.StringToNetwork(networkString)
-        setImportedNetwork(network);
-        setImportedDataset([trainingData, testData]);
-    }
+    // }
 
     const setBatchSizeExercise = () => {
-        startExercise(BatchSizeExercise);
+        // setExerciseMode(true);
+        setExercise(BatchSizeExercise());
     }
 
     return (
@@ -415,7 +443,6 @@ function MainPage(props: MainPageProps) {
                 downloadOriginalNetwork={downloadOriginalNetwork}
                 importNetworkConfig={importNetworkConfig}
                 setBatchSizeExercise={setBatchSizeExercise}
-                exercise={exercise}
             />
             <ControlPanel
                 training={training}
@@ -464,8 +491,6 @@ function MainPage(props: MainPageProps) {
                 removeLayer={removeLayer}
                 hiddenDomain={ACTIVATIONS[nnConfig.activationFunction].range}
                 outputDomain={ACTIVATIONS["Tanh"].range}
-                exercise={exercise}
-                closeExercise={closeExercise}
             />}
             <InfoPanel />
             <LinksDiv>

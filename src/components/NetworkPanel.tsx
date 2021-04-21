@@ -6,21 +6,20 @@ import NNNode from "./NNNode";
 import { INPUTS } from "../visControl"
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { IconButton, Typography } from "@material-ui/core";
+import { IconButton, Tooltip, Typography } from "@material-ui/core";
 import { ContainerSection, StyledInfoButton } from "./MainPage";
 import { DefinedTerm, DefX1, DefX2 } from "./Definitions";
 import MouseTooltip from "./MouseTooltip";
-import ResizeSensor from "css-element-queries";
-import useEventListener from "./UseEventListener";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { NNConfig } from "../NetworkController";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
+import { Exercise } from "../Exercises/Exercise";
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const StyledNetworkPanel = styled((props: any) => <ContainerSection gridArea="network" {...props} />)`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* max-width: fit-content; */
 `
 
 interface ContainerBox {
@@ -57,8 +56,6 @@ const HoverCard = styled("div")`
     flex-direction: row;
     justify-content: center;
     z-index: 10000;
-    /* position: absolute; */
-    /* position: static; */
 `
 
 const PlusMinusButtonsContainer = styled("div")`
@@ -79,7 +76,7 @@ const GridContainer = styled("div")`
     grid-template-rows: auto 1fr 48px;
     grid-gap: 0px;
     grid-template-areas: 
-        "inputs-label layer-controls ."
+        "inputs-label layer-controls exercise-button"
         "inputs-layer hidden-layers output"
         ". hidden-layers ."
         ;
@@ -115,6 +112,10 @@ const LayerControls = styled((props: any) => <NetworkContainerSection gridArea="
     justify-content: space-around;
     align-items: center;
 `
+const ExerciseButton = styled((props: any) => <NetworkContainerSection gridArea="exercise-button" {...props} />)`
+    min-width: 60px;
+    min-height: 60px;
+`
 
 interface CanvasProps {
     visible: boolean;
@@ -148,6 +149,8 @@ interface NetworkProps {
     removeLayer: () => void;
     hiddenDomain: [number, number];
     outputDomain: [number, number];
+    exercise?: Exercise;
+    closeExercise: () => void;
 }
 
 // Could remove the output node and point straight to the graph
@@ -203,9 +206,6 @@ function NetworkPanel(props: NetworkProps) {
         setHoverTarget("");
         setShowHoverCard(false);
     }
-
-    // useEventListener("mouseenter", updateHovercard, undefined, true);
-    // useEventListener("mouseleave", hideHoverCard, undefined, true);
 
     useEffect(() => {
         setLinksUpdated(false);
@@ -355,23 +355,11 @@ function NetworkPanel(props: NetworkProps) {
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
             .attr("d", d)
             .attr("fill", "transparent")
-            // .attr("pointer-events", "all")
             .attr("stroke", linkConfig.color)
             .attr("stroke-width", linkConfig.size || 0)
             .attr("stroke-dasharray", "10,2")
-            // .attr("cursor", "pointer")
-            // .on("mouseover", function (d, i) {
-            //     d3.select(this).transition()
-            //         .duration(100000)
-            //         .ease(d3.easeLinear)
-            //         .attr("stroke-dashoffset", -8000)
-            // })
-            // .on("mouseout", function (d, i) {
-            //     d3.select(this)
-            //         .transition();
-            // })
 
-            d && hoverLine.attr("marker-start", "url(#markerArrow)")
+        d && hoverLine.attr("marker-start", "url(#markerArrow)")
             .attr("class", "link")
             .attr("id", `link-${input.source.id}-${input.dest.id}`)
             .attr("d", d)
@@ -494,115 +482,123 @@ function NetworkPanel(props: NetworkProps) {
     return (
         <StyledNetworkPanel>
             <>
-            <GridContainer style={{ overflow: "hidden" }} ref={container}>
-                <svg
-                    ref={svgContainer}
-                    width={containerBox.width}
-                    height={containerBox.height}
-                    style={{ position: "absolute", pointerEvents: "none" }}
-                    id={'lines-container'}
-                />
-                {!network || !linksUpdated && <FadeCanvas visible={true} width={containerBox.width} height={containerBox.height} />}
-                <div style={{ paddingTop: "10px", paddingLeft: "30px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gridArea: "inputs-label" }}>
-                    <Typography>Inputs</Typography>
-                    <StyledInfoButton title="Inputs Tooltip" fontSize="small" marginRight={0} marginLeft={5}>
-                        <React.Fragment>
-                            <Typography color="inherit">Inputs</Typography>
-                            <Typography variant="body2">
-                                The inputs determine the data that is input into the neural network from the data set.
+                <GridContainer style={{ overflow: "hidden" }} ref={container}>
+                    <svg
+                        ref={svgContainer}
+                        width={containerBox.width}
+                        height={containerBox.height}
+                        style={{ position: "absolute", pointerEvents: "none" }}
+                        id={'lines-container'}
+                    />
+                    {!network || !linksUpdated && <FadeCanvas visible={true} width={containerBox.width} height={containerBox.height} />}
+                    <div style={{ paddingTop: "10px", paddingLeft: "30px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gridArea: "inputs-label" }}>
+                        <Typography>Inputs</Typography>
+                        <StyledInfoButton title="Inputs Tooltip" fontSize="small" marginRight={0} marginLeft={5}>
+                            <React.Fragment>
+                                <Typography color="inherit">Inputs</Typography>
+                                <Typography variant="body2">
+                                    The inputs determine the data that is input into the neural network from the data set.
                                 Each input is a function of <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and/or <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm>.
                             </Typography>
-                            {/* <br /><u>Click the icon to get more information</u> */}
-                        </React.Fragment>
-                    </StyledInfoButton>
-                </div>
-                <LayerControls>
-                    <IconButton onClick={props.removeLayer}>
-                        <RemoveCircleIcon />
-                    </IconButton>
-                    <Typography> Hidden Layers: {props.config.networkShape.length - 2}</Typography>
-                    <IconButton onClick={props.addLayer}>
-                        <AddCircleIcon />
-                    </IconButton>
-                </LayerControls>
-                <Container style={{ gridArea: "inputs-layer", paddingLeft: "60px" }}>
-                    <Layer>
-                        {network && Object.keys(INPUTS).map(nodeId =>
-                            <NNNode
-                                id={`node-${nodeId}`}
-                                nodeId={nodeId}
-                                active={props.inputs[nodeId]}
-                                nodeWidth={nodeWidth}
-                                numCells={20}
-                                decisionBoundary={props.decisionBoundaries[nodeId]}
-                                discreetBoundary={props.discreetBoundary}
-                                handleOnClick={props.handleOnClick}
-                                domain={props.hiddenDomain}
-                            />
-                        )}
-                    </Layer>
-                </Container>
-                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", justifyContent: "space-around", gridArea: "hidden-layers" }}>
-                    {network && network.slice(1, network.length - 1).map((layer, layerNum) =>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                            <Layer style={{ flexGrow: 1 }}>
-                                {layer.map(node => <NNNode
-                                    id={`node-${node.id}`}
+                                {/* <br /><u>Click the icon to get more information</u> */}
+                            </React.Fragment>
+                        </StyledInfoButton>
+                    </div>
+                    <LayerControls>
+                        <IconButton onClick={props.removeLayer}>
+                            <RemoveCircleIcon />
+                        </IconButton>
+                        <Typography> Hidden Layers: {props.config.networkShape.length - 2}</Typography>
+                        <IconButton onClick={props.addLayer}>
+                            <AddCircleIcon />
+                        </IconButton>
+                    </LayerControls>
+                    <Container style={{ gridArea: "inputs-layer", paddingLeft: "60px" }}>
+                        <Layer>
+                            {network && Object.keys(INPUTS).map(nodeId =>
+                                <NNNode
+                                    id={`node-${nodeId}`}
+                                    nodeId={nodeId}
+                                    active={props.inputs[nodeId]}
                                     nodeWidth={nodeWidth}
                                     numCells={20}
-                                    active={true}
-                                    decisionBoundary={props.decisionBoundaries[node.id]}
+                                    decisionBoundary={props.decisionBoundaries[nodeId]}
                                     discreetBoundary={props.discreetBoundary}
-                                    domain={ props.hiddenDomain }
-                                />)}
-                            </Layer>
-                            {(layerNum !== network.length - 2) &&
-                                <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
-                                <IconButton onClick={() => props.removeNode(layerNum + 1)}>
-                                    <RemoveCircleIcon />
+                                    handleOnClick={props.handleOnClick}
+                                    domain={props.hiddenDomain}
+                                />
+                            )}
+                        </Layer>
+                    </Container>
+                    <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", justifyContent: "space-around", gridArea: "hidden-layers" }}>
+                        {network && network.slice(1, network.length - 1).map((layer, layerNum) =>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <Layer style={{ flexGrow: 1 }}>
+                                    {layer.map(node => <NNNode
+                                        id={`node-${node.id}`}
+                                        nodeWidth={nodeWidth}
+                                        numCells={20}
+                                        active={true}
+                                        decisionBoundary={props.decisionBoundaries[node.id]}
+                                        discreetBoundary={props.discreetBoundary}
+                                        domain={props.hiddenDomain}
+                                    />)}
+                                </Layer>
+                                {(layerNum !== network.length - 2) &&
+                                    <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
+                                        <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                            <RemoveCircleIcon />
+                                        </IconButton>
+                                        <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                            <AddCircleIcon />
+                                        </IconButton>
+                                    </PlusMinusButtonsContainer>}
+                            </div>)}
+                    </Container>
+                    <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", gridArea: "output", paddingRight: "10px" }}>
+                        {network && network.slice(network.length - 1).map((layer, layerNum) =>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <Layer style={{ flexGrow: 1 }}>
+                                    {layer.map(node => <NNNode
+                                        id={`node-${node.id}`}
+                                        nodeWidth={nodeWidth}
+                                        numCells={20}
+                                        active={true}
+                                        decisionBoundary={props.decisionBoundaries[node.id]}
+                                        discreetBoundary={props.discreetBoundary}
+                                        domain={props.outputDomain}
+                                    />)}
+                                </Layer>
+                            </div>)}
+                    </Container>
+                   
+                    <ExerciseButton>
+                        {props.exercise &&
+                            <Tooltip title={"Clear exercise"} aria-label={"Clear exercise"}>
+                                <IconButton
+                                    // variant="outlined"
+                                    // color="secondary"
+                                    // endIcon={<PlayArrowIcon />}
+                                    onClick={props.closeExercise}
+                                >
+                                    {/* Close Exercise */}
+                                    <CancelIcon fontSize="large" />
                                 </IconButton>
-                                <IconButton onClick={() => props.addNode(layerNum + 1)}>
-                                    <AddCircleIcon />
-                                </IconButton>
-                            </PlusMinusButtonsContainer>}
-                        </div>)}
-                </Container>
-                <Container style={{ width: "100%", height: "100%", paddingLeft: "0px", gridArea: "output", paddingRight: "10px" }}>
-                    {network && network.slice(network.length - 1).map((layer, layerNum) =>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                            <Layer style={{ flexGrow: 1 }}>
-                                {layer.map(node => <NNNode
-                                    id={`node-${node.id}`}
-                                    nodeWidth={nodeWidth}
-                                    numCells={20}
-                                    active={true}
-                                    decisionBoundary={props.decisionBoundaries[node.id]}
-                                    discreetBoundary={props.discreetBoundary}
-                                    domain={props.outputDomain}
-                                />)}
-                            </Layer>
-                        </div>)}
-                </Container>
-                {/* <svg
-                    ref={svgContainer}
-                    width={containerBox.width}
-                    height={containerBox.height}
-                    style={{ position: "absolute", pointerEvents: "none" }}
-                    id={'lines-container'}
-                    className={"testg"}
-                /> */}
-            </GridContainer>
-            <MouseTooltip
-                visible={showHoverCard}
-                // offsetX={containerBox.left}
-                // offsetY={containerBox.top}
-                style={{ /* position: "absolute"  ,*/ pointerEvents: "none" }}
-            >
-                <HoverCard>
-                    {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
-                    {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
-                </HoverCard>
-            </MouseTooltip>
+                            </Tooltip>
+                        }
+                    </ExerciseButton>
+                </GridContainer>
+                <MouseTooltip
+                    visible={showHoverCard}
+                    // offsetX={containerBox.left}
+                    // offsetY={containerBox.top}
+                    style={{ /* position: "absolute"  ,*/ pointerEvents: "none" }}
+                >
+                    <HoverCard>
+                        {(hoverCardConfig.type === HoverCardType.WEIGHT) && <p>Weight: {hoverCardConfig.value.toFixed(3)}</p>}
+                        {(hoverCardConfig.type === HoverCardType.BIAS) && <p>Bias: {hoverCardConfig.value.toFixed(3)}</p>}
+                    </HoverCard>
+                </MouseTooltip>
             </>
         </StyledNetworkPanel>
     );

@@ -30,7 +30,7 @@ interface ControlPanelProps {
     toggleAutoTrain: () => void;
     toggleDiscreetOutput: () => void;
     handleRegenerateDataset: () => void;
-    handleReset: () => void;
+    handleReset: (resetDataset?: boolean) => void;
     saveNetworkState: () => void;
     loadNetworkState: () => void;
     clearNetworkState: () => void;
@@ -69,15 +69,15 @@ function ControlPanel(props: ControlPanelProps) {
             <StyledButton variant={"contained"} onClick={toggleAutoTrain}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
             {/* </Tooltip> */}
             {/* <Tooltip placement={"left-end"} title={<p style={{ fontSize: 12 }}>Reset the network and the training data</p>} aria-label={"Reset the network and the training data"}> */}
-            <StyledButton variant={"contained"} color={"secondary"} onClick={handleReset}> Reset </StyledButton>
+            <StyledButton variant={"contained"} color={"secondary"} onClick={() => handleReset(false)}> Reset </StyledButton>
             {/* </Tooltip> */}
             <div style={{ display: "flex", marginTop: "10px", alignItems: "flex-end" }}>
                 <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Comparison Tools</h4>
-                <StyledInfoButton title="Comparison Tools Tooltip" marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
+                <StyledInfoButton title="Comparison Tools Tooltip" interactive={false} marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
                     <React.Fragment>
                         <Typography variant="body2">
                             The comparision tools allow you to save the current state of your network so that you can change the configuration and see how the changes effect the performance of the network. <br />
-                            <u>(Click on the tool tip for instructions on how to utilise this)</u>
+                            <u>(Click the icon for instructions on how to utilise this)</u>
                         </Typography>
                     </React.Fragment>
                 </StyledInfoButton>

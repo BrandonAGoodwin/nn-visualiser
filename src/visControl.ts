@@ -218,16 +218,16 @@ export function NetworkToString(
     };
     let networkString = JSON.stringify(networkData);
 
-    console.log(networkString)
+    // console.log(networkString)
     return networkString;
 }
 
 export function StringToNetwork(networkString: string) {
     console.log("String to network");
     let network: nn.Node[][] = [];
-    console.log(networkString)
+    // console.log(networkString)
     let networkData = JSON.parse(networkString);
-    console.log(networkData);
+    // console.log(networkData);
     // let nnConfig = networkData.nnConfig;
     let {
         nnConfig,
@@ -275,7 +275,7 @@ export function StringToNetwork(networkString: string) {
             }
         }
     }
-    console.log(network);
+    // console.log(network);
 
 
     return {

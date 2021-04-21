@@ -3,10 +3,12 @@ import { Button, Divider, FormControl, InputLabel, MenuItem, Select, Typography 
 import React, { useContext, useEffect } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
+import { Exercise } from "../Exercises/Exercise";
 import { NNConfig } from "../NetworkController";
 import { DefActivationFunction, DefBatchSize, DefLearningRate } from "./Definitions";
 import FileUploader from "./FileUploader";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
+import BatchSizeInfoPanel from "./InfoPanels/BatchSizeInfoPanel";
 import DatasetInfoPanel from "./InfoPanels/DatasetInfoPanel";
 import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
 import { ContainerSection, StyledInfoButton } from "./MainPage";
@@ -43,6 +45,8 @@ interface ConfigBarProps {
     downloadNetwork: () => void;
     downloadOriginalNetwork: () => void;
     importNetworkConfig: (file: File) => void;
+    setBatchSizeExercise: () => void;
+    exercise?: Exercise;
 }
 
 function ConfigBar(props: ConfigBarProps) {
@@ -60,6 +64,8 @@ function ConfigBar(props: ConfigBarProps) {
         downloadNetwork,
         downloadOriginalNetwork,
         importNetworkConfig,
+        setBatchSizeExercise,
+        exercise
     } = props;
 
     // const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
@@ -99,6 +105,7 @@ function ConfigBar(props: ConfigBarProps) {
                 <StyledSelect
                     value={nnConfig.activationFunction}
                     onChange={handleActivationChange}
+                    disabled={exercise?.interfaceConfig.activationFunction === false}
                 >
                     <MenuItem value="Tanh">Tanh</MenuItem>
                     <MenuItem value="ReLU">ReLU</MenuItem>
@@ -115,6 +122,7 @@ function ConfigBar(props: ConfigBarProps) {
                 <StyledSelect
                     value={nnConfig.learningRate}
                     onChange={handleLearningRateChange}
+                    disabled={exercise?.interfaceConfig.learningRate === false}
                 >
 
                     <MenuItem disabled={linearActivationFunction(nnConfig)} value="10">10</MenuItem>
@@ -141,6 +149,7 @@ function ConfigBar(props: ConfigBarProps) {
                 <StyledSelect
                     value={dgConfig.datasetType}
                     onChange={handleDatasetChange}
+                    disabled={exercise?.interfaceConfig.dataset === false}
                 >
                     <MenuItem value="Gaussian2">2 Gaussian</MenuItem>
                     <MenuItem value="Gaussian3">3 Gaussian</MenuItem>
@@ -163,6 +172,7 @@ function ConfigBar(props: ConfigBarProps) {
                 defaultValue={dgConfig.numSamples}
                 onChange={handleNumSamplesChange}
                 appendValueToLabel={true}
+                disabled={exercise?.interfaceConfig.datasetSize === false}
             />
             <StyledInfoButton title="Sample Size Tooltip" fontSize={"small"} marginLeft={3} >
                 <React.Fragment>
@@ -179,6 +189,7 @@ function ConfigBar(props: ConfigBarProps) {
                 defaultValue={dgConfig.noise}
                 onChange={handleNoiseChange}
                 appendValueToLabel={true}
+                disabled={exercise?.interfaceConfig.noise === false}
             />
             <StyledInfoButton title="Noise Tooltip" fontSize={"small"} marginLeft={3} >
                 <React.Fragment>
@@ -195,8 +206,9 @@ function ConfigBar(props: ConfigBarProps) {
                 defaultValue={Math.min(nnConfig.batchSize, Math.floor(dgConfig.numSamples * 0.8))}
                 onChange={handleBatchSizeChange}
                 appendValueToLabel={true}
+                disabled={exercise?.interfaceConfig.batchSize === false}
             />
-            <StyledInfoButton title="Batch Size Tooltip" fontSize={"small"} marginLeft={3} >
+            <StyledInfoButton title="Batch Size Tooltip" fontSize={"small"} marginLeft={3} onClick={setInfoPanelWrapper} infoPanel={BatchSizeInfoPanel({ handleSetBatchExercise: setBatchSizeExercise })}>
                 {DefBatchSize()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
@@ -205,6 +217,7 @@ function ConfigBar(props: ConfigBarProps) {
                 variant={"contained"}
                 onClick={handleRegenerateDataset}
                 style={{ minWidth: "min-content", maxHeight: "min-content", fontSize: 12, marginTop: "auto", marginBottom: "auto", marginLeft: "10px" }}
+                disabled={exercise?.interfaceConfig.datasetRegenerate === false}
             >
                 Regenerate Dataset
             </Button>

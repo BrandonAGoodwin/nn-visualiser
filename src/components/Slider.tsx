@@ -36,6 +36,7 @@ interface sliderProps {
     min: number;
     max: number;
     appendValueToLabel: boolean;
+    disabled?: boolean;
 }
 
 function LabeledSlider(props: sliderProps) {
@@ -58,6 +59,7 @@ function LabeledSlider(props: sliderProps) {
                 max={props.max}
                 onChange={handleOnChange}
                 onChangeCommitted={props.onChange}
+                disabled={props.disabled}
             />
         </StyledDiv>
     );
