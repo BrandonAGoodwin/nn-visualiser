@@ -113,10 +113,8 @@ function InsightsPanel(props: InsightsPanelProps) {
         for (let i = 1; i < nnConfig.networkShape.length - 1; i++) {
             hiddenNodes += nnConfig.networkShape[1];
         }
-        console.log(hiddenNodes);
 
         let x = hiddenNodes / (nnConfig.networkShape.length - 2);
-        console.log(x)
         if ((nnConfig.networkShape.length - 2 >= 3 && x < 1) || (nnConfig.networkShape.length - 2 >= 4 && x <= 4)) {
             return true;
         } else {
