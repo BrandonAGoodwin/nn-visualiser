@@ -220,7 +220,6 @@ function NetworkPanel(props: NetworkProps) {
         }
     }, [props.network, props.inputs]);
 
-
     useEffect(() => {
         // drawAllLinks(props.network);
         updateContainerBox();
@@ -246,6 +245,10 @@ function NetworkPanel(props: NetworkProps) {
         }
     }, [hoverTarget, props.decisionBoundaries]);
 
+    useEffect(() => {
+        let node2Coord = getNodeCoords(props.network);
+        node2Coord && drawLabels(node2Coord);
+    }, [props.exercise]);
 
     const drawAllLinks = (network: nn.Node[][]) => {
         console.log("Draw Links");
@@ -397,6 +400,10 @@ function NetworkPanel(props: NetworkProps) {
                 return;
             }
 
+            if(props.exercise && props.exercise.interfaceConfig.inputs === false && !props.inputs[nodeId]) {
+                return;
+            }
+
             let label = INPUTS[nodeId].label != null ? INPUTS[nodeId].label : nodeId;
 
             let text = svg.append("text")
@@ -526,6 +533,7 @@ function NetworkPanel(props: NetworkProps) {
                                     discreetBoundary={props.discreetBoundary}
                                     handleOnClick={props.handleOnClick}
                                     domain={props.hiddenDomain}
+                                    hide={props.exercise?.interfaceConfig.inputs === false && props.inputs[nodeId] === false}
                                 />
                             )}
                         </Layer>

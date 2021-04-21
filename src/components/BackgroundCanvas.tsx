@@ -2,7 +2,6 @@ import * as d3 from "d3";
 import React, { useContext, useEffect, useRef } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 
-
 interface CanvasProps {
     id?: string;
     width: number;
@@ -18,8 +17,8 @@ interface CanvasProps {
     paddingTop?: number;
     paddingBottom?: number;
     domain: [number, number];
+    hide?: boolean;
 }
-
 
 function BackgroundCanvas(props: CanvasProps) {
     const {minColour, midColour, maxColour} = useContext(ThemeContext);
@@ -27,15 +26,23 @@ function BackgroundCanvas(props: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        //console.log(`BackgroundCanvas decisionBoundary useEffect`);
         updateCanvas();
     }, [props.decisionBoundary, props.discreetBoundary]);
+    
     
     const updateCanvas = () => {
 
         //console.log("Update canvas");
 
         let start = Date.now();
+
+
+        if(props.hide) {
+            const canvas = canvasRef.current;
+            const context = canvas?.getContext("2d");
+            context && context.clearRect(0,0,props.numCells, props.numCells );
+            return;
+        }
 
         let tmpScale = d3.scaleLinear<string, number>()
             .domain([0, 0.5, 1])
@@ -88,6 +95,7 @@ function BackgroundCanvas(props: CanvasProps) {
             className="background"
             width={props.numCells}
             height={props.numCells}
+            // hidden={props.hide}
             style={{
                 width: `${props.width}px`,
                 height: `${props.height}px`,
