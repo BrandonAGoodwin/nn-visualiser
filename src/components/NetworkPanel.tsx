@@ -159,7 +159,7 @@ function NetworkPanel(props: NetworkProps) {
     const { setInfoPanel } = useContext(InfoPanelContext);
     const svgContainer: any = useRef<any>(null);
     const container: any = useRef<any>(null);
-    const nodeWidth = 30;
+    const nodeWidth = 40;
     const [linksUpdated, setLinksUpdated] = useState<boolean>(false);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [labelsDrawn, setLabelsDrawn] = useState<boolean>(false);
