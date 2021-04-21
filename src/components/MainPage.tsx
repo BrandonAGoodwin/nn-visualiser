@@ -238,6 +238,7 @@ function MainPage(props: MainPageProps) {
 
         } else {
             setImportedNetwork(undefined);
+            updateDecisionBoundaries();
         }
     }, [exercise]);
 

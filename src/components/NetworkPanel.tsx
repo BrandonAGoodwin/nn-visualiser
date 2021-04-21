@@ -63,6 +63,7 @@ const PlusMinusButtonsContainer = styled("div")`
     justify-content: center;
     align-items: center;
     align-self: flex-start;
+    min-height: 48px;
 `
 
 const GridContainer = styled("div")`
@@ -505,13 +506,15 @@ function NetworkPanel(props: NetworkProps) {
                         </StyledInfoButton>
                     </div>
                     <LayerControls>
-                        <IconButton onClick={props.removeLayer}>
+
+                        {!(props.exercise && props.exercise.interfaceConfig.networkShape === false) && <IconButton onClick={props.removeLayer}>
                             <RemoveCircleIcon />
-                        </IconButton>
+                        </IconButton>}
                         <Typography> Hidden Layers: {props.config.networkShape.length - 2}</Typography>
-                        <IconButton onClick={props.addLayer}>
+                        {!(props.exercise && props.exercise.interfaceConfig.networkShape === false) && <IconButton onClick={props.addLayer}>
                             <AddCircleIcon />
                         </IconButton>
+                        }
                     </LayerControls>
                     <Container style={{ gridArea: "inputs-layer", paddingLeft: "60px" }}>
                         <Layer>
@@ -524,7 +527,7 @@ function NetworkPanel(props: NetworkProps) {
                                     numCells={20}
                                     decisionBoundary={props.decisionBoundaries[nodeId]}
                                     discreetBoundary={props.discreetBoundary}
-                                    handleOnClick={props.handleOnClick}
+                                    handleOnClick={(props.exercise && props.exercise.interfaceConfig.inputs === false) ? undefined : props.handleOnClick}
                                     domain={props.hiddenDomain}
                                 />
                             )}
@@ -544,14 +547,14 @@ function NetworkPanel(props: NetworkProps) {
                                         domain={props.hiddenDomain}
                                     />)}
                                 </Layer>
-                                {(layerNum !== network.length - 2) &&
+                                {(layerNum !== network.length - 2) && 
                                     <PlusMinusButtonsContainer style={{ flexGrow: 0 }}>
-                                        <IconButton onClick={() => props.removeNode(layerNum + 1)}>
+                                        {!(props.exercise && props.exercise.interfaceConfig.networkShape === false) &&<IconButton onClick={() => props.removeNode(layerNum + 1)}>
                                             <RemoveCircleIcon />
-                                        </IconButton>
-                                        <IconButton onClick={() => props.addNode(layerNum + 1)}>
+                                        </IconButton>}
+                                        {!(props.exercise && props.exercise.interfaceConfig.networkShape === false) &&<IconButton onClick={() => props.addNode(layerNum + 1)}>
                                             <AddCircleIcon />
-                                        </IconButton>
+                                        </IconButton>}
                                     </PlusMinusButtonsContainer>}
                             </div>)}
                     </Container>
@@ -571,7 +574,7 @@ function NetworkPanel(props: NetworkProps) {
                                 </Layer>
                             </div>)}
                     </Container>
-                   
+
                     <ExerciseButton>
                         {props.exercise &&
                             <Tooltip title={"Clear exercise"} aria-label={"Clear exercise"}>
