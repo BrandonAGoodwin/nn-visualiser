@@ -1,8 +1,16 @@
 import React from "react";
-import { NNConfig } from "../../NetworkController";
 import { MathComponent } from "mathjax-react";
+import { Button } from "@material-ui/core";
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SaveIcon from '@material-ui/icons/Save';
 
-function LearningRateInfoPanel() {
+
+
+interface LearningRateInfoPanelProps {
+    handleSetLearningRateExercise: () => void;
+}
+
+function LearningRateInfoPanel(props: LearningRateInfoPanelProps) {
 
     return (
         <div style={{ float: "left"}}>
@@ -10,14 +18,22 @@ function LearningRateInfoPanel() {
             <p>The learning rate affects the rate at which the weights and biases change each epoch when training the neural network.</p>
             <h2>Usage</h2>
             <MathComponent tex={String.raw`w'=w-\epsilon\Delta J(x)`} />
-           <h2>Observations</h2>
+            <h3>Exercise</h3>
+            <Button
+                variant="outlined"
+                color="secondary"
+                endIcon={<PlayArrowIcon />}
+                onClick={props.handleSetLearningRateExercise}
+            >
+                Learning Rate Exercise
+            </Button>
+            <p>Try running a dozen epochs with the preset learning rate and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then increase or decrease the learning rate to see how the learning rate effects the training performance using the <b>loss graph</b>.</p>
+            <h2>Observations</h2>
             <p>
                 We observe that <b>smaller</b> learning rates lead to <b>slower learning</b> but <b>more precise decision boundaries </b>
                 and <b>less fluctuating</b> around the local optima and conversely <b>larger</b> learning rates lead to <b>faster learning </b>
                 but <b>less precise decision boundaries</b> and <b>more fluctuating</b> around local minima.
             </p>
-            <h3>Exercise</h3>
-            <p>Try different different learning rates and see how much the loss is reduced on average after 3 epochs.</p>
         </div>
     );
 }

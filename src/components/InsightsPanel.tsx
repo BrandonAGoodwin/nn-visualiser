@@ -38,12 +38,7 @@ const StyledInsightsPanel = styled((props: any) => <ContainerSection gridArea="i
     min-height: 250px;
 `
 
-interface InsightsPanelProps {
-    nnConfig: NNConfig;
-    dgConfig: DGConfig;
-    analyticsData: AnalyticsData;
-    exercise?: Exercise;
-}
+
 
 const InsightLink = styled("a")`
     text-decoration: underline;
@@ -54,12 +49,21 @@ const InsightLink = styled("a")`
 const nonLinearInputs = ["xSquared", "ySquared", "xTimesY", "sinX", "sinY"];
 const linearlySeperableDatasets = ["Gaussian2"];
 
+interface InsightsPanelProps {
+    nnConfig: NNConfig;
+    dgConfig: DGConfig;
+    analyticsData: AnalyticsData;
+    exercise?: Exercise;
+    handleSetLearningRateExercise: () => void;
+}
+
 function InsightsPanel(props: InsightsPanelProps) {
     const {
         nnConfig,
         dgConfig,
         analyticsData,
-        exercise
+        exercise,
+        handleSetLearningRateExercise,
     } = props;
 
     const [insight, setInsight] = useState<JSX.Element>();
@@ -72,7 +76,7 @@ function InsightsPanel(props: InsightsPanelProps) {
     }
 
     const networkIsLinear = (nnConfig: NNConfig) => {
-        return ((nnConfig.activationFunction === "Linear") || nnConfig.networkShape.length === 2)  && inputsAreLinear(nnConfig);
+        return ((nnConfig.activationFunction === "Linear") || nnConfig.networkShape.length === 2) && inputsAreLinear(nnConfig);
     }
 
     const datasetIsLinearlySeperable = (dgConfig: DGConfig) => {
@@ -164,10 +168,10 @@ function InsightsPanel(props: InsightsPanelProps) {
                         <li><BatchGradientDecentInsight setInsight={setInsightWrapper} /></li>
                     }
                     {smallLearningRate(nnConfig) &&
-                        <li><SmallLearningRateInsight setInsight={setInsightWrapper} /></li>
+                        <li><SmallLearningRateInsight setInsight={setInsightWrapper} handleSetLearningRateExercise={handleSetLearningRateExercise} /></li>
                     }
                     {largeLearningRate(nnConfig) &&
-                        <li><LargeLearningRateInsight setInsight={setInsightWrapper} /></li>
+                        <li><LargeLearningRateInsight setInsight={setInsightWrapper} handleSetLearningRateExercise={handleSetLearningRateExercise} /></li>
                     }
                     {narrowNetwork(nnConfig) &&
                         <li><NarrowNetworkInsight setInsight={setInsightWrapper} /></li>
@@ -250,14 +254,14 @@ function BatchGradientDecentInsight(props: ({ setInsight: (insight: JSX.Element)
     );
 }
 
-function SmallLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+function SmallLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void, handleSetLearningRateExercise: () => void })) {
     const { setInfoPanelWrapper } = useContext(InfoPanelContext);
     const insight = (
         <>
             <h4>Small Learning Rate</h4>
             <StyledList>
                 <li>The <b>
-                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>learning rate</DefinedTerm> value is significantly lower
+                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel handleSetLearningRateExercise={props.handleSetLearningRateExercise} />}>learning rate</DefinedTerm> value is significantly lower
                 </b> than what would normally be used for standard gradient decent</li>
                 <li>This can lead very slow learning (requiring many epochs of training)</li>
             </StyledList>
@@ -269,14 +273,14 @@ function SmallLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) =
     );
 }
 
-function LargeLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+function LargeLearningRateInsight(props: ({ setInsight: (insight: JSX.Element) => void, handleSetLearningRateExercise: () => void })) {
     const { setInfoPanelWrapper } = useContext(InfoPanelContext);
     const insight = (
         <>
             <h4>Large Learning Rate</h4>
             <StyledList>
                 <li>The <b>
-                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>learning rate</DefinedTerm> value is significantly larger
+                    <DefinedTerm definition={DefLearningRate()} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel handleSetLearningRateExercise={props.handleSetLearningRateExercise} />}>learning rate</DefinedTerm> value is significantly larger
                 </b> than what would normally be used for standard gradient decent</li>
                 <li>This can cause "overshooting" during gradient decent which can cause divergent behaviour</li>
                 <li>Loss will tend to fluctuate</li>

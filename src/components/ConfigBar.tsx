@@ -142,7 +142,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="0.000000001">0.000000001</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Learning Rate Tooltip" marginLeft={3} fontSize={"small"} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>
+            <StyledInfoButton title="Learning Rate Tooltip" marginLeft={3} fontSize={"small"} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel handleSetLearningRateExercise={setLearningRateExercise}/>}>
                 {DefLearningRate()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />

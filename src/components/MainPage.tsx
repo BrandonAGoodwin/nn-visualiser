@@ -400,7 +400,7 @@ function MainPage(props: MainPageProps) {
     }
 
     const setLearningRateExercise = () => {
-        setExercise(LearningRateExercise);
+        startExercise(LearningRateExercise);
     }
 
     return (
@@ -439,6 +439,7 @@ function MainPage(props: MainPageProps) {
                 dgConfig={dgConfig}
                 analyticsData={analyticsData}
                 exercise={exercise}
+                handleSetLearningRateExercise={setLearningRateExercise}
             />
             <GraphPanel
                 network={network}
