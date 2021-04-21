@@ -118,6 +118,7 @@ export type NetworkController = {
     state: NNState,
     network: nn.Node[][] | undefined,
     analyticsData: AnalyticsData,
+    setNNConfig: React.Dispatch<React.SetStateAction<NNConfig>>,
     setNetwork: (network: nn.Node[][]) => void;
     setActivationFunction: (activationFunction: string) => void,
     setLearningRate: (learningRate: number) => void,
@@ -147,7 +148,7 @@ export function useNetwork(
 
     useEffect(() => {
         // console.log("Config change useEffect");
-        reset();
+        // reset();
     }, [nnConfig]);
 
 
@@ -308,6 +309,7 @@ export function useNetwork(
         state,
         network,
         analyticsData,
+        setNNConfig,
         setNetwork,
         setActivationFunction,
         setLearningRate,

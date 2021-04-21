@@ -4,7 +4,7 @@ import * as nn from '../NeuralNet';
 import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
-import { GitHub } from '@material-ui/icons';
+import { CollectionsBookmarkOutlined, GitHub } from '@material-ui/icons';
 import { ACTIVATIONS, NetworkController, NetworkState, NNConfig, useNetwork } from '../NetworkController';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
@@ -14,6 +14,7 @@ import NetworkPanel from './NetworkPanel';
 import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
 import InsightsPanel from './InsightsPanel';
+import { createImmediatelyInvokedFunctionExpression } from 'typescript';
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -33,7 +34,7 @@ const Container = styled("div")`
 
     // Using values from NeuralNetworkVis for middle column
     grid-template-columns: 230px max(560px, calc(50vw + 10px)) min-content;
-    grid-template-rows: 90px auto 1fr auto;
+    grid-template-rows: 100px auto 1fr auto;
     /* grid-template-rows: 90px 1fr 80px auto; */
     grid-gap: 15px;
     grid-template-areas: 
@@ -90,6 +91,7 @@ function MainPage(props: MainPageProps) {
         nnConfig,
         network,
         analyticsData,
+        setNNConfig,
         setNetwork,
         setActivationFunction,
         setLearningRate,
@@ -116,10 +118,8 @@ function MainPage(props: MainPageProps) {
 
     const [decisionBoundaries, setDecisionBoundaries] = useState<{ [nodeId: string]: number[] }>({});
     const [decisionBoundary, setDecisionBoundary] = useState<number[]>([]);
-    const [loss, setLoss] = useState<number>(0);
     const [epochs, setEpochs] = useState<number>(0);
     const [discreetBoundary, setDiscreetBoundary] = useState<boolean>(false);
-    const [lossData, setLossData] = useState<[epoch: number, trainingLoss: number, testLoss: number][]>([]);
     const [training, setTraining] = useState<boolean>(false);
     const [trainingInterval, setTrainingInterval] = useState<number>();
     const [compareMode, setCompareMode] = useState<boolean>(false);
@@ -127,6 +127,8 @@ function MainPage(props: MainPageProps) {
     // // const [networkSaveState, setNetworkSaveState] = useState<nn.Node[][]>();
     // const [comparisonAnalyticsData, setComparisonAnalyticsData] = useState<AnalyticsData>()
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
+    const [importedFile, setImportedFile] = useState<any>();
+    const [importedNetwork, setImportedNetwork] = useState<nn.Node[][]>();
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -141,10 +143,16 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        handleReset(false);
-        const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
-        if (nnConfig.batchSize > numTrainingSamples) {
-            setBatchSize(numTrainingSamples);
+        if (!importedFile) {
+            handleReset(false);
+            const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
+            if (nnConfig.batchSize > numTrainingSamples) {
+                setBatchSize(numTrainingSamples);
+            }
+        } else {
+            console.log("Setting imported network");
+            importedNetwork && setNetwork(importedNetwork);
+            setImportedFile(undefined);
         }
     }, [nnConfig, dgConfig]);
 
@@ -154,17 +162,42 @@ function MainPage(props: MainPageProps) {
                 const { trainingLossData, testLossData } = prevAnalyticsData;
                 let newTrainingLossData = trainingLossData.concat([[epochs, vis.getCost(network, trainingData, nnConfig.inputs)]]);
                 let newTestLossData = testLossData.concat([[epochs, vis.getCost(network, testData, nnConfig.inputs)]]);
-                return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs};
+                return { trainingLossData: newTrainingLossData, testLossData: newTestLossData, epochs: epochs };
             }
             return prevAnalyticsData;
         });
 
-    
-    }, [epochs]); 
-    
+        // if (network) {
+        //     let networkString = vis.NetworkToString(network, nnConfig);
+        //     let [testConfig, testNetwork] = vis.StringToNetwork(networkString);
+        //     downloadNetwork(network, nnConfig);
+        // }
+    }, [epochs]);
+
+
     useEffect(() => {
         props.updateComparisionData(getNetworkState, comparisonData);
     }, [analyticsData, comparisonData]);
+
+    useEffect(() => {
+        if (importedFile) {
+            let fileReader = new FileReader();
+            fileReader.onloadend = function (e) {
+
+                const networkString = fileReader.result;
+                console.log(networkString);
+
+                if (typeof networkString === "string") {
+                    const [importedNNConfig, importedNetwork] = vis.StringToNetwork(networkString);
+
+                    setNNConfig(importedNNConfig);
+                    setNetwork(importedNetwork);
+                }
+            }
+            fileReader.readAsText(importedFile);
+
+        }
+    }, [importedFile]);
 
 
     // const generateNetwork = () => {
@@ -213,11 +246,50 @@ function MainPage(props: MainPageProps) {
     const handleStep = () => {
         console.log("HandleStep")
         step(trainingData);
+        console.log(trainingData);
+        console.log(testData);
         setEpochs((prevEpochs) => prevEpochs + 1);
         updateDecisionBoundaries();
     }
 
-    
+    const downloadNetwork = () => {
+        if (network) {
+            const element = document.createElement("a");
+            const file = new Blob([vis.NetworkToString(network, nnConfig)], { type: 'text/plain' });
+            element.href = URL.createObjectURL(file);
+            element.download = "NetworkConfig.txt";
+            document.body.appendChild(element);
+            element.click();
+        }
+    }
+
+    // const importNetworkConfig = (file: File) => {
+
+    //     let fileReader = new FileReader();
+    //     fileReader.onloadend = function(e) {
+    //         const networkString = fileReader.result;
+    //         console.log(networkString);
+    //     }
+    //     fileReader.readAsText(file);
+    // }
+
+    const importNetworkConfig = (file: File) => {
+        setImportedFile(file);
+        let fileReader = new FileReader();
+        fileReader.onloadend = function (e) {
+            const networkString = fileReader.result;
+            // console.log(networkString);
+            if (typeof networkString === "string") {
+                const [importedNNConfig, importedNetwork] = vis.StringToNetwork(networkString);
+                setImportedNetwork(importedNetwork);
+            }
+        }
+        fileReader.readAsText(file);
+    }
+
+
+
+
     // const step = (noSteps: number) => {
     //     console.log(`MainPage step(${noSteps})`);
     //     if (!network || !dataset) return;
@@ -264,17 +336,13 @@ function MainPage(props: MainPageProps) {
     }
 
     const getNetworkState = ({
-            nnConfig: nnConfig,
-            dgConfig: dgConfig,
-            decisionBoundaries: decisionBoundaries,
-            decisionBoundary: decisionBoundary,
-            analyticsData: analyticsData
-            // epochs: epochs,
-            // loss: loss,
-            // lossData: lossData,
-            // noise: dgConfig.noise
-        })
-    
+        nnConfig: nnConfig,
+        dgConfig: dgConfig,
+        decisionBoundaries: decisionBoundaries,
+        decisionBoundary: decisionBoundary,
+        analyticsData: analyticsData
+    })
+
 
     const toggleAutoTrain = () => {
         setTraining((training) => {
@@ -289,25 +357,15 @@ function MainPage(props: MainPageProps) {
         })
     }
 
-    // const saveNetworkState = () => {
-    //     setCompareMode(true);
-    // }
-
-    // const loadOriginalState = () => {
-
-    // }
-
     const saveNetworkState = () => {
         saveComparisionData();
         setCompareMode(true);
     }
 
     const loadNetworkState = () => {
-        // handleReset(); // This is defo broken
         networkOriginalState && setNetwork(vis.copyNetwork(networkOriginalState));
         setEpochs(0);
-        // setLossData([]);
-        setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0});
+        setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0 });
         // Maybe load in original data set too (maybe make it a separate button)
     }
 
@@ -328,6 +386,8 @@ function MainPage(props: MainPageProps) {
                 setNumSamples={setNumSamples}
                 setBatchSize={setBatchSize}
                 handleRegenerateDataset={generateDataset}
+                downloadNetwork={downloadNetwork}
+                importNetworkConfig={importNetworkConfig}
             />
             <ControlPanel
                 training={training}
@@ -377,7 +437,7 @@ function MainPage(props: MainPageProps) {
                 hiddenDomain={ACTIVATIONS[nnConfig.activationFunction].range}
                 outputDomain={ACTIVATIONS["Tanh"].range}
             />}
-            <InfoPanel/>
+            <InfoPanel />
             <LinksDiv>
                 <a href="https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/bxg796" target="_blank">
                     <StyledLinkButton>

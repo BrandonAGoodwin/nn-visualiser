@@ -162,3 +162,139 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
 
 }
 
+export function NetworkToJSON(network: Node[][]): string {
+    let json = "";
+    JSON.stringify(network);
+    let numLayers = network.length;
+
+    var cache: any = [];
+    json = JSON.stringify(network, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            // Duplicate reference found, discard key
+            if (cache.includes(value)) return;
+
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    });
+    cache = null; // Enable garbage collection
+
+    // for(let i = 0; i < numLayers; i++) {
+
+    // }
+
+    return json;
+}
+
+interface NetworkData {
+    nnConfig: NNConfig;
+    nodeStore:  { [nodeId: string]: number };
+    linkStore: { [linkId: string]: number };
+}
+
+export function NetworkToString(network: nn.Node[][], nnConfig: NNConfig): string {
+    console.log("Network to string")
+    let networkShape: number[] = [];
+    let nodeStore: { [nodeId: string]: number } = {};
+    let linkStore: { [linkId: string]: number } = {};
+    let numLayers = network.length;
+
+    for (let layerNum = 0; layerNum < numLayers; layerNum++) {
+        let currentLayer = network[layerNum];
+        let numNodes = currentLayer.length;
+
+        networkShape.push(numNodes);
+
+        if (layerNum > 0) {
+            for (let i = 0; i < numNodes; i++) {
+                let node = currentLayer[i];
+
+                nodeStore[node.id] = node.bias;
+
+                // const {
+                //     activationFunction, 
+                //     ...nodeData
+                // } = node;
+
+                let linksIn = node.linksIn;
+                for (let j = 0; j < linksIn.length; j++) {
+                    let link = linksIn[j];
+                    linkStore[link.id] = link.weight;
+                }
+                // let nodeData = {
+                //     // id: node.id,
+                //     // bias: node.bias,
+                //     ...node,
+
+                // };
+            }
+        }
+    }
+
+    let networkData = {
+        nnConfig: nnConfig,
+        nodeStore: nodeStore,
+        linkStore: linkStore,
+    };
+    let networkString = JSON.stringify(networkData);
+
+    console.log(networkString)
+    return networkString;
+}
+
+export function StringToNetwork(networkString: string): [NNConfig, nn.Node[][]] {
+    console.log("String to network");
+    let network: nn.Node[][] = [];
+    console.log(networkString)
+    let networkData: NetworkData = JSON.parse(networkString);
+    console.log(networkData);
+    // let nnConfig = networkData.nnConfig;
+    let {
+        nnConfig,
+        nodeStore,
+        linkStore,
+    } = networkData;
+
+    let activationFunction = ACTIVATIONS[nnConfig.activationFunction];
+
+    let inputIds: string[] = [];
+    let id = 1;
+    Object.keys(nnConfig.inputs).forEach((inputId) => {
+        if (nnConfig.inputs[inputId]) inputIds.push(inputId);
+    });
+
+    let numLayers = nnConfig.networkShape.length;
+    for (let layerNum = 0; layerNum < numLayers; layerNum++) {
+        let currentLayer: nn.Node[] = [];
+
+        network.push(currentLayer);
+
+        let numNodes = nnConfig.networkShape[layerNum];
+        let isInputLayer = layerNum === 0;
+        for (let i = 0; i < numNodes; i++) {
+            let nodeId = isInputLayer ? inputIds[i] : (id++).toString();
+
+            let isOutputNode = layerNum === numLayers - 1 && i === 0;
+            let isLinear = nnConfig.activationFunction !== "Linear";
+
+            let node = new nn.Node(nodeId, (isOutputNode && isLinear) ? nn.Activations.TANH : activationFunction, !isInputLayer ? nodeStore[nodeId] : undefined);
+
+            currentLayer.push(node);
+
+            if (!isInputLayer) {
+                let prevLayer = network[layerNum - 1]
+                for (let j = 0; j < prevLayer.length; j++) {
+                    let prevNode = prevLayer[j];
+                    let link = new nn.Link(prevNode, node, linkStore[`${prevNode.id}-${node.id}`]);
+                    prevNode.linksOut.push(link);
+                    node.linksIn.push(link);
+                }
+            }
+        }
+    }
+    console.log(network);
+
+
+    return [nnConfig, network];
+}
