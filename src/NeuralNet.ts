@@ -1,3 +1,4 @@
+import { NNConfig } from "./NetworkController";
 
 /** Represents a node in the neural network. */
 export class Node {
@@ -38,9 +39,10 @@ export class Node {
     /** AKA dc/db =  delta^l */
     db: number = 0;
 
-    constructor(id: string, activationFunction: ActivationFunction) {
+    constructor(id: string, activationFunction: ActivationFunction, startBias?: number) {
         this.id = id;
         this.activationFunction = activationFunction;
+        if(startBias) this.bias = startBias;
     }
 
     // Figure out what happens for input layer (maybe make sure this doesn't get called)
@@ -126,6 +128,8 @@ export class Costs {
  * (for now weights are initialised to 0)
  */
 export class Link {
+    id: string;
+
     /** Linked node in the previous layer. */
     source: Node;
     /** Linked node in the next layer. */
@@ -150,6 +154,7 @@ export class Link {
         this.costDer = 0.0;
         this.derAcc = 0.0;
         this.noAccDers = 0.0;
+        this.id = source.id + "-" + dest.id;
     }
 }
 
@@ -352,7 +357,7 @@ export function getOutputNode(network: Node[][]): Node {
 
 export function copyNetwork(network: Node[][]): Node[][] {
     let networkCopy: Node[][] = [];
-    
+
     for (let layerNum = 0; layerNum < network.length; layerNum++) {
         let currentLayerCopy: Node[] = [];
 
@@ -382,3 +387,4 @@ export function copyNetwork(network: Node[][]): Node[][] {
 
     return networkCopy;
 }
+

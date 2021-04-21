@@ -5,6 +5,7 @@ import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
 import { NNConfig } from "../NetworkController";
 import { DefActivationFunction, DefBatchSize, DefLearningRate } from "./Definitions";
+import FileUploader from "./FileUploader";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
 import DatasetInfoPanel from "./InfoPanels/DatasetInfoPanel";
 import LearningRateInfoPanel from "./InfoPanels/LearningRateInfoPanel";
@@ -39,6 +40,9 @@ interface ConfigBarProps {
     setNumSamples: (numSamples: number) => void;
     setBatchSize: (batchSize: number) => void;
     handleRegenerateDataset: () => void;
+    downloadNetwork: () => void;
+    downloadOriginalNetwork: () => void;
+    importNetworkConfig: (file: File) => void;
 }
 
 function ConfigBar(props: ConfigBarProps) {
@@ -52,7 +56,10 @@ function ConfigBar(props: ConfigBarProps) {
         setNoise,
         setNumSamples,
         setBatchSize,
-        handleRegenerateDataset
+        handleRegenerateDataset,
+        downloadNetwork,
+        downloadOriginalNetwork,
+        importNetworkConfig,
     } = props;
 
     // const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
@@ -201,6 +208,23 @@ function ConfigBar(props: ConfigBarProps) {
             >
                 Regenerate Dataset
             </Button>
+            <Divider orientation="vertical" flexItem style={{ marginLeft: "10px", marginRight: "10px"}}/>
+            {/* <Button
+                size={"small"}
+                variant={"contained"}
+                onClick={downloadNetwork}
+                style={{ minWidth: "min-content", maxHeight: "min-content", fontSize: 12, marginTop: "auto", marginBottom: "auto", marginLeft: "10px" }}
+            >
+                Download Network
+            </Button> */}
+            {/* <div><button onClick={downloadNetwork}>Download Network</button></div> */}
+            <FileUploader
+                handleDownloadCurrentClick={downloadNetwork}
+                handleDownloadOriginalClick={downloadOriginalNetwork}
+                handleUploadConfig={importNetworkConfig}
+            />
+            
+
         </StyledConfigBar>
     );
 }

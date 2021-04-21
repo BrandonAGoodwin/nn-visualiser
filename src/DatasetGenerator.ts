@@ -25,9 +25,9 @@ export function useDatasetGenerator(defaultConfig: DGConfig = defaultDGConfig) {
     const [trainingData, setTrainingData] = useState<Datapoint2D[]>([]);
     const [testData, setTestData] = useState<Datapoint2D[]>([]);
 
-    useEffect(() => {
-        generateDataset();
-    }, [dgConfig]);
+    // useEffect(() => {
+    //     generateDataset();
+    // }, [dgConfig]);
 
 
     const generateDataset = () => {
@@ -81,6 +81,9 @@ export function useDatasetGenerator(defaultConfig: DGConfig = defaultDGConfig) {
         generateDataset,
         trainingData,
         testData,
+        setDGConfig,
+        setTrainingData,
+        setTestData,
         setDatasetType,
         setNoise,
         setNumSamples

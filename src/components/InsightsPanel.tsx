@@ -166,6 +166,9 @@ function InsightsPanel(props: InsightsPanelProps) {
                     {narrowNetwork(nnConfig) &&
                         <li><NarrowNetworkInsight setInsight={setInsightWrapper} /></li>
                     }
+                    {datasetIsLinearlySeperable(dgConfig) &&
+                        <li><LinearlySeperableDatasetInsight setInsight={setInsightWrapper} /></li>
+                    }
                 </StyledList>
             </div>
             }
@@ -295,6 +298,23 @@ function NarrowNetworkInsight(props: ({ setInsight: (insight: JSX.Element) => vo
 
     return (
         <InsightLink onClick={() => props.setInsight(insight)}>Narrow Network</InsightLink>
+    );
+}
+function LinearlySeperableDatasetInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
+    // const { setInfoPanelWrapper } = useContext(InfoPanelContext);
+    const insight = (
+        <>
+            <h4>Linearly Seperable Dataset</h4>
+            <StyledList>
+                <li>Dataset can be separated by a linear (straight line) boundary</li>
+                <li>Problem can be solved using basic least mean squares regression</li>
+                <li>(Noise in data might have changed this)</li>
+            </StyledList>
+        </>
+    );
+
+    return (
+        <InsightLink onClick={() => props.setInsight(insight)}>Linearly seperable dataset</InsightLink>
     );
 }
 
