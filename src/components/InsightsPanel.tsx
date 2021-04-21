@@ -69,7 +69,7 @@ function InsightsPanel(props: InsightsPanelProps) {
     }
 
     const networkIsLinear = (nnConfig: NNConfig) => {
-        return (nnConfig.activationFunction === "Linear") && inputsAreLinear(nnConfig);
+        return ((nnConfig.activationFunction === "Linear") || nnConfig.networkShape.length === 2)  && inputsAreLinear(nnConfig);
     }
 
     const datasetIsLinearlySeperable = (dgConfig: DGConfig) => {
