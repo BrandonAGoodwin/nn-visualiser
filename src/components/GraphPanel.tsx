@@ -136,7 +136,7 @@ function GraphPanel(props: GraphPanelProps) {
                 </FormGroup>
                 <p style={{ marginTop: "20px", marginBottom: "0px" }}> Epochs: <b>{trainingEpoch}</b></p>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                    <p style={{ marginTop: "20px", marginBottom: "0px" }}>
+                    <p style={{ marginTop: "10px", marginBottom: "0px" }}>
                         Loss (Training): <b>{trainingLoss.toFixed(3)}</b> <br />
                         Loss (Test): <b>{testLoss.toFixed(3)}</b>
                     </p>
@@ -144,6 +144,7 @@ function GraphPanel(props: GraphPanelProps) {
                         {DefLoss()}
                     </StyledInfoButton>
                 </div>
+                <h4 style={{marginBottom: "5px", marginTop: "5px"}}>Loss Graph</h4>
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <LossGraph
                         height={80}

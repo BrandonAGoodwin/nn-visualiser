@@ -61,6 +61,7 @@ export function DefBatchSize() {
             <Typography color="inherit">Batch Size</Typography>
             {/* Could create an info panel for Stochastic Gradient Decent*/}
             <Typography variant="body2">Specifies the number of training samples used in each epoch of <StyledLink color={"lightblue"} href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</StyledLink>.<br />(When batch size = 1, this is equivalent to <StyledLink color={"lightblue"} href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</StyledLink>) </Typography>
+            <u>Click the icon to get more information</u>
         </>
     );
 }
