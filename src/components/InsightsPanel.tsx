@@ -3,6 +3,7 @@ import { Typography } from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import { InfoPanelContext } from "../contexts/InfoPanelContext";
 import { DGConfig } from "../DatasetGenerator";
+import { Exercise } from "../Exercises/Exercise";
 import { AnalyticsData, NNConfig } from "../NetworkController";
 import { DefActivationFunction, DefinedTerm, DefLearningRate } from "./Definitions";
 import ActivationInfoPanel from "./InfoPanels/ActivationInfoPanel";
@@ -38,9 +39,10 @@ const StyledInsightsPanel = styled((props: any) => <ContainerSection gridArea="i
 `
 
 interface InsightsPanelProps {
-    nnConfig: NNConfig,
-    dgConfig: DGConfig,
-    analyticsData: AnalyticsData
+    nnConfig: NNConfig;
+    dgConfig: DGConfig;
+    analyticsData: AnalyticsData;
+    exercise?: Exercise;
 }
 
 const InsightLink = styled("a")`
@@ -56,7 +58,8 @@ function InsightsPanel(props: InsightsPanelProps) {
     const {
         nnConfig,
         dgConfig,
-        analyticsData
+        analyticsData,
+        exercise
     } = props;
 
     const [insight, setInsight] = useState<JSX.Element>();
@@ -145,6 +148,9 @@ function InsightsPanel(props: InsightsPanelProps) {
                     </StyledInfoButton>
                 </div>
                 <StyledList>
+                    {exercise &&
+                        <li>Currently running: {exercise.name}</li>
+                    }
                     {networkIsLinear(nnConfig) &&
                         <li><LinearNetworkInsight setInsight={setInsightWrapper} /></li>
                     }

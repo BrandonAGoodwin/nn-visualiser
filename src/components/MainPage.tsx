@@ -15,7 +15,7 @@ import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
 import InsightsPanel from './InsightsPanel';
 import { Datapoint2D } from '../datasets';
-import { BatchSizeExercise, Exercise } from '../Exercises/Exercise';
+import { BatchSizeExercise, Exercise, LearningRateExercise } from '../Exercises/Exercise';
 import { config } from 'process';
 
 const Container = styled("div")`
@@ -399,6 +399,10 @@ function MainPage(props: MainPageProps) {
         startExercise(BatchSizeExercise);
     }
 
+    const setLearningRateExercise = () => {
+        setExercise(LearningRateExercise);
+    }
+
     return (
         <Container id="main-page">
             <ConfigBar
@@ -415,6 +419,7 @@ function MainPage(props: MainPageProps) {
                 downloadOriginalNetwork={downloadOriginalNetwork}
                 importNetworkConfig={importNetworkConfig}
                 setBatchSizeExercise={setBatchSizeExercise}
+                setLearningRateExercise={setLearningRateExercise}
                 exercise={exercise}
             />
             <ControlPanel
@@ -433,6 +438,7 @@ function MainPage(props: MainPageProps) {
                 nnConfig={nnConfig}
                 dgConfig={dgConfig}
                 analyticsData={analyticsData}
+                exercise={exercise}
             />
             <GraphPanel
                 network={network}

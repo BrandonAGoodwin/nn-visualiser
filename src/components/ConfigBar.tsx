@@ -46,6 +46,7 @@ interface ConfigBarProps {
     downloadOriginalNetwork: () => void;
     importNetworkConfig: (file: File) => void;
     setBatchSizeExercise: () => void;
+    setLearningRateExercise: () => void;
     exercise?: Exercise;
 }
 
@@ -65,6 +66,7 @@ function ConfigBar(props: ConfigBarProps) {
         downloadOriginalNetwork,
         importNetworkConfig,
         setBatchSizeExercise,
+        setLearningRateExercise,
         exercise
     } = props;
 
@@ -208,7 +210,7 @@ function ConfigBar(props: ConfigBarProps) {
                 appendValueToLabel={true}
                 disabled={exercise?.interfaceConfig.batchSize === false}
             />
-            <StyledInfoButton title="Batch Size Tooltip" fontSize={"small"} marginLeft={3} onClick={setInfoPanelWrapper} infoPanel={BatchSizeInfoPanel({ handleSetBatchExercise: setBatchSizeExercise })}>
+            <StyledInfoButton title="Batch Size Tooltip" fontSize={"small"} marginLeft={3} onClick={setInfoPanelWrapper} infoPanel={<BatchSizeInfoPanel handleSetBatchExercise={setBatchSizeExercise} />}>
                 {DefBatchSize()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
