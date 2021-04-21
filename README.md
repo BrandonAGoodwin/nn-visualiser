@@ -1,10 +1,14 @@
-# Getting Started with Create React App
+# Neural Network Simulator App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c008f2a8-79c4-4962-804c-8412f9c8c5e3/deploy-status)](https://app.netlify.com/sites/romantic-cori-49638d/deploys)
 
-## Available Scripts
+This project is hosted at [neuralnetsimulator.app](https://www.neuralnetsimulator.app/).
 
-In the project directory, you can run:
+## 
+
+## Running Locally
+
+Node.js is required to run the app locally, use the below scripts to either run the react application in develompment mode, interactive watch more or build the app for production.
 
 ### `npm start`
 
@@ -38,9 +42,3 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
