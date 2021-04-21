@@ -41,6 +41,7 @@ interface ConfigBarProps {
     setBatchSize: (batchSize: number) => void;
     handleRegenerateDataset: () => void;
     downloadNetwork: () => void;
+    downloadOriginalNetwork: () => void;
     importNetworkConfig: (file: File) => void;
 }
 
@@ -57,6 +58,7 @@ function ConfigBar(props: ConfigBarProps) {
         setBatchSize,
         handleRegenerateDataset,
         downloadNetwork,
+        downloadOriginalNetwork,
         importNetworkConfig,
     } = props;
 
@@ -217,7 +219,8 @@ function ConfigBar(props: ConfigBarProps) {
             </Button> */}
             {/* <div><button onClick={downloadNetwork}>Download Network</button></div> */}
             <FileUploader
-                handleDownloadClick={downloadNetwork}
+                handleDownloadCurrentClick={downloadNetwork}
+                handleDownloadOriginalClick={downloadOriginalNetwork}
                 handleUploadConfig={importNetworkConfig}
             />
             

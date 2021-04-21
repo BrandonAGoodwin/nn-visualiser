@@ -4,7 +4,7 @@ import * as nn from '../NeuralNet';
 import { IconButton } from '@material-ui/core';
 import styled from '@emotion/styled';
 import InfoButton from './InfoButton';
-import { CollectionsBookmarkOutlined, GitHub } from '@material-ui/icons';
+import { GitHub } from '@material-ui/icons';
 import { ACTIVATIONS, NetworkController, NetworkState, NNConfig, useNetwork } from '../NetworkController';
 import { DGConfig, useDatasetGenerator } from '../DatasetGenerator';
 import ConfigBar from './ConfigBar';
@@ -14,7 +14,7 @@ import NetworkPanel from './NetworkPanel';
 import StatsBar from './StatsBar';
 import GraphPanel from './GraphPanel';
 import InsightsPanel from './InsightsPanel';
-import { createImmediatelyInvokedFunctionExpression } from 'typescript';
+import { Datapoint2D } from '../datasets';
 
 const Container = styled("div")`
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -111,6 +111,9 @@ function MainPage(props: MainPageProps) {
         generateDataset,
         trainingData,
         testData,
+        setDGConfig,
+        setTrainingData,
+        setTestData,
         setDatasetType,
         setNoise,
         setNumSamples,
@@ -129,6 +132,7 @@ function MainPage(props: MainPageProps) {
     const [comparisonData, setComaparisonData] = useState<NetworkState>();
     const [importedFile, setImportedFile] = useState<any>();
     const [importedNetwork, setImportedNetwork] = useState<nn.Node[][]>();
+    const [importedDataset, setImportedDataset] = useState<[Datapoint2D[], Datapoint2D[]]>();
 
     useEffect(() => {
         updateDecisionBoundary();
@@ -143,7 +147,7 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        if (!importedFile) {
+        if (!importedNetwork) {
             handleReset(false);
             const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
             if (nnConfig.batchSize > numTrainingSamples) {
@@ -152,9 +156,24 @@ function MainPage(props: MainPageProps) {
         } else {
             console.log("Setting imported network");
             importedNetwork && setNetwork(importedNetwork);
-            setImportedFile(undefined);
+            setImportedNetwork(undefined);
+            setEpochs(0);
         }
-    }, [nnConfig, dgConfig]);
+    }, [nnConfig]);
+
+    useEffect(() => {
+        if (!importedDataset) {
+            generateDataset();
+        } else {
+            console.log("Setting imported dataset");
+            if (importedDataset) {
+                let [importedTrainingData, importedTestData] = importedDataset;
+                setTrainingData(importedTrainingData);
+                setTestData(importedTestData);
+                setImportedDataset(undefined);
+            }
+        }
+    }, [dgConfig]);
 
     useEffect(() => {
         network && (epochs != 0) && setAnalyticsData((prevAnalyticsData) => {
@@ -188,14 +207,15 @@ function MainPage(props: MainPageProps) {
                 console.log(networkString);
 
                 if (typeof networkString === "string") {
-                    const [importedNNConfig, importedNetwork] = vis.StringToNetwork(networkString);
+                    const { nnConfig, dgConfig } = vis.StringToNetwork(networkString);
 
-                    setNNConfig(importedNNConfig);
-                    setNetwork(importedNetwork);
+                    setNNConfig(nnConfig);
+                    setDGConfig(dgConfig);
+                    // setNetwork(importedNetwork);
                 }
             }
             fileReader.readAsText(importedFile);
-
+            setImportedFile(undefined);
         }
     }, [importedFile]);
 
@@ -255,7 +275,18 @@ function MainPage(props: MainPageProps) {
     const downloadNetwork = () => {
         if (network) {
             const element = document.createElement("a");
-            const file = new Blob([vis.NetworkToString(network, nnConfig)], { type: 'text/plain' });
+            const file = new Blob([vis.NetworkToString(network, nnConfig, dgConfig, trainingData, testData)], { type: 'text/plain' });
+            element.href = URL.createObjectURL(file);
+            element.download = "NetworkConfig.txt";
+            document.body.appendChild(element);
+            element.click();
+        }
+    }
+
+    const downloadOriginalNetwork = () => {
+        if (networkOriginalState) {
+            const element = document.createElement("a");
+            const file = new Blob([vis.NetworkToString(networkOriginalState, nnConfig, dgConfig, trainingData, testData)], { type: 'text/plain' });
             element.href = URL.createObjectURL(file);
             element.download = "NetworkConfig.txt";
             document.body.appendChild(element);
@@ -280,11 +311,15 @@ function MainPage(props: MainPageProps) {
             const networkString = fileReader.result;
             // console.log(networkString);
             if (typeof networkString === "string") {
-                const [importedNNConfig, importedNetwork] = vis.StringToNetwork(networkString);
-                setImportedNetwork(importedNetwork);
+                const { network, trainingData, testData } = vis.StringToNetwork(networkString);
+                setImportedNetwork(network);
+                setImportedDataset([trainingData, testData]);
             }
         }
         fileReader.readAsText(file);
+        if (training) toggleAutoTrain();
+        setEpochs(0);
+        setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0 });
     }
 
 
@@ -341,7 +376,7 @@ function MainPage(props: MainPageProps) {
         decisionBoundaries: decisionBoundaries,
         decisionBoundary: decisionBoundary,
         analyticsData: analyticsData
-    })
+    });
 
 
     const toggleAutoTrain = () => {
@@ -387,6 +422,7 @@ function MainPage(props: MainPageProps) {
                 setBatchSize={setBatchSize}
                 handleRegenerateDataset={generateDataset}
                 downloadNetwork={downloadNetwork}
+                downloadOriginalNetwork={downloadOriginalNetwork}
                 importNetworkConfig={importNetworkConfig}
             />
             <ControlPanel

@@ -3,6 +3,7 @@ import { Datapoint2D, DatasetGenerator, Dataset } from "./datasets";
 import * as d3 from "d3";
 import seedrandom from "seedrandom";
 import { ACTIVATIONS, NNConfig } from "./NetworkController";
+import { DGConfig } from "./DatasetGenerator";
 
 
 interface InputFunc {
@@ -162,38 +163,13 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
 
 }
 
-export function NetworkToJSON(network: Node[][]): string {
-    let json = "";
-    JSON.stringify(network);
-    let numLayers = network.length;
-
-    var cache: any = [];
-    json = JSON.stringify(network, (key, value) => {
-        if (typeof value === 'object' && value !== null) {
-            // Duplicate reference found, discard key
-            if (cache.includes(value)) return;
-
-            // Store value in our collection
-            cache.push(value);
-        }
-        return value;
-    });
-    cache = null; // Enable garbage collection
-
-    // for(let i = 0; i < numLayers; i++) {
-
-    // }
-
-    return json;
-}
-
-interface NetworkData {
-    nnConfig: NNConfig;
-    nodeStore:  { [nodeId: string]: number };
-    linkStore: { [linkId: string]: number };
-}
-
-export function NetworkToString(network: nn.Node[][], nnConfig: NNConfig): string {
+export function NetworkToString(
+    network: nn.Node[][],
+    nnConfig: NNConfig,
+    dgConfig: DGConfig,
+    trainingData: Datapoint2D[],
+    testData: Datapoint2D[]
+): string {
     console.log("Network to string")
     let networkShape: number[] = [];
     let nodeStore: { [nodeId: string]: number } = {};
@@ -236,6 +212,9 @@ export function NetworkToString(network: nn.Node[][], nnConfig: NNConfig): strin
         nnConfig: nnConfig,
         nodeStore: nodeStore,
         linkStore: linkStore,
+        dgConfig: dgConfig,
+        trainingData: trainingData,
+        testData: testData,
     };
     let networkString = JSON.stringify(networkData);
 
@@ -243,17 +222,20 @@ export function NetworkToString(network: nn.Node[][], nnConfig: NNConfig): strin
     return networkString;
 }
 
-export function StringToNetwork(networkString: string): [NNConfig, nn.Node[][]] {
+export function StringToNetwork(networkString: string) {
     console.log("String to network");
     let network: nn.Node[][] = [];
     console.log(networkString)
-    let networkData: NetworkData = JSON.parse(networkString);
+    let networkData = JSON.parse(networkString);
     console.log(networkData);
     // let nnConfig = networkData.nnConfig;
     let {
         nnConfig,
         nodeStore,
         linkStore,
+        dgConfig,
+        trainingData,
+        testData
     } = networkData;
 
     let activationFunction = ACTIVATIONS[nnConfig.activationFunction];
@@ -296,5 +278,11 @@ export function StringToNetwork(networkString: string): [NNConfig, nn.Node[][]] 
     console.log(network);
 
 
-    return [nnConfig, network];
+    return {
+        nnConfig,
+        network,
+        dgConfig,
+        trainingData,
+        testData
+    };
 }
