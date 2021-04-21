@@ -106,7 +106,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="Linear">Linear</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Activation Tooltip" onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel />}>
+            <StyledInfoButton title="Activation Tooltip" marginLeft={3} fontSize={"small"} onClick={setInfoPanelWrapper} infoPanel={<ActivationInfoPanel />}>
                 {DefActivationFunction()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
@@ -132,7 +132,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="0.000000001">0.000000001</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Learning Rate Tooltip" onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>
+            <StyledInfoButton title="Learning Rate Tooltip" marginLeft={3} fontSize={"small"} onClick={setInfoPanelWrapper} infoPanel={<LearningRateInfoPanel />}>
                 {DefLearningRate()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
@@ -147,7 +147,7 @@ function ConfigBar(props: ConfigBarProps) {
                     <MenuItem value="XOR">XOR</MenuItem>
                 </StyledSelect>
             </StyledFormControl>
-            <StyledInfoButton title="Dataset Tooltip" onClick={setInfoPanelWrapper} infoPanel={<DatasetInfoPanel {...nnConfig} />}>
+            <StyledInfoButton title="Dataset Tooltip" marginLeft={3} fontSize={"small"} onClick={setInfoPanelWrapper} infoPanel={<DatasetInfoPanel {...nnConfig} />}>
                 <React.Fragment>
                     <Typography color="inherit">Datasets</Typography>
                     <Typography variant="body2">Defines the shape of the dataset we want our neural network to solve.</Typography><br />
@@ -164,7 +164,7 @@ function ConfigBar(props: ConfigBarProps) {
                 onChange={handleNumSamplesChange}
                 appendValueToLabel={true}
             />
-            <StyledInfoButton title="Sample Size Tooltip">
+            <StyledInfoButton title="Sample Size Tooltip" fontSize={"small"} marginLeft={3} >
                 <React.Fragment>
                     {<Typography color="inherit">Noise</Typography>}
                     <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
@@ -180,7 +180,7 @@ function ConfigBar(props: ConfigBarProps) {
                 onChange={handleNoiseChange}
                 appendValueToLabel={true}
             />
-            <StyledInfoButton title="Noise Tooltip">
+            <StyledInfoButton title="Noise Tooltip" fontSize={"small"} marginLeft={3} >
                 <React.Fragment>
                     <Typography color="inherit">Noise</Typography>
                     <Typography variant="body2">This sets the noise in the generated data set. The more noise the greater the variance in the generated data.</Typography>
@@ -196,7 +196,7 @@ function ConfigBar(props: ConfigBarProps) {
                 onChange={handleBatchSizeChange}
                 appendValueToLabel={true}
             />
-            <StyledInfoButton title="Batch Size Tooltip">
+            <StyledInfoButton title="Batch Size Tooltip" fontSize={"small"} marginLeft={3} >
                 {DefBatchSize()}
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
@@ -208,7 +208,7 @@ function ConfigBar(props: ConfigBarProps) {
             >
                 Regenerate Dataset
             </Button>
-            <Divider orientation="vertical" flexItem style={{ marginLeft: "10px", marginRight: "10px"}}/>
+            <Divider orientation="vertical" flexItem style={{ marginLeft: "10px", marginRight: "10px" }} />
             {/* <Button
                 size={"small"}
                 variant={"contained"}
@@ -223,7 +223,7 @@ function ConfigBar(props: ConfigBarProps) {
                 handleDownloadOriginalClick={downloadOriginalNetwork}
                 handleUploadConfig={importNetworkConfig}
             />
-            
+
 
         </StyledConfigBar>
     );

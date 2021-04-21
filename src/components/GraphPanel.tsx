@@ -57,7 +57,6 @@ function GraphPanel(props: GraphPanelProps) {
         decisionBoundary,
         discreetBoundary,
         toggleDiscreetBoundary,
-        comparisonData,
         analyticsData,
         comparisonAnalyticsData,
         domain
@@ -103,7 +102,7 @@ function GraphPanel(props: GraphPanelProps) {
                 density={25}
                 canvasWidth={250}
                 marginLeft={35}
-                marginRight={20}
+                marginRight={35}
                 marginTop={20}
                 marginBottom={40}
                 numCells={numCells}
@@ -147,8 +146,8 @@ function GraphPanel(props: GraphPanelProps) {
                 </div>
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <LossGraph
-                        height={60}
-                        width={150}
+                        height={80}
+                        width={180}
                         margin={5}
                         analyticsData={analyticsData}
                         comparisonAnalyticsData={comparisonAnalyticsData}
