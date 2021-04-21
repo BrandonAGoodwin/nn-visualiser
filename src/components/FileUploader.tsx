@@ -18,7 +18,7 @@ function FileUploader(props: FileUploaderProps) {
     <div >   
             <div style={{display: "flex"}}>
                 {/* <button onClick={props.handleDownloadCurrentClick} style={{ display: "inline"}}>Download Current Network</button> */}
-                <button onClick={props.handleDownloadOriginalClick} style={{ display: "inline"}}>Download Untrained Network</button>
+                <button onClick={props.handleDownloadOriginalClick} style={{ display: "inline"}}>Export Untrained Network</button>
             </div>
             <input type="file" onChange={handleFileChange} style={{ display: "block" ,maxWidth: "min-content"}}/>
             <button onClick={() => selectedFile ? props.handleUploadConfig(selectedFile) : alert("Please upload a file to import")}>Import Network</button>
