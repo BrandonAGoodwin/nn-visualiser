@@ -57,6 +57,7 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
             </p>
             <ul>
                 <li>This means the weights and biases are updated once after back propagation has been done with all training samples</li>
+                <li>Usually requires more epochs of training than mini-batch gradient decent as weight updates use an average over the whole data set making it hard to make more nuanced updates</li>
             </ul>
         </div>
     );

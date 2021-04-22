@@ -181,7 +181,7 @@ export function generateNetwork(
     });
 
     let id = 1;
-    // console.log(inputIds)
+
     for (let layerNum = 0; layerNum < numlayers; layerNum++) {
         let currentLayer: Node[] = [];
 
@@ -286,7 +286,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
             }
         }
 
-        // Don't bother computing ouput derivatives for input nodes (Saves on compuiation)
+        // Don't bother computing ouput derivatives for input nodes (Saves on computation)
         if (layerNum === 1) continue;
 
         // Parse through the previous layer and calculate output derivative all the nodes
