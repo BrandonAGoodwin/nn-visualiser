@@ -12,7 +12,7 @@ function DefaultInfoPanel() {
         <div>
             <h1>How To Get Started</h1>
             <p>
-                This is a tool that lets you play with a simple neural network implementation. Below are instructions on how to get started designing your own neural network and test its performance.
+                This is a tool that lets you play with a simple neural network implementation. Below are instructions on how to get started designing your own neural network and testing its performance.
                 <ul>
                     <li>There are some exercises to help show the effects of certain hyper-parameters that can be accessed via the <b>info buttons</b> <Info fontSize={"small"} /> (e.g. batch size exercise and learning rate exercise).</li>
                     <li>Use the Insights panel above to see properties of the current network configuration. </li>
