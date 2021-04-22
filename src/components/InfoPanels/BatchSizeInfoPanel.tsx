@@ -29,7 +29,7 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
                 Batch Size Exercise
             </Button>
             <p>
-                Try running a couple dozen epochs with the preset batch size and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then <b>change the batch size to see how the batch size effects the training performance</b> using the <b>loss graph</b>.
+                Try running a couple dozen epochs with the preset batch size and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then <b>change the batch size to see how the batch size affects the training performance</b> using the <b>loss graph</b>.
             </p>
             <h2>Mini-batch Gradient Descent</h2>
             <p>
@@ -56,7 +56,7 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
                 When the batch size = the number of training samples this is equivalent to batch gradient descent
             </p>
             <ul>
-                <li>This means the weights and baises are updated once after back propagation has been done with all training samples</li>
+                <li>This means the weights and biases are updated once after back propagation has been done with all training samples</li>
             </ul>
         </div>
     );

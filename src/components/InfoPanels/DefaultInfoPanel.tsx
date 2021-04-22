@@ -25,7 +25,7 @@ function DefaultInfoPanel() {
             <p>Links (or edges) connect neurons in adjacent layers, each link has a weight value w that is updated by training the network using Gradient Descent.</p>
 
             <h4>Magnitude</h4>
-            <p>The width of a link corresponds to the absolute magnitude of it's weight. Wider links have greater absolute weight values (and therefore have a stronger influence in the destination node) than narrower links.</p>
+            <p>The width of a link corresponds to the absolute magnitude of its weight. Wider links have greater absolute weight values (and therefore have a stronger influence in the destination node) than narrower links.</p>
             <h4>Positive Value Link</h4>
             <img src={positiveLink} alt="Positive link" width={100} />
             <p>Links with a weight value &gt; 0 are {maxColourName}.</p>
