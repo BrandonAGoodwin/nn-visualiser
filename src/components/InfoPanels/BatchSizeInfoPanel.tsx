@@ -17,7 +17,7 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
             <h1>Batch Size</h1>
 
             <p>
-                The batch size specifies the number of training examples used in each epoch of <a color={"lightblue"} href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Decent</a>.
+                The batch size specifies the number of training examples used in each epoch of <a color={"lightblue"} href="https://www.google.com/search?q=mini+batch+gradient+descent" target="_blank">Mini-Batch Gradient Descent</a>.
             </p>
             <h3>Exercise</h3>
             <Button
@@ -31,19 +31,19 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
             <p>
                 Try running a couple dozen epochs with the preset batch size and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then <b>change the batch size to see how the batch size effects the training performance</b> using the <b>loss graph</b>.
             </p>
-            <h2>Mini-batch Gradient Decent</h2>
+            <h2>Mini-batch Gradient Descent</h2>
             <p>
                 <ul>
                     <li> Weights and biases are updated after running back propagation every n training samples where n is the batch size. </li>
-                    <li> Tends to be the most effective gradient decent method yielding the fastest training results</li>
+                    <li> Tends to be the most effective gradient descent method yielding the fastest training results</li>
                     <li> Doesn't suffer from fluctuation as it takes multiple data samples into account</li>
                     <li> Individal epochs aren't too computationally expensive as long as the batch size is only a fraction of the training set size</li>
                 </ul>
             </p>
 
-            <h2>Stochastic Gradient Decent</h2>
+            <h2>Stochastic Gradient Descent</h2>
             <p>
-                When the batch size = 1, this is equivalent to <a color={"lightblue"} href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Decent</a>.
+                When the batch size = 1, this is equivalent to <a color={"lightblue"} href="https://www.google.com/search?q=stochastic+gradient+descent" target="_blank">Stochastic Gradient Descent</a>.
                 <ul>
                     <li>This means the weights and biases are updated every time back propagation is done with a training sample</li>
                     <li>Training generally takes fewer epochs, but takes longer as weights and biases are updated for every sample in the training set, but training will be done in less epochs</li>
@@ -51,9 +51,9 @@ function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
                     <li>This can cause the decision boundary to fluctuate because weight updates will be more extreme as they are not being updated using the average of multiple derivatives accumulated over multiple iterations of back propagation</li>
                 </ul>
             </p>
-            <h2>Batch Gradient Decent</h2>
+            <h2>Batch Gradient Descent</h2>
             <p>
-                When the batch size = the number of training samples this is equivalent to batch gradient decent
+                When the batch size = the number of training samples this is equivalent to batch gradient descent
             </p>
             <ul>
                 <li>This means the weights and baises are updated once after back propagation has been done with all training samples</li>

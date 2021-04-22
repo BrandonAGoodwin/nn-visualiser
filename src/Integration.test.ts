@@ -3,7 +3,7 @@ import * as vis from "./visControl";
 import { Dataset } from "./datasets";
 
 
-describe("Gradient Decent", () => {
+describe("Gradient Descent", () => {
     let network: nn.Node[][];
 
     let trainingData = Dataset.GAUSSIAN_2(30, 0);

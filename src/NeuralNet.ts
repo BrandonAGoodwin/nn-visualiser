@@ -28,10 +28,10 @@ export class Node {
     inputDerivative: number = 0.0;
 
     /** Sum of input derivatives over multiple backpropagation iterations to be used for avarage
-     * when carring out gradient decent
+     * when carring out gradient descent
      */
     accInputDererivatives: number = 0.0;
-    /** Number of derivatives accumulated, used to calculate average dc/db for gradient decent */
+    /** Number of derivatives accumulated, used to calculate average dc/db for gradient descent */
     numInputDerivatives: number = 0.0;
 
     /** AKA dc/dw = delta^l . a^l-1 */
@@ -266,7 +266,7 @@ export function backPropagate(network: Node[][], costFunction: CostFunction, y: 
             // inputDerivative = dc/dz = dc/da . phi_d(z)
             node.inputDerivative = node.outputDerivative * node.activationFunction.derivative(node.totalInput);
 
-            // For average in gradient decent
+            // For average in gradient descent
             // dc/db for the bias on the current node
             node.accInputDererivatives += node.inputDerivative;
             node.numInputDerivatives++;
