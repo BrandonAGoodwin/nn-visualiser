@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 
-interface CanvasProps {
+interface DecisionBoundaryCanvasProps {
     id?: string;
     width: number;
     height: number;
@@ -21,13 +21,13 @@ interface CanvasProps {
 }
 
 
-function BackgroundCanvas(props: CanvasProps) {
+function DecisionBoundaryCanvas(props: DecisionBoundaryCanvasProps) {
     const {minColour, midColour, maxColour} = useContext(ThemeContext);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        //console.log(`BackgroundCanvas decisionBoundary useEffect`);
+        //console.log(`DecisionBoundaryCanvas decisionBoundary useEffect`);
         updateCanvas();
     }, [props.decisionBoundary, props.discreetBoundary]);
     
@@ -99,4 +99,4 @@ function BackgroundCanvas(props: CanvasProps) {
         />);
 }
 
-export default BackgroundCanvas;
+export default DecisionBoundaryCanvas;

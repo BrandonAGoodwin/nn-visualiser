@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import { Datapoint2D } from '../datasets';
-import BackgroundCanvas from './BackgroundCanvas';
+import DecisionBoundaryCanvas from './DecisionBoundaryCanvas';
 import { AnalyticsData, LossData } from '../NetworkController';
 import styled from '@emotion/styled';
 

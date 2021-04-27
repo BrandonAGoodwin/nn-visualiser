@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
 import { Datapoint2D } from "../datasets";
-import BackgroundCanvas from "./BackgroundCanvas";
+import DecisionBoundaryCanvas from "./DecisionBoundaryCanvas";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 interface GraphProps {
@@ -219,7 +219,7 @@ function NNGraph(props: GraphProps): JSX.Element {
                     height={canvasWidth + marginTop + marginBottom}
                     style={{ position: "absolute" }}
                 />
-                <BackgroundCanvas
+                <DecisionBoundaryCanvas
                     width={canvasWidth}
                     height={canvasWidth}
                     numCells={numCells}

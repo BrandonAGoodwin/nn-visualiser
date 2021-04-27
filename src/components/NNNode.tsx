@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import React, { useEffect, useState } from "react";
-import BackgroundCanvas from "./BackgroundCanvas";
+import DecisionBoundaryCanvas from "./DecisionBoundaryCanvas";
 
 interface NNNodeProps {
     nodeWidth: number;
@@ -55,7 +55,7 @@ function NNNode(props: NNNodeProps) {
             onClick={() => (handleOnClick && nodeId && handleOnClick(nodeId, active))}
             onMouseOver={() => (handleOnHover && nodeId && handleOnHover(nodeId, active))}
         >
-            <BackgroundCanvas
+            <DecisionBoundaryCanvas
                 width={nodeWidth}
                 height={nodeWidth}
                 numCells={numCells}
