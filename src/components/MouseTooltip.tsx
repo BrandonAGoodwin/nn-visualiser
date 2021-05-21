@@ -20,33 +20,15 @@ const MouseTooltip: React.FC<TooltipProps> = ({
     ...args
 }) => {
     const props = { offsetX, offsetY, ...args };
-    //   static defaultProps = {
-    //     visible: true,
-    //     offsetX: 0,
-    //     offsetY: 0,
-    //   };
-
-    //   state = {
-    //     xPosition: 0,
-    //     yPosition: 0,
-    //     mouseMoved: false,
-    //     listenerActive: false,
-    //   };
-
-    //   const [xPosition, setXPosition] = useState<number>(0);
-    //   const [yPositionm, setYPosition] = useState<number>(0);
+ 
     const [position, setPosition] = useState<Point2D>({ x: 0, y: 0 });
     const [mouseMoved, setMouseMoved] = useState<boolean>(false);
     const [listenerActive, setListenerActive] = useState<boolean>(false);
 
 
     useEffect(() => {
-        // window.addEventListener('mousemove', getTooltipPosition);
-        // setListenerActive(true);
         addListener();
         return () => {
-            // window.removeEventListener('mousemove', getTooltipPosition);
-            // setListenerActive(false);
             removeListener();
         }
     }, []);
@@ -61,58 +43,20 @@ const MouseTooltip: React.FC<TooltipProps> = ({
         }
     }, [props.visible, mouseMoved]);
 
-    //   componentDidMount() {
-    //     this.addListener();
-    //   }
-
-    //   componentDidUpdate() {
-    //     this.updateListener();
-    //   }
-
-    //   componentWillUnmount() {
-    //     this.removeListener();
-    //   }
-
     const getTooltipPosition = (event: MouseEvent) => {
         setPosition({ x: event.clientX, y: event.clientY });
         setMouseMoved(true);
-        // Maybe have one state object
-        // this.setState({
-        //   xPosition,
-        //   yPosition,
-        //   mouseMoved: true,
-        // });
     };
-
-    //   addListener = () => {
-    //     window.addEventListener('mousemove', this.getTooltipPosition);
-    //     this.setState({ listenerActive: true });
-    //   };
 
       const addListener = () => {
         window.addEventListener('mousemove', getTooltipPosition);
         setListenerActive(true);
       };
 
-    //   removeListener = () => {
-    //     window.removeEventListener('mousemove', this.getTooltipPosition);
-    //     this.setState({ listenerActive: false });
-    //   };
-
       const removeListener = () => {
         window.removeEventListener('mousemove', getTooltipPosition);
             setListenerActive(false);
       };
-
-    //   updateListener = () => {
-    //     if (!this.state.listenerActive && this.props.visible) {
-    //       this.addListener();
-    //     }
-
-    //     if (this.state.listenerActive && !this.props.visible) {
-    //       this.removeListener();
-    //     }
-    //   };
 
     return (
         <div
@@ -130,13 +74,5 @@ const MouseTooltip: React.FC<TooltipProps> = ({
     );
 }
 
-// MouseTooltip.propTypes = {
-//   visible: PropTypes.bool,
-//   children: PropTypes.node.isRequired,
-//   offsetX: PropTypes.number,
-//   offsetY: PropTypes.number,
-//   className: PropTypes.string,
-//   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-// };
 
 export default MouseTooltip;

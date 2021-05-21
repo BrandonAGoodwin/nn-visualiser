@@ -13,7 +13,6 @@ const StyledInfoPanel = styled((props: any) => <ContainerSection gridArea="info"
     padding-top: 10px;
     position: relative;
     max-width: inherit;
-    /* max-width: fit-content; */
 `;
 
 interface InfoPanelProps {

@@ -34,8 +34,6 @@ function DefaultInfoPanel() {
             <img src={node} alt="Decision boundary" width={60} />
             <p>Each node displays the decision boundary formed at that node. Each node has a bias value that is displayed by overing over the node with the cursor.</p>
             <h3>Links</h3>
-            {/* Maths font w? */}
-            {/* Defined Term or google link for Gradient Descent*/}
             <p>Links (or edges) connect neurons in adjacent layers, each link has a weight value w that is updated by training the network using Gradient Descent.<br/>
             The weight of each link is displayed when hovered over using the cursor.</p>
 
@@ -47,18 +45,6 @@ function DefaultInfoPanel() {
             <h4>Negative Value Link</h4>
             <img src={negativeLink} alt="Negative link" width={100} />
             <p>Links with a weight value &lt; 0 are {minColourName}.</p>
-            {/* <h4>Mention/Link to:</h4>
-            <ul>
-                <li>Node representation</li>
-                <li>Link representation</li>
-                <li>Inputs</li>
-                <li>Data set</li>
-                <li>Building network</li>
-                <li>Training</li>
-                <li>Comparision func</li>
-                <li>Tool tips</li>
-            </ul>
-            <p></p> */}
         </div>
     );
 }

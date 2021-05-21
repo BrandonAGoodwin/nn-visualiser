@@ -311,7 +311,6 @@ function NarrowNetworkInsight(props: ({ setInsight: (insight: JSX.Element) => vo
     );
 }
 function LinearlySeperableDatasetInsight(props: ({ setInsight: (insight: JSX.Element) => void })) {
-    // const { setInfoPanelWrapper } = useContext(InfoPanelContext);
     const insight = (
         <>
             <h4>Linearly Seperable Dataset</h4>

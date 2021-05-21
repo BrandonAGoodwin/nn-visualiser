@@ -5,7 +5,6 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import SaveIcon from '@material-ui/icons/Save';
 
 
-
 interface LearningRateInfoPanelProps {
     handleSetLearningRateExercise: () => void;
 }

@@ -62,15 +62,9 @@ function ControlPanel(props: ControlPanelProps) {
                 </StyledInfoButton>
             </div>
             <Divider style={{ minWidth: "90%", marginLeft: "auto", marginRight: "auto", marginBottom: "5px" }} />
-            {/* <Tooltip placement={"right-end"} title={<p style={{ fontSize: 12 }}>Run one epoch of training on the network"</p>} aria-label={"Run one epoch of training on the network"} >  */}
             <StyledButton variant={"contained"} onClick={handleStep}> Step </StyledButton>
-            {/* </Tooltip>  */}
-            {/* <Tooltip placement={"right-end"} title={<p style={{ fontSize: 12 }}>Set the network to repeatedly train at a fixed rate</p>} aria-label={"Set the network to repeatedly train at a fixed rate"}> */}
             <StyledButton variant={"contained"} onClick={toggleAutoTrain}> Auto Train: <b>{training ? "On" : "Off"}</b></StyledButton>
-            {/* </Tooltip> */}
-            {/* <Tooltip placement={"left-end"} title={<p style={{ fontSize: 12 }}>Reset the network and the training data</p>} aria-label={"Reset the network and the training data"}> */}
             <StyledButton variant={"contained"} color={"secondary"} onClick={() => handleReset(false)}> Reset </StyledButton>
-            {/* </Tooltip> */}
             <div style={{ display: "flex", marginTop: "10px", alignItems: "flex-end" }}>
                 <h4 style={{ marginBottom: "5px", marginTop: "0px" }}>Comparison Tools</h4>
                 <StyledInfoButton title="Comparison Tools Tooltip" interactive={false} marginLeft={5} onClick={setInfoPanelWrapper} infoPanel={<ComparisionInfoPanel />}>
@@ -121,16 +115,6 @@ function ControlPanel(props: ControlPanelProps) {
                     Clear
                     </Button>
             </Tooltip>
-            {/* <StyledButton variant={"contained"} onClick={saveNetworkState}> Save Current Network State </StyledButton> */}
-            {/* <StyledButton variant={"contained"} onClick={loadNetworkState} disabled={(!compareMode) || false}> Load Network State </StyledButton> */}
-            {/* <Tooltip title={"Clear saved network state"} aria-label={"Save network state"} style={{ fontSize: 16 }}>
-                    <IconButton onClick={clearNetworkState} >
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip> */}
-
-            {/* </div> */}
-            {/* <StyledButton variant={"contained"} onClick={clearNetworkState}> Clear Network State </StyledButton> */}
         </StyledControlPanel >
     );
 }

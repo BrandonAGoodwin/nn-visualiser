@@ -37,7 +37,7 @@ function ColourScale(props: ColourScaleProps) {
 
         const scale = d3.scaleLinear()
             .domain([-1, 1])
-            .range(props.horizontal ? [0, props.width -1] : [props.height -1, 0]);
+            .range(props.horizontal ? [0, props.width - 1] : [props.height - 1, 0]);
 
         const colourScale = svg.append("g")
             .attr("transform", `translate(${marginLeft}, ${marginTop})`);
@@ -58,7 +58,7 @@ function ColourScale(props: ColourScaleProps) {
         });
 
         let color: any = d3.scaleQuantize()
-            .domain(props.horizontal ? [0,props.width] : [0, props.height])
+            .domain(props.horizontal ? [0, props.width] : [0, props.height])
             .range(colors);
 
         const canvas = canvasRef.current;
@@ -74,8 +74,6 @@ function ColourScale(props: ColourScaleProps) {
         let iter = -1;
 
         for (let i = (props.horizontal ? 0 : props.height); props.horizontal ? i <= props.width : i >= 0; props.horizontal ? i++ : i--) {
-            // let value: number = props.decisionBoundary[i];
-            // if(props.discreetBoundary) value = value > 0 ? 1 : -1;
             let c = d3.rgb(color(i));
             data[++iter] = c.r;
             data[++iter] = c.g;
@@ -86,7 +84,7 @@ function ColourScale(props: ColourScaleProps) {
 
         colourScale.select(".domain")
             .attr("opacity", "0");
-        
+
         // let delta = Date.now() - start;
     }
 
@@ -112,9 +110,6 @@ function ColourScale(props: ColourScaleProps) {
                     paddingTop: `${marginTop}px`,
                     paddingRight: `${marginRight}px`,
                     paddingBottom: `${marginBottom}px`,
-                    // paddingRight: `${props.padding && props.paddingRight ? props.paddingRight : "0"}px`,
-                    // paddingTop: `${props.padding && props.paddingTop ? props.paddingTop: "0"}px`,
-                    // paddingBottom: `${props.padding && props.paddingBottom ? props.paddingBottom : "0"}px`,
                 }}
             />
         </div>

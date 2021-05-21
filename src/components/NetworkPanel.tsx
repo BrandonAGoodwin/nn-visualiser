@@ -223,12 +223,10 @@ function NetworkPanel(props: NetworkProps) {
 
 
     useEffect(() => {
-        // drawAllLinks(props.network);
         updateContainerBox();
     }, [props.decisionBoundaries]);
 
     useEffect(() => {
-        // At this point this means links are always drawn twice
         drawAllLinks(props.network);
     }, [containerBox]);
 
@@ -262,7 +260,6 @@ function NetworkPanel(props: NetworkProps) {
             let currentLayer = network[layerNum];
             for (let i = 0; i < currentLayer.length; i++) {
                 let node: nn.Node = currentLayer[i];
-                // Instead store node positions in a dictionary to reduce elementSearches and increase speed
                 for (let j = 0; j < node.linksOut.length; j++) {
                     let link: nn.Link = node.linksOut[j];
 
@@ -335,7 +332,6 @@ function NetworkPanel(props: NetworkProps) {
         let dest = node2coord[input.dest.id];
         if (!(dest && source)) return;
 
-        // Check X and Ys are reversed properlly
         let datum: any = {
             source:
                 [source.cx + nodeWidth / 2 + 2, source.cy]
@@ -369,7 +365,6 @@ function NetworkPanel(props: NetworkProps) {
             .attr("stroke", "grey")
             .attr("stroke-opacity", 0)
             .attr("stroke-width", 10)
-            // .attr("stroke-dasharray", "10,2")
             .attr("cursor", "pointer")
             .on("mouseover", function (d, i) {
                 line.transition()
@@ -501,7 +496,6 @@ function NetworkPanel(props: NetworkProps) {
                                     The inputs determine the data that is input into the neural network from the data set.
                                 Each input is a function of <DefinedTerm definition={DefX1()}>X<sub>1</sub></DefinedTerm> and/or <DefinedTerm definition={DefX2()}>X<sub>2</sub></DefinedTerm>.
                             </Typography>
-                                {/* <br /><u>Click the icon to get more information</u> */}
                             </React.Fragment>
                         </StyledInfoButton>
                     </div>
@@ -579,12 +573,8 @@ function NetworkPanel(props: NetworkProps) {
                         {props.exercise &&
                             <Tooltip title={"Clear exercise"} aria-label={"Clear exercise"}>
                                 <IconButton
-                                    // variant="outlined"
-                                    // color="secondary"
-                                    // endIcon={<PlayArrowIcon />}
                                     onClick={props.closeExercise}
                                 >
-                                    {/* Close Exercise */}
                                     <CancelIcon fontSize="large" />
                                 </IconButton>
                             </Tooltip>
@@ -593,8 +583,6 @@ function NetworkPanel(props: NetworkProps) {
                 </GridContainer>
                 <MouseTooltip
                     visible={showHoverCard}
-                    // offsetX={containerBox.left}
-                    // offsetY={containerBox.top}
                     style={{ /* position: "absolute"  ,*/ pointerEvents: "none" }}
                 >
                     <HoverCard>

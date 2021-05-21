@@ -257,11 +257,6 @@ function MainPage(props: MainPageProps) {
             setAnalyticsData({ trainingLossData: [], testLossData: [], epochs: 0 });
         } else {
             reset();
-            // if(networkOriginalState) {
-            // networkOriginalState && loadNetworkState();
-            // } else {
-            //     reset();
-            // }
         }
         setEpochs(0);
         if (!compareMode && resetDataset && !exercise) generateDataset();
@@ -482,7 +477,3 @@ function MainPage(props: MainPageProps) {
 }
 
 export default MainPage;
-
-// function defaultAnalyticsData(defaultAnalyticsData: any) {
-//     throw new Error('Function not implemented.');
-// }

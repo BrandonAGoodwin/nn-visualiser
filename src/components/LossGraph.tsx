@@ -1,14 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import { Datapoint2D } from '../datasets';
-import DecisionBoundaryCanvas from './DecisionBoundaryCanvas';
 import { AnalyticsData, LossData } from '../NetworkController';
 import styled from '@emotion/styled';
 
-// export type LossData = {
-//     epoch: number;
-//     trainingLoss: number;
-// }
 
 const Tooltip = styled("div")`
     position: absolute;			
@@ -24,16 +18,12 @@ const Tooltip = styled("div")`
 `
 
 interface GraphProps {
-    // dataset: LossData[];
-    // comparisionDataset?: LossData[];
     analyticsData: AnalyticsData;
     comparisonAnalyticsData?: AnalyticsData;
     width: number;
     height: number;
     margin: number;
     showTestData?: boolean;
-    // xDomain: number[];
-    // yDomain: number[];
 }
 
 function getBounds(lossDatasets: LossData[][]) {
@@ -106,21 +96,6 @@ function LossGraph(props: GraphProps) {
         label: string
     ) => {
 
-        // let div = d3.select("body").append("div")
-        //     .attr("class", "loss-graph tooltip")
-        //     .style("position", "absolute")
-        //     .style("text-align", "center")
-        //     .style("width", "60px")
-        //     .style("height", "28px")
-        //     .style("padding", "2px")
-        //     // .style("font: 12p"
-        //     .style("background", "lightsteelblue")
-        //     .style("border", "0px")
-        //     .style("border-radius", "8px")
-        //     .style("pointer-events", "none")
-        //     .style("opacity", 0); // This causes scrolling issues prob don't select body 
-
-        
         let path = graph.append("path")
             .datum(lossData)
             .attr("fill", "none")
@@ -130,36 +105,6 @@ function LossGraph(props: GraphProps) {
                 .x((d: [number, number]) => x(d[0]) || 0)
                 .y((d: [number, number]) => y(d[1]) || 0))
 
-            // graph.append("path")
-            // .datum(lossData)
-            // .attr("fill", "none")
-            // .attr("stroke", "grey")
-            // .attr("stroke-width", 20)
-            // .style("stroke-opacity", 0.7)
-            // .attr("pointer-events", "stroke")
-            // .attr("cursor", "pointer")
-            // .attr("d", d3.line()
-            //     .x((d: [number, number]) => x(d[0]) || 0)
-            //     .y((d: [number, number]) => y(d[1]) || 0))
-            // .on("mouseover", (event:any , d: [number, number]) => {
-            //     path.transition()
-            //         .duration(100)
-            //         .style("stroke-width", 3);
-            //     div.transition()
-            //         .duration(200)
-            //         .style("opacity", 0.9);
-            //     div.text(label)
-            //         .style("left", (event.pageX) + "px")
-            //         .style("top", (event.pageY - 28) + "px");;
-            // })
-            // .on("mouseout", (d: [number, number]) => {
-            //     path.transition()
-            //         .duration(100)
-            //         .style("stroke-width", 1.5);
-            //     div.transition()
-            //         .duration(500)
-            //         .style("opacity", 0);
-            // });
     }
 
     const updateGraphs = () => {
@@ -189,7 +134,7 @@ function LossGraph(props: GraphProps) {
 
         const x = d3.scaleLinear()
             .range([0, props.width])
-            .domain([1, Math.max(epochs, compEpochs || 0)]); // Maybe domain should start from 0 if we get initial loss
+            .domain([1, Math.max(epochs, compEpochs || 0)]); 
 
         const y = d3.scaleLinear()
             .range([props.height, 0])
@@ -222,7 +167,6 @@ function LossGraph(props: GraphProps) {
             ref={d3Container}
             width={props.width + props.margin * 2}
             height={props.height + props.margin * 2}
-        //style={{ position: "absolute" }}
         />
     );
 }

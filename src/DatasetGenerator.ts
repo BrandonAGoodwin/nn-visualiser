@@ -21,13 +21,8 @@ export interface DGConfig {
 
 export function useDatasetGenerator(defaultConfig: DGConfig = defaultDGConfig) {
     const [dgConfig, setDGConfig] = useState<DGConfig>(defaultConfig);
-    // const [dataset, setDataset] = useState<Datapoint2D[]>([]);
     const [trainingData, setTrainingData] = useState<Datapoint2D[]>([]);
     const [testData, setTestData] = useState<Datapoint2D[]>([]);
-
-    // useEffect(() => {
-    //     generateDataset();
-    // }, [dgConfig]);
 
 
     const generateDataset = () => {
@@ -52,9 +47,6 @@ export function useDatasetGenerator(defaultConfig: DGConfig = defaultDGConfig) {
         } while ((!negativeClassFlag || !positiveClassFlag) && (counter < 20))
         setTrainingData(newTrainingData);
         setTestData(newTestData);
-        // setDataset(dataset)
-        // console.log(dataset);
-        // return dataset;
     }
 
     const setDatasetType = (datasetType: string) => {

@@ -70,8 +70,6 @@ function ConfigBar(props: ConfigBarProps) {
         exercise
     } = props;
 
-    // const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
-
     const handleActivationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
         setActivationFunction(e.target.value as string);
     };

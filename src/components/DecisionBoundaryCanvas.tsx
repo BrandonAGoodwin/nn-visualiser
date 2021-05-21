@@ -27,13 +27,10 @@ function DecisionBoundaryCanvas(props: DecisionBoundaryCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        //console.log(`DecisionBoundaryCanvas decisionBoundary useEffect`);
         updateCanvas();
     }, [props.decisionBoundary, props.discreetBoundary]);
     
     const updateCanvas = () => {
-
-        //console.log("Update canvas");
 
         let start = Date.now();
 
@@ -49,7 +46,6 @@ function DecisionBoundaryCanvas(props: DecisionBoundaryCanvasProps) {
         });
 
         let color: any = d3.scaleQuantize()
-            // .domain([-1, 1])
             .domain(props.domain)
             .range(colors);
 

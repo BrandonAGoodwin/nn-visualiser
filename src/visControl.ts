@@ -1,7 +1,6 @@
 import * as nn from "./NeuralNet";
 import { Datapoint2D, DatasetGenerator, Dataset } from "./datasets";
 import * as d3 from "d3";
-import seedrandom from "seedrandom";
 import { ACTIVATIONS, NNConfig } from "./NetworkController";
 import { DGConfig } from "./DatasetGenerator";
 
@@ -11,12 +10,6 @@ interface InputFunc {
     label: string;
 }
 
-// let ACTIVATIONS: { [name: string]: nn.ActivationFunction } = {
-//     "Tanh": nn.Activations.TANH,
-//     "ReLU": nn.Activations.RELU,
-//     "Sigmoid": nn.Activations.SIGMOID,
-//     "Linear": nn.Activations.LINEAR,
-// }
 
 let GENERATORS: { [datasetType: string]: DatasetGenerator } = {
     "Gaussian2": Dataset.GAUSSIAN_2,
@@ -55,10 +48,7 @@ export function constructInputs(x: number, y: number, inputs: { [key: string]: b
     for (let inputName in INPUTS) {
         if (inputs[inputName]) constructedInputs.push(INPUTS[inputName].f(x, y))
     }
-    // console.log("X:" + x + " Y:"+ y)
-    // console.log(constructedInputs)
     return constructedInputs;
-
 }
 
 export function step(network: nn.Node[][], trainingData: Datapoint2D[], learningRate: number, inputs: { [key: string]: boolean }, batchSize: number): nn.Node[][] {
@@ -155,7 +145,6 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
                 boundaries[nodeId][iter] = INPUTS[nodeId].f(x || 0, y || 0);
             });
             iter++;
-            //boundary[iter++] = nn.getOutputNode(network).output;
         }
     }
 
@@ -188,22 +177,11 @@ export function NetworkToString(
 
                 nodeStore[node.id] = node.bias;
 
-                // const {
-                //     activationFunction, 
-                //     ...nodeData
-                // } = node;
-
                 let linksIn = node.linksIn;
                 for (let j = 0; j < linksIn.length; j++) {
                     let link = linksIn[j];
                     linkStore[link.id] = link.weight;
                 }
-                // let nodeData = {
-                //     // id: node.id,
-                //     // bias: node.bias,
-                //     ...node,
-
-                // };
             }
         }
     }
@@ -225,10 +203,8 @@ export function NetworkToString(
 export function StringToNetwork(networkString: string) {
     console.log("String to network");
     let network: nn.Node[][] = [];
-    // console.log(networkString)
     let networkData = JSON.parse(networkString);
-    // console.log(networkData);
-    // let nnConfig = networkData.nnConfig;
+
     let {
         nnConfig,
         nodeStore,
@@ -275,8 +251,6 @@ export function StringToNetwork(networkString: string) {
             }
         }
     }
-    // console.log(network);
-
 
     return {
         nnConfig,

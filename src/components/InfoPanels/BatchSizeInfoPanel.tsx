@@ -10,8 +10,6 @@ interface BatchSizeInfoPanelProps {
 
 function BatchSizeInfoPanel(props: BatchSizeInfoPanelProps) {
 
-    // Exercise explaination could go in insights section (COULD HAVE/WON'T HAVE)
-
     return (
         <div style={{ float: "left", maxWidth: "80%" }}>
             <h1>Batch Size</h1>
