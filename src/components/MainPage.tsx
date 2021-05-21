@@ -35,7 +35,7 @@ const Container = styled("div")`
     /* max-width: 100%; */
 
     // Using values from NeuralNetworkVis for middle column
-    grid-template-columns: 245px max(560px, calc(50vw + 10px)) min-content;
+    grid-template-columns: 245px max(850px, calc(50vw + 10px)) min-content;
     grid-template-rows: 100px auto 1fr auto;
     /* grid-template-rows: 90px 1fr 80px auto; */
     grid-gap: 15px;

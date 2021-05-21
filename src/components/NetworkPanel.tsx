@@ -72,7 +72,8 @@ const GridContainer = styled("div")`
     height: 100%;
     width: 50vw;
     /* max-width: 40vw; */
-    min-width: 550px;
+    /* min-width: 550px; */
+    min-width: 840px;
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto 1fr 48px;
     grid-gap: 0px;
