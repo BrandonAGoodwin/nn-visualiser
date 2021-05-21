@@ -115,7 +115,7 @@ const defaultNetworkState = {
 
 export type NetworkController = {
     nnConfig: NNConfig,
-    state: NNState,
+    // state: NNState,
     network: nn.Node[][] | undefined,
     analyticsData: AnalyticsData,
     setNNConfig: React.Dispatch<React.SetStateAction<NNConfig>>,
@@ -136,14 +136,14 @@ export type NetworkController = {
 // Maybe remove dataset related stuff from this
 export function useNetwork(
     defaultData: NNConfig = defaultNetworkData,
-    defaultState: NNState = defaultNetworkState
+    // defaultState: NNState = defaultNetworkState
 ): NetworkController {
     const [nnConfig, setNNConfig] = useState<NNConfig>(defaultData);
     const [network, setNetwork] = useState<nn.Node[][]>();
     const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(defaultAnaLyticsData);
     // const [compAnalyticsData, setCompAnalyticsData] = useState<AnalyticsData>();
-    const [compareMode, setCompareMode] = useState<boolean>(false);
-    const [state, setState] = useState<NNState>(defaultState); // Maybe refactor to networkState or something else
+    // const [compareMode, setCompareMode] = useState<boolean>(false);
+    // const [state, setState] = useState<NNState>(defaultState); // Maybe refactor to networkState or something else
 
 
     useEffect(() => {
@@ -306,7 +306,7 @@ export function useNetwork(
 
     return {
         nnConfig,
-        state,
+        // state,
         network,
         analyticsData,
         setNNConfig,

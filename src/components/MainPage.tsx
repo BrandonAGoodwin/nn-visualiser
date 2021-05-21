@@ -149,7 +149,7 @@ function MainPage(props: MainPageProps) {
 
     useEffect(() => {
         console.log("Dataset/Noise change useEffect");
-        if (!importedNetwork && !exercise) {
+        if (!importedNetwork) {
             handleReset(false);
             const numTrainingSamples = Math.floor(dgConfig.numSamples * 0.8);
             if (nnConfig.batchSize > numTrainingSamples) {
@@ -157,14 +157,8 @@ function MainPage(props: MainPageProps) {
             }
         } else {
             console.log("Setting imported network");
-
-
-            if (exercise) {
-                handleReset(false);
-            } else {
-                importedNetwork && setNetwork(importedNetwork);
-                setImportedNetwork(undefined);
-            }
+            importedNetwork && setNetwork(importedNetwork);
+            setImportedNetwork(undefined);
             setEpochs(0);
         }
     }, [nnConfig]);
