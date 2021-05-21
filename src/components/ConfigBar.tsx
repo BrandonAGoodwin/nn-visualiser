@@ -18,7 +18,7 @@ const StyledConfigBar = styled((props: any) => <ContainerSection gridArea="confi
     display: flex;
     flex-direction: row;
     justify-content: left;
-    padding-left: 30px;
+    padding-left: 10px;
     padding-top: 10px;
 `;
 
@@ -167,7 +167,7 @@ function ConfigBar(props: ConfigBarProps) {
             </StyledInfoButton>
             <Divider orientation="vertical" flexItem />
             <LabeledSlider
-                label="Dataset Size"
+                label="Data Set Size"
                 min={10}
                 step={10}
                 max={500}
@@ -178,7 +178,7 @@ function ConfigBar(props: ConfigBarProps) {
             />
             <StyledInfoButton title="Sample Size Tooltip" fontSize={"small"} marginLeft={3} >
                 <React.Fragment>
-                    {<Typography color="inherit">Noise</Typography>}
+                    {<Typography color="inherit">Data Set size</Typography>}
                     <Typography variant="body2">Changes the number of samples in the dataset. <br />(Training is done using 80% of the samples and the remaining 20% are used as the test dataset. </Typography>
                 </React.Fragment>
             </StyledInfoButton>

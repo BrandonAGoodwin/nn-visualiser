@@ -149,11 +149,11 @@ export function getAllDecisionBoundaries(network: nn.Node[][], density: number, 
             nn.forEachNode(network, (node: nn.Node) => {
                 if (!boundaries[node.id]) boundaries[node.id] = [];
                 boundaries[node.id][iter] = node.output;
-            })
+            });
             inputNodeIds.forEach((nodeId) => {
                 if (!boundaries[nodeId]) boundaries[nodeId] = [];
                 boundaries[nodeId][iter] = INPUTS[nodeId].f(x || 0, y || 0);
-            })
+            });
             iter++;
             //boundary[iter++] = nn.getOutputNode(network).output;
         }

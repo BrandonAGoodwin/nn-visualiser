@@ -81,7 +81,6 @@ export function DefLoss() {
         <>
             <Typography color="inherit">Loss</Typography>
             <Typography variant="body2">This is loss calculated using the <StyledLink color="lightblue" href="https://www.google.com/search?q=sum+squared+residuals" target="_blank">sum of squared residulals</StyledLink> between the output of our neural network and the expected output from out training set.</Typography><br />
-            <u>Click the icon to get more information</u>
         </>
     );
 }
@@ -110,7 +109,7 @@ export function DefNode() {
     return (
         <Typography variant="body2">
             Nodes are the individual functions that make up the neural network and are connected to nodes in adjacent layers by links.<br />
-            <u>Click the icon to get more information</u>
+            {/* <u>Click the icon to get more information</u> */}
         </Typography>
     );
 }
