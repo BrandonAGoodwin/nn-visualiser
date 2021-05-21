@@ -12,7 +12,7 @@ const ContainerSection = styled("div")`
     margin: 30px auto;
     min-width: 800px;
     width: auto;
-    max-width: 80vw;
+    max-width: 60vw;
     height: 80vh;
     padding: 30px;
     border-radius: 30px;
@@ -31,7 +31,7 @@ function ComparePage(props: PageProps) {
 
     return (
         <ContainerSection id="compare-page">
-
+{/* 
             {props.currentState && <LossGraph
                 height={60}
                 width={170}
@@ -40,7 +40,14 @@ function ComparePage(props: PageProps) {
                 analyticsData={props.currentState.analyticsData}
                 comparisonAnalyticsData={props.savedState?.analyticsData}
                 // comparisionData={props.savedState?.lossData}
-            />}
+            />} */}
+            <div>
+                <h1>About this Tool &#128640;{/* &#10024; */}</h1>
+                <p>
+                    Hi, my name is Brandon &#128075;&#127997;,<br/> I am a bachelors student studying in computer science in their final year.<br/>
+                    I created this tool for my final year project. The goal of the project was to produce an interactive learning tool with the aim of aiding students’ understanding of neural networks. 
+                </p>
+            </div>
         </ContainerSection>
     );
 }

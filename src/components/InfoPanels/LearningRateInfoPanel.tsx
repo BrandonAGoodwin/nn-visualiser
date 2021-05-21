@@ -27,7 +27,7 @@ function LearningRateInfoPanel(props: LearningRateInfoPanelProps) {
             >
                 Learning Rate Exercise
             </Button>
-            <p>Try running a dozen epochs with the preset learning rate and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then <b>increase or decrease the learning rate to see how the learning rate affects the training performance</b> using the <b>loss graph</b>.</p>
+            <p>Try running a dozen epochs of training with the preset learning rate and save the state using the <b>Save</b> <SaveIcon fontSize={"small"} /> button, then <b>increase or decrease the learning rate to see how the learning rate affects the training performance</b> using the <b>loss graph</b>.</p>
             <h2>Observations</h2>
             <p>
                 We observe that <b>smaller</b> learning rates lead to <b>slower learning</b> but <b>more precise decision boundaries </b>

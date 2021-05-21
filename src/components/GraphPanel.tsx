@@ -140,7 +140,7 @@ function GraphPanel(props: GraphPanelProps) {
                         Loss (Training): <b>{trainingLoss.toFixed(3)}</b> <br />
                         Loss (Test): <b>{testLoss.toFixed(3)}</b>
                     </p>
-                    <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />}>
+                    <StyledInfoButton title="Loss Tooltip" marginLeft={5} fontSize="small" /* onClick={setInfoPanelWrapper} infoPanel={<LossInfoPanel />} */>
                         {DefLoss()}
                     </StyledInfoButton>
                 </div>
