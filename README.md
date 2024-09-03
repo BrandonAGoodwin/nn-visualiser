@@ -10,6 +10,13 @@ This project is hosted at [neuralnetsimulator.app](https://www.neuralnetsimulato
 
 Node.js is required to run the app locally, use the below scripts to either run the react application in develompment mode, interactive watch more or build the app for production.
 
+### `docker compose up`
+
+Runs the app in development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The page will *not* reload if you make edits.\
+You will also see any lint errors in the console.
+
 ### `npm start`
 
 Runs the app in the development mode.\
